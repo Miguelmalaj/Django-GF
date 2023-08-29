@@ -1,0 +1,228 @@
+{% load adminlte_helpers i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% block title_outer %}
+        <title>{% block title %}{{ site.name }}{% endblock %}</title>
+    {% endblock %}
+
+    {% block meta %}
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    {% endblock %}
+
+    {% block stylesheets %}
+        {% include 'adminlte/lib/_styles.html' %}
+        {% block style_sheets %}{% endblock %}
+    {% endblock %}
+
+    {% block extra_head %}
+    
+    {% endblock %}
+</head>
+<body class="hold-transition sidebar-mini {% block body_class %}{% block bodyclass %}layout-fixed {% endblock %}{% endblock %}">
+
+{% block body %}
+    <div class="wrapper">
+        {% block nav_header %}
+            {% include 'adminlte/lib/_main_header.html' %}
+        {% endblock %}
+
+        {% block nav_sidebar %}
+            {% include 'adminlte/lib/_main_sidebar.html' %}
+        {% endblock %}
+
+        {% block content_wrapper %}
+        <div class="content-wrapper">
+            {% block content_header %}
+                <section class="content-header">
+                    {% block no_heading %}
+                        <h1>
+                            {% block page_name %}{% endblock %}
+                            <div class="header-actions">
+                                {% block page_actions %}
+                                <div class="row mb-2">
+                                    <div class="col-sm-12">
+                                        <div class="card card-outline card-lightblue">
+                                            <div class="card-header">						
+                                                <h3 class="card-title"><i class="fas fa-people-carry"></i> Resumen de Entregas de vehiculos anual </h3>
+                                                
+                                                <ul class='navbar-nav'>
+                                               
+                                                    <div class="row">
+                                                        <div class="col-md-3">                                           
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                        </div>
+                                                        <div class="col-md-6 align-content-lg-end text-right">
+                                                            <form method="post" action="{% url 'entregasanuales' %}">
+                                                            {% csrf_token %}
+                                                                <li class='nav-item d-none d-sm-inline-block'>
+                                                                    <select  class='form-control select2' id="empresas" name="empresas">
+                                                                        {% if datos.empresa == '11' %}<option selected value="11">Felix Automotores</option>{% else %}<option value="11">Felix Automotores</option>{% endif%}
+                                                                        {% if datos.empresa == '31' %}<option selected value="31">Felix Automotriz</option>{% else %}<option value="31">Felix Automotriz</option>{% endif%}
+                                                                        {% if datos.empresa == '51' %}<option selected value="51">Culiacan Zapata</option>{% else %}<option value="51">Culiacan Zapata</option>{% endif%}
+                                                                        {% if datos.empresa == '52' %}<option selected value="52">Culiacan Aeropuerto</option>{% else %}<option value="52">Culiacan Aeropuerto</option>{% endif%}
+                                                                        {% if datos.empresa == '71' %}<option selected value="71">Noroeste Motors</option>{% else %}<option value="71">Noroeste Motors</option>{% endif%}
+                                                                    </select>
+                                                                </li>
+                                                                <li class='nav-item d-none d-sm-inline-block'>
+                                                                    <select class='form-control select2' id="periodo" name="periodo">
+                                                                        {% for year in datos.cboperiodos %}
+                                                                            {% if datos.periodoselec == year %}<option selected  value="{{ year }}">{{ year }}</option> {% else %}<option  value="{{ year }}">{{ year }}</option>{% endif%}
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </li>
+                                                                <li class='nav-item d-none d-sm-inline-block'>
+                                                                    <button type='submit' class='btn btn-primary btn-block'>Actualizar</button>
+                                                                </li>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </ul>						
+                                            </div>
+                                            
+                                        </div>
+                                    </div><!-- /.col -->
+                                </div><!-- /.row -->
+                                {% endblock %}
+                            </div>
+                            {% block no_description %}
+                            <small>{% block page_description %}
+                                
+                                {% endblock %}</small>
+                            {% endblock %}
+                        </h1>
+                        {% block breadcrumbs %}
+                            {# Breadcrumb implementation left to developers #}
+                        {% endblock %}
+                    {% endblock no_heading %}
+                </section>
+            {% endblock %}
+
+            {% block content_outer %}
+            <section class="content">
+                {% block messages %}
+                    {% include 'adminlte/lib/_messages.html' %}
+                    
+                {% endblock %}
+                {% block content_block_wrap %}
+                    {% block content %}
+                    <div class="card card-outline card-lightblue">
+                        <div class="card-header">			
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                   
+                                        <div class="card card-info direct-chat direct-chat-lightblue">
+                                            <div class="card-header">
+                                                <i class="fas fa-car-side"></i><span class="info-box-text"> Entregas por vehiculo</span>
+                                            </div>
+                                            <table id="ventasveh" class="table table-sm">
+                                                <thead>
+                                                    <tr style="font-size: 12px">
+                                                        <th>Nombre</th>
+                                                        <th style='text-align: right'>Ene</th>
+                                                        <th style='text-align: right'>Feb</th>
+                                                        <th style='text-align: right'>Mar</th>
+                                                        <th style='text-align: right'>Abr</th>
+                                                        <th style='text-align: right'>May</th>
+                                                        <th style='text-align: right'>Jun</th>
+                                                        <th style='text-align: right'>Jul</th>
+                                                        <th style='text-align: right'>Ago</th>
+                                                        <th style='text-align: right'>Sep</th>
+                                                        <th style='text-align: right'>Oct</th>
+                                                        <th style='text-align: right'>Nov</th>
+                                                        <th style='text-align: right'>Dic</th>
+                                                        <th style='text-align: right'>Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for row in datos.tablaveh %}
+                                                    <tr style="font-size: 12px">
+                                                        {% for cell in row %}
+                                                            {% if forloop.first %}
+                                                                <td>{{ cell }}</td>
+                                                            {% else%}
+                                                            <td style='text-align: right'>{{ cell|floatformat:0 }}</td>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                 
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    
+                                        <div class="card card-info direct-chat direct-chat-lightblue">
+                                            <div class="card-header">
+                                                <i class="fas fa-users"></i><span class="info-box-text"> Entregas por vendedor</span>
+                                            </div>
+                                            <table id="ventasvend" class="table table-sm">
+                                                <thead>
+                                                    <tr style="font-size: 12px">
+                                                        <th>Nombre</th>
+                                                        <th style='text-align: right'>Ene</th>
+                                                        <th style='text-align: right'>Feb</th>
+                                                        <th style='text-align: right'>Mar</th>
+                                                        <th style='text-align: right'>Abr</th>
+                                                        <th style='text-align: right'>May</th>
+                                                        <th style='text-align: right'>Jun</th>
+                                                        <th style='text-align: right'>Jul</th>
+                                                        <th style='text-align: right'>Ago</th>
+                                                        <th style='text-align: right'>Sep</th>
+                                                        <th style='text-align: right'>Oct</th>
+                                                        <th style='text-align: right'>Nov</th>
+                                                        <th style='text-align: right'>Dic</th>
+                                                        <th style='text-align: right'>Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for row in datos.tablavend %}
+                                                    <tr style="font-size: 12px">
+                                                        {% for cell in row %}
+                                                            {% if forloop.first %}
+                                                                <td>{{ cell }}</td>
+                                                            {% else%}
+                                                            <td style='text-align: right'>{{ cell|floatformat:0 }}</td>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endblock %}
+                {% endblock %}
+            </section>
+            {% endblock %}
+
+        </div>
+        {% endblock content_wrapper %}
+        
+        {% block nav_footer %}
+            {% include 'adminlte/lib/_main_footer.html' %}
+        {% endblock %}
+
+    </div>
+{% endblock body %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+{% block js %}{% endblock %}
+{% endblock %}
+
+{% block extra_js %}
+
+{% endblock %}
+{% block extra_foot %}{% endblock %}
+</body>
+</html>

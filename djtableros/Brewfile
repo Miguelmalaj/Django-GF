@@ -1,0 +1,8 @@
+tap "homebrew/bundle"
+tap "homebrew/core"
+tap "microsoft/mssql-release"
+tap "sidneys/homebrew"
+brew "openssl@3", link: false
+brew "pyenv"
+brew "pyenv-virtualenv"
+brew "testdisk"

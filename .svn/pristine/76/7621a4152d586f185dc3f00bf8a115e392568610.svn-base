@@ -1,0 +1,438 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+<div class="row mb-2">
+    <div class="col-sm-12">
+        <div class="card card-outline card-lightblue">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="far fa-list-alt"></i> Inventario de vehiculos por agencia </h3>
+                <ul class='navbar-nav'>
+                    <div class="row">
+                        <div class="col-md-3">                                           
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-6 align-content-lg-end text-right">
+                            <form method="post" action="{% url 'inventariovehiculos' %}">
+                            {% csrf_token %}                                                               
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <button type='submit' class='btn btn-primary btn-block'><i class="far fa-hand-point-right"></i> Actualizar</button>
+                                </li>
+                            </form>
+                        </div>
+                    </div>
+                </ul>						
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-lightblue">
+    <div class="card-header">			
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card card-widget widget-user">
+                    <div class="widget-user-header bg-lightblue">
+                        <h3 class="widget-user-username">Felix Automotores</h3>
+                        <h5 class="widget-user-desc">{{ datos.mochis.totalinv }} Vehiculos en inventario</h5>
+                    </div>
+                    <div class="widget-user-image">
+                        <img class="img-circle elevation-2" src="{%static 'admin-lte/dist/img/logo_chevrolet.jpg' %}" alt="User Avatar">
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.mochis.nu }}</h5>
+                                <span class="description-text">NUEVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.mochis.de }}</h5>
+                                <span class="description-text">DEMOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.mochis.us }}</h5>
+                                <span class="description-text">SEMINVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 border-right border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-times"></i></small><small class="mt-2 mb-2"> {{ datos.mochis.diasmas }} mas antiguo</small>
+                            </div>
+                            <div class="col-sm-6 border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-alt"></i></small><small class="mt-2 mb-2"> {{ datos.mochis.prom }} antig. prom.</small>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 border-top d-flex justify-content-around">
+                            <small class="mt-2"><a href="{% url 'inventario_detalle' '1' '1' %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">{{ datos.mochis.vencidos }} Unidades pagando PP </p></span>
+                        <div class="progress-group"><!-- 30 dias -->						
+                            +30 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM30"></i></a></span>
+                            <span class="float-right badge bg-primary">{{ datos.mochis.30 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-primary' style='width: {{ datos.mochis.30porc }}%'; aria-valuemax='{{ datos.mochis.vencidos }}'></div> 
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 90 dias -->
+                            +90 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM90"></i></a></span>
+                            <span class="float-right badge bg-warning">{{ datos.mochis.90 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-warning' style='width: {{ datos.mochis.90porc }}%'; aria-valuemax='{{ datos.mochis.vencidos }}'></div>            
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 180 dias -->
+                            +180 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM180"></i></a></span>
+                            <span class="float-right badge bg-danger">{{ datos.mochis.180 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-danger' style='width: {{ datos.mochis.180porc }}%'; aria-valuemax='{{ datos.mochis.vencidos }}'></div>
+                            </div>
+                        </div>	
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-widget widget-user">
+                    <div class="widget-user-header bg-lightblue">
+                        <h3 class="widget-user-username">Felix Automotriz</h3>
+                        <h5 class="widget-user-desc">{{ datos.guasave.totalinv }} Vehiculos en inventario</h5>
+                    </div>
+                    <div class="widget-user-image">
+                        <img class="img-circle elevation-2" src="{%static 'admin-lte/dist/img/logo_chevrolet.jpg' %}" alt="User Avatar">
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.guasave.nu }}</h5>
+                                <span class="description-text">NUEVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.guasave.de }}</h5>
+                                <span class="description-text">DEMOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.guasave.us }}</h5>
+                                <span class="description-text">SEMINVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 border-right border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-times"></i></small><small class="mt-2 mb-2"> {{ datos.guasave.diasmas }} mas antiguo</small>
+                            </div>
+                            <div class="col-sm-6 border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-alt"></i></small><small class="mt-2 mb-2"> {{ datos.guasave.prom }} antig. prom.</small>
+                            </div>
+                            <div class="col-sm-12 border-top d-flex justify-content-around">
+                                <small class="mt-2"><a href="{% url 'inventario_detalle' '3' '1' %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">{{ datos.guasave.vencidos }} Unidades pagando PP </p></span>
+                        <div class="progress-group"><!-- 30 dias -->						
+                            +30 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM30"></i></a></span>
+                            <span class="float-right badge bg-primary">{{ datos.guasave.30 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-primary' style='width: {{ datos.guasave.30porc }}%'; aria-valuemax='{{ datos.guasave.vencidos }}'></div> 
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 90 dias -->
+                            +90 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM90"></i></a></span>
+                            <span class="float-right badge bg-warning">{{ datos.guasave.90 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-warning' style='width: {{ datos.guasave.90porc }}%'; aria-valuemax='{{ datos.guasave.vencidos }}'></div>            
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 180 dias -->
+                            +180 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM180"></i></a></span>
+                            <span class="float-right badge bg-danger">{{ datos.guasave.180.real }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-danger' style='width: {{ datos.guasave.180porc }}%'; aria-valuemax='{{ datos.guasave.vencidos }}'></div>
+                            </div>
+                        </div>	
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-widget widget-user">
+                    <div class="widget-user-header bg-lightblue">
+                        <h3 class="widget-user-username">Culiacan Motors</h3>
+                        <h5 class="widget-user-desc">{{ datos.culiacan.totalinv }} Vehiculos en inventario</h5>
+                    </div>
+                    <div class="widget-user-image">
+                        <img class="img-circle elevation-2" src="{%static 'admin-lte/dist/img/logo_chevrolet.jpg' %}" alt="User Avatar">
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.culiacan.nu }}</h5>
+                                <span class="description-text">NUEVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.culiacan.de }}</h5>
+                                <span class="description-text">DEMOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.culiacan.us }}</h5>
+                                <span class="description-text">SEMINVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 border-right border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-times"></i></small><small class="mt-2 mb-2"> {{ datos.culiacan.diasmas }} mas antiguo</small>
+                            </div>
+                            <div class="col-sm-6 border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-alt"></i></small><small class="mt-2 mb-2"> {{ datos.culiacan.prom }} antig. prom.</small>
+                            </div>
+                            <div class="col-sm-12 border-top d-flex justify-content-around">
+                                <small class="mt-2"><a href="{% url 'inventario_detalle' '5' '1' %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">{{ datos.culiacan.vencidos }} Unidades pagando PP </p></span>
+                        <div class="progress-group"><!-- 30 dias -->						
+                            +30 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM30"></i></a></span>
+                            <span class="float-right badge bg-primary">{{ datos.culiacan.30 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-primary' style='width: {{ datos.culiacan.30porc }}%'; aria-valuemax='{{ datos.culiacan.vencidos }}'></div> 
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 90 dias -->
+                            +90 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM90"></i></a></span>
+                            <span class="float-right badge bg-warning">{{ datos.culiacan.90.real }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-warning' style='width: {{ datos.culiacan.90porc }}%'; aria-valuemax='{{ datos.culiacan.vencidos }}'></div>            
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 180 dias -->
+                            +180 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM180"></i></a></span>
+                            <span class="float-right badge bg-danger">{{ datos.culiacan.180.real }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-danger' style='width: {{ datos.culiacan.180porc }}%'; aria-valuemax='{{ datos.culiacan.vencidos }}'></div>
+                            </div>
+                        </div>	
+                    </div>
+                </div>
+            </div> 
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card card-widget widget-user">
+                    <div class="widget-user-header bg-warning">
+                        <h3 class="widget-user-username">Noroeste Motors</h3>
+                        <h5 class="widget-user-desc">{{ datos.cadillac.totalinv }} Vehiculos en inventario</h5>
+                    </div>
+                    <div class="widget-user-image">
+                        <img class="img-circle elevation-2" src="{%static 'admin-lte/dist/img/logo_cadillac.jpg' %}" alt="User Avatar">
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.cadillac.nu }}</h5>
+                                <span class="description-text">NUEVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.cadillac.de }}</h5>
+                                <span class="description-text">DEMOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.cadillac.us }}</h5>
+                                <span class="description-text">SEMINVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 border-right border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-times"></i></small><small class="mt-2 mb-2"> {{ datos.cadillac.diasmas }} mas antiguo</small>
+                            </div>
+                            <div class="col-sm-6 border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-alt"></i></small><small class="mt-2 mb-2"> {{ datos.cadillac.prom }} antig. prom.</small>
+                            </div>
+                            <div class="col-sm-12 border-top d-flex justify-content-around">
+                                <small class="mt-2"><a href="{% url 'inventario_detalle' '7' '1' %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">{{ datos.cadillac.vencidos }} Unidades pagando PP </p></span>
+                        <div class="progress-group"><!-- 30 dias -->						
+                            +30 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM30"></i></a></span>
+                            <span class="float-right badge bg-primary">{{ datos.cadillac.30 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-primary' style='width: {{ datos.cadillac.30porc }}%'; aria-valuemax='{{ datos.cadillac.vencidos }}'></div> 
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 90 dias -->
+                            +90 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM90"></i></a></span>
+                            <span class="float-right badge bg-warning">{{ datos.cadillac.90.real }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-warning' style='width: {{ datos.cadillac.90porc }}%'; aria-valuemax='{{ datos.cadillac.vencidos }}'></div>            
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 180 dias -->
+                            +180 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM180"></i></a></span>
+                            <span class="float-right badge bg-danger">{{ datos.cadillac.180.real }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-danger' style='width: {{ datos.cadillac.180porc }}%'; aria-valuemax='{{ datos.cadillac.vencidos }}'></div>
+                            </div>
+                        </div>	
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card card-widget widget-user">
+                    <div class="widget-user-header bg-lightblue">
+                        <h3 class="widget-user-username">Consolidado Grupo</h3>
+                        <h5 class="widget-user-desc">{{ datos.grupo.totalinv }} Vehiculos en inventario</h5>
+                    </div>
+                    <div class="widget-user-image">
+                        <img class="img-circle elevation-2" src="{%static 'admin-lte/dist/img/logo_cadchev.jpg' %}" alt="User Avatar">
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.grupo.nu }}</h5>
+                                <span class="description-text">NUEVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.grupo.de }}</h5>
+                                <span class="description-text">DEMOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ datos.grupo.us }}</h5>
+                                <span class="description-text">SEMINUEVOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 border-right border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-times"></i></small><small class="mt-2 mb-2"> {{ datos.grupo.diasmas }} mas antiguo</small>
+                            </div>
+                            <div class="col-sm-6 border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-alt"></i></small><small class="mt-2 mb-2"> {{ datos.grupo.prom }} antig. prom.</small>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 border-top d-flex justify-content-around">
+                            <small class="mt-2"><a href="{% url 'inventario_detalle' '0' '0' %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">{{ datos.grupo.vencidos }} Unidades pagando PP </p></span>
+                        <div class="progress-group"><!-- 30 dias -->						
+                            +30 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM30"></i></a></span>
+                            <span class="float-right badge bg-primary">{{ datos.grupo.30 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-primary' style='width: {{ datos.grupo.30porc }}%'; aria-valuemax='{{ datos.grupo.vencidos }}'></div> 
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 90 dias -->
+                            +90 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM90"></i></a></span>
+                            <span class="float-right badge bg-warning">{{ datos.grupo.90 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-warning' style='width: {{ datos.grupo.90porc }}%'; aria-valuemax='{{ datos.grupo.vencidos }}'></div>            
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 180 dias -->
+                            +180 dias
+                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#modal-LMM180"></i></a></span>
+                            <span class="float-right badge bg-danger">{{ datos.grupo.180 }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-danger' style='width: {{ datos.grupo.180porc }}%'; aria-valuemax='{{ datos.grupo.vencidos }}'></div>
+                            </div>
+                        </div>	
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modales  -->
+            <div class="modal fade" id="modal-LMM30">
+                <div class="modal-dialog modal-xl">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Felix Automotores: Interes PP +30 dias ({{ datos.mochis.30}}) vehiculos</h4>	
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <table id="detallelmm30" class="table table-bordered table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Inventario</th>
+                                        <th>Descripcion</th>
+                                        <th>VIN</th>
+                                        <th>Dias</th>
+                                        
+                                        <th>Ubicacion</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                            <!-- <p>One fine body&hellip;</p> -->
+                          <!-- <p>One fine body&hellip;</p> -->
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                          <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                          <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>	
+        </div>
+    </div>
+</div>
+{% endblock %}

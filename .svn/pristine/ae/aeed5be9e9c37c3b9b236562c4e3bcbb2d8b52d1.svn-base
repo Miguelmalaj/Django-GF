@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_actions %}
+<div class="row mb-2">
+    <div class="col-sm-12">
+        <div class="card card-outline card-lightblue">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="far fa-id-badge"></i> Funnel de Ventas x Asesor </h3>                
+                <ul class='navbar-nav'>
+                    <div class="row">
+                        <div class="col-md-3">                                           
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-6 align-content-lg-end text-right">
+                            <ul class='navbar-nav ml-auto'>
+                                <form method="post" action="{% url 'funnelvendedor' %}">
+                                {% csrf_token %}
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select  class='form-control select2' id="empresas" name="empresas">
+                                            {% if datos.empresa == '11' %}<option selected value="11">Felix Automotores</option>{% else %}<option value="11">Felix Automotores</option>{% endif%}
+                                            {% if datos.empresa == '31' %}<option selected value="31">Felix Automotriz</option>{% else %}<option value="31">Felix Automotriz</option>{% endif%}
+                                            {% if datos.empresa == '51' %}<option selected value="51">Culiacan Zapata</option>{% else %}<option value="51">Culiacan Zapata</option>{% endif%}
+                                            {% if datos.empresa == '52' %}<option selected value="52">Culiacan Aeropuerto</option>{% else %}<option value="52">Culiacan Aeropuerto</option>{% endif%}
+                                            {% if datos.empresa == '71' %}<option selected value="71">Noroeste Motors</option>{% else %}<option value="71">Noroeste Motors</option>{% endif%}
+                                        </select>
+                                    </li>
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select  class='form-control select2' id="mes" name="mes">
+                                            {% for mes, nombre_mes in datos.cbomeses.items %}
+                                                {% if datos.mes == mes %}<option selected  value="{{ mes }}">{{ nombre_mes }}</option> {% else %}<option  value="{{ mes }}">{{ nombre_mes }}</option>{% endif%}
+                                            {% endfor %}
+                                        </select>
+                                    </li>
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select class='form-control select2' id="periodo" name="periodo">
+                                            {% for year in datos.cboperiodos %}
+                                                {% if datos.periodoselec == year %}<option selected  value="{{ year }}">{{ year }}</option> {% else %}<option  value="{{ year }}">{{ year }}</option>{% endif%}
+                                            {% endfor %}
+                                        </select>
+                                    </li>
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <button type='submit' class='btn btn-primary btn-block'>Actualizar</button>
+                                    </li>
+                                </form>
+                            </ul>
+                        </div>
+                    </div>
+                </ul>						
+            </div>
+            
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-lightblue">
+    <div class="card-header">	
+        <div class="row">
+            {% for data in datos.tablavendedores %}
+            
+                {% ifchanged data.vendedor %}
+                    {% if not forloop.first %}
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                    {% endif %}
+                    <div class="col-md-3">
+                        <div class="card card-outline">
+                            <div class="card-body">
+                                <h3 class="lead bg-lightblue" style="text-align: center;"><b>{{ data.vendedor }}</b></h3>
+                                <table class="table table-striped table-sm">
+                                    <tr style="font-size: 12px">
+                                        <th style="text-align:center"></th>
+                                        <th style="text-align:right">{{ datos.mesperiodo }}</th>
+                                        <th style="text-align:right">Obj.</th>
+                                        <th style="text-align:right">% Avance</th>
+                                    </tr>
+                {% endifchanged %}
+                    <tr style="font-size: 12px">
+                        <td style="text-align:left">{{ data.concepto }}</td>
+                        <td style="text-align:right">{{ data.real }}</td>
+                        <td style="text-align:right">{{ data.objetivo }}</td>
+                        <td style="text-align:right">{{ data.avance|floatformat:"0" }} %</td>
+                    </tr>
+                {% if forloop.last %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                {% endif %}
+            {% endfor %}
+                    
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

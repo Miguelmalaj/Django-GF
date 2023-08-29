@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+<div class="row mb-2">
+    <div class="col-sm-12">
+        <div class="card card-outline card-lightblue">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="far fa-list-alt"></i> Inventario detallado de vehiculos | {{ datos.nombrempresa }}</h3>                
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-lightblue">
+    <div class="card-header">			
+        <div class="row">
+            <div class="col-12 col-sm-12">
+                <div class="card card-lightblue direct-chat direct-chat-lightblue table-responsive">
+                    <div class="card-header">
+                        <span class="info-box-text"> {{ datos.totalveh}} Vehiculos </span>
+                    </div>
+                    <table id="inventarioveh" class="table table-sm">
+                        <thead>
+                            <tr style="font-size: 12px">
+                                <th>Inv.</th>
+                                <th>Descrpcion</th>
+                                <th>Paq.</th>
+                                <th>Serie</th>
+                                <th>F.Asig.</th>
+                                <th>F.Interes</th>
+                                <th>Dias</th>
+                                <th>Exterior | Interior</th>
+                                <th>Modelo</th>
+                                <th>Ubicacion</th>
+                                <th>Observaciones</th>
+                                <th style='font-size: 12px; text-align: right'>Saldo GMF</th>
+                                <th style='font-size: 12px; text-align: right'>Costo</th>
+                                {% if datos.nombrempresa == 'CONSOLIDADO' %}
+                                    <th>Agencia</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {% for row in datos.inventario %}
+                                <tr style="font-size: 12px">
+                                    <td style='font-size: 12px'>{{ row.inv }}</td>
+                                    <td style='font-size: 12px'>{{ row.descm }}</td>
+                                    <td style='font-size: 12px'>{{ row.paq }}</td>
+                                    <td style='font-size: 12px'>{{ row.vin }}</td>
+                                    <td style='font-size: 12px'>{{ row.fasignacion }}</td>
+                                    <td style='font-size: 12px'>{{ row.finteres }}</td>
+                                    <td style='font-size: 12px'>{{ row.diaspp }}</td>
+                                    <td style='font-size: 12px'>{{ row.color }}</td>
+                                    <td style='font-size: 12px'>{{ row.modelo }}</td>
+                                    <td style='font-size: 12px'>{{ row.ubicacion }}</td>
+                                    <td style='font-size: 12px'>{{ row.observaciones }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.saldopp|floatformat:0|intcomma }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.costo|floatformat:0|intcomma }}</td>
+                                    {% if datos.nombrempresa == 'CONSOLIDADO' %}
+                                    <td style='font-size: 12px'>{{ row.agencia }}</td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+    $(function () {
+      
+      $("#inventarioveh").DataTable({
+        "ordering": true,
+        "order":[[6, "desc"]],
+        "responsive": true,
+        "autoWidth": true,
+        "searching":true,
+        "lengthChange": true,
+        "paginate": false,
+      });
+      
+    });
+  </script>
+{% endblock %}

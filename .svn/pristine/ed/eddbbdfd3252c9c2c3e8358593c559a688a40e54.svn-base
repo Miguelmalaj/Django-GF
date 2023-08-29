@@ -1,0 +1,45 @@
+import cx_Oracle
+from dashboards.models import empresas
+
+encoding = "UTF-8"
+
+conn = None
+
+def creaconeccion(bytempresa):
+    conn = None
+
+    try:
+        empresa = empresas.objects.get(empresa=bytempresa, sucursal=1 )
+        conn= cx_Oracle.connect(empresa.usuario,empresa.clave_acceso,empresa.direccion_ip)
+    except empresas.DoesNotExist:
+        strempresa = "Empresa no encontrada"
+    except cx_Oracle.Error as error:
+        print(error)
+    finally:
+        if conn:
+            return conn
+
+def obtiene_empresa(bytempresa, bytsucursal):
+    try:
+        strempresa = empresas.objects.get(empresa=bytempresa, sucursal=bytsucursal )
+    except empresas.DoesNotExist:
+        strempresa = "Empresa no encontrada"
+
+    return strempresa
+
+def obtiene_numero(bytEmpresa, bytSucursal):
+    if bytEmpresa== 1:
+        strempresa= "6682226904"    # Antonio Nieblas
+    elif bytEmpresa == 2:
+        strempresa= "6871420168"    # Ricardo Parra
+    elif bytEmpresa == 3:
+            if bytSucursal == 1:
+                strempresa= "6671770000"    # Leo Felix L
+            elif bytSucursal == 2:
+                strempresa= "6683963164"    # Jorge Galvez
+            elif bytSucursal == 3:
+                strempresa= "6688613650"    # Carlos Serrano
+    elif bytEmpresa == 4:
+        strempresa= "6682226904"    # Antonio Nieblas
+    
+    return strempresa

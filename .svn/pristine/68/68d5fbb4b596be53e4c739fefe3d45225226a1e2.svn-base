@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+<div class="row mb-2">
+    <div class="col-sm-12">
+        <div class="card card-outline card-lightblue">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="far fa-list-alt"></i> Cuentas x Cobrar </h3>
+                <ul class='navbar-nav'>
+                    <div class="row">
+                        <div class="col-md-3">                                           
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-6 align-content-lg-end text-right">
+                            <form method="post" action="{% url 'cuentasxcobrar' %}">
+                            {% csrf_token %}                                                               
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <button type='submit' class='btn btn-primary btn-block'><i class="far fa-hand-point-right"></i> Actualizar</button>
+                                </li>
+                            </form>
+                        </div>
+                    </div>
+                </ul>						
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-lightblue">
+    <div class="card-header">	
+        <div class="row">
+            <!-- Ciclo para recorrer los datos, y crear las tarjetas para cada empresa -->
+            {% for empresa, detalles in datos.items %}
+            <div class="col-md-4">
+                <div class="card card-widget widget-user">
+                    <div class="widget-user-header {{ detalles.bg }}">
+                        <h3 class="widget-user-username">{{ detalles.nombre_empresa }}</h3>
+                        <h5 class="widget-user-desc">{{ detalles.totalcartera|floatformat:0|intcomma }}</h5>
+                        
+                    </div>
+                    <div class="widget-user-image">
+                        <img class="img-circle elevation-2" src="{% static detalles.logo %}" alt="User Avatar">
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-sm-12 border-top border-bottom d-flex justify-content-around bg-ligth">
+                                <div class="description-block">
+                                    <h5 class="description-header text-danger">{{ detalles.totalvencido|floatformat:0|intcomma }} Vencido</h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ detalles.auto|floatformat:0|intcomma }}</h5>
+                                <span class="description-text">AUTOS</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ detalles.refa|floatformat:0|intcomma }}</h5>
+                                <span class="description-text">REFA</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="description-block">
+                                <h5 class="description-header">{{ detalles.serv|floatformat:0|intcomma }}</h5>
+                                <span class="description-text">SERV</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 border-right border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-times"></i></small><small class="mt-2 mb-2"> {{ detalles.diasmas }} mas antiguo</small>
+                            </div>
+                            <div class="col-sm-6 border-top d-flex justify-content-around">
+                                <small class="mt-2"><i class="far fa-calendar-alt"></i></small><small class="mt-2 mb-2"> {{ detalles.prom }} antig. prom.</small>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 border-top d-flex justify-content-around">
+                            {% if detalles.empresa and detalles.sucursal %}
+                            <small class="mt-2"><a href="{% url 'cuentasxcobrar_detalle' detalles.empresa detalles.sucursal %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">Desgloce de cxc </p></span>
+                        <div class="progress-group"><!-- 30 dias -->						
+                            Por vencer ({{ detalles.vigentep|floatformat:2 }}%) 
+                            <span class="float-right">{{ detalles.vigente|floatformat:0|intcomma }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-lightblue' style="width: {{ detalles.vigentep }}%"; aria-valuemax='{{ detalles.totalcartera }}'></div> 
+                            </div>
+                        </div>
+                        <div class="progress-group"><!-- 30 dias -->						
+                            1 a 30 vencido ({{ detalles.1a30p|floatformat:2 }}%) 
+                            <span class="float-right">$ {{ detalles.1a30|floatformat:0|intcomma }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-lightblue' style="width: {{ detalles.1a30p }}%"; aria-valuemax='{{ detalles.totalvencido }}'></div> 
+                            </div>
+                        </div>
+                        <div class="progress-group"><!-- 30 dias -->						
+                            30 a 60 vencido ({{ detalles.30a60p|floatformat:2 }}%) 
+                            <span class="float-right">$ {{ detalles.30a60|floatformat:0|intcomma }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-warning' style="width: {{ detalles.30a60p }}%"; aria-valuemax='{{ detalles.totalvencido }}'></div> 
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 30 dias -->						
+                            60 a 90 vencido ({{ detalles.60a90p|floatformat:2 }}%) 
+                            <span class="float-right">$ {{ detalles.60a90|floatformat:0|intcomma }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-danger' style="width: {{ detalles.60a90p }}%"; aria-valuemax='{{ detalles.totalvencido }}'></div> 
+                            </div>
+                        </div>	
+                        <div class="progress-group"><!-- 30 dias -->						
+                            +90 vencido ({{ detalles.90p|floatformat:2 }}%) 
+                            <span class="float-right">$ {{ detalles.90|floatformat:0|intcomma }}</span>
+                            <div class="progress progress-sm">
+                                <div class='progress-bar bg-danger' style="width: {{ detalles.90p }}%"; aria-valuemax='{{ detalles.totalvencido }}'></div> 
+                            </div>
+                        </div>	
+                        
+                    </div>
+                </div>
+            </div>   
+            {% endfor %}
+        </div>		
+        
+    </div>
+
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(function () {
+        
+      $("#mochis_detalle30 ").DataTable({
+        "ordering": true,
+        "order":[[6, "desc"]],
+        "responsive": true,
+        "autoWidth": true,
+        "searching":true,
+        "lengthChange": true,
+        "paginate": false,
+      });
+      
+    });
+  </script>
+{% endblock %}

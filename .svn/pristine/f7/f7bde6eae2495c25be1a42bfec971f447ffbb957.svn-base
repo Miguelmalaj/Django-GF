@@ -1,0 +1,466 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+<div class="row">
+    <div class="col-sm-12 col-12 table-responsive">
+        <div class="card card-outline card-primary">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="fas fas fa-chart-area"></i> Venta de Servicio | {{ datos.nombreempresa }} </h3>	
+                <ul class='navbar-nav'>
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-9 align-content-lg-end text-right">
+                            <ul class='navbar-nav ml-auto'>
+                                <form method="post" action="{% url 'ventaservicio' %}">
+                                {% csrf_token %}
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select  class='form-control select2' id="empresas" name="empresas">
+                                            {% if datos.empresa == '11' %}<option selected value="11">Felix Automotores</option>{% else %}<option value="11">Felix Automotores</option>{% endif%}
+                                            {% if datos.empresa == '31' %}<option selected value="31">Felix Automotriz</option>{% else %}<option value="31">Felix Automotriz</option>{% endif%}
+                                            {% if datos.empresa == '51' %}<option selected value="51">Culiacan Zapata</option>{% else %}<option value="51">Culiacan Zapata</option>{% endif%}
+                                            {% if datos.empresa == '52' %}<option selected value="52">Culiacan Aeropuerto</option>{% else %}<option value="52">Culiacan Aeropuerto</option>{% endif%}
+                                            {% if datos.empresa == '71' %}<option selected value="71">Noroeste Motors</option>{% else %}<option value="71">Noroeste Motors</option>{% endif%}
+                                        </select>
+                                    </li>
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select  class='form-control select2' id="mes" name="mes">
+                                            {% for mes, nombre_mes in datos.cbomeses.items %}
+                                                {% if datos.mes == mes %}<option selected  value="{{ mes }}">{{ nombre_mes }}</option> {% else %}<option  value="{{ mes }}">{{ nombre_mes }}</option>{% endif%}
+                                            {% endfor %}
+                                        </select>
+                                    </li>
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select class='form-control select2' id="periodo" name="periodo">
+                                            {% for year in datos.cboperiodos %}
+                                                {% if datos.periodoselec == year %}<option selected  value="{{ year }}">{{ year }}</option> {% else %}<option  value="{{ year }}">{{ year }}</option>{% endif%}
+                                            {% endfor %}
+                                        </select>
+                                    </li>
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <button type='submit' class='btn btn-primary btn-block'>Actualizar</button>
+                                    </li>
+                                </form>
+                            </ul>
+                        </div>
+                    </div>
+                </ul>				
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 table-responsive">
+        <div class="card card-primary card-outline card-outline-tabs">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-sm-3 col-lg-12 order-2 order-md-2">
+                        
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-sm-3 col-6">
+                                    <div class="description-block border-right">
+                                        {% if datos.manoobra.0.porc >= 45 %}
+                                            <span class='description-percentage text-success'>{{ datos.manoobra.0.porc|floatformat:2 }} %</span>
+                                        {% else %}
+                                            <span class='description-percentage text-danger'>{{ datos.manoobra.0.porc|floatformat:2 }} %</span>
+                                        {% endif %}
+                                    <h5 class="description-header">${{ datos.manoobra.0.util|floatformat:0|intcomma}}</h5>
+                                    <span class="description-text">Util. Mano Obra</span>
+                                    </div>
+                                    <!-- /.description-block -->
+                                </div>
+                                <!-- /.col -->
+                                <div class="col-sm-3 col-6">
+                                    <div class="description-block border-right">
+                                        {% if datos.tot.0.porc >= 45 %}
+                                        <span class='description-percentage text-success'>{{ datos.tot.0.porc|floatformat:2 }} %</span>
+                                        {% else %}
+                                            <span class='description-percentage text-danger'>{{ datos.tot.0.porc|floatformat:2 }} %</span>
+                                        {% endif %}
+                                        <h5 class="description-header">${{ datos.tot.0.util|floatformat:0|intcomma}}</h5>
+                                        <span class="description-text">Util. TOTs</span>
+                                    
+                                    </div>
+                                    <!-- /.description-block -->
+                                </div>
+                                <!-- /.col -->
+                                <div class="col-sm-3 col-6">
+                                    <div class="description-block border-right">
+                                        <div class="description-block border-right">
+                                            {% if datos.internas.0.porc >= 45 %}
+                                            <span class='description-percentage text-success'>{{ datos.internas.0.porc|floatformat:2 }} %</span>
+                                            {% else %}
+                                                <span class='description-percentage text-danger'>{{ datos.internas.0.porc|floatformat:2 }} %</span>
+                                            {% endif %}
+                                            <h5 class="description-header">${{ datos.internas.0.util|floatformat:0|intcomma}}</h5>
+                                            <span class="description-text">Internas</span>
+                                        </div>
+                                    </div>
+                                    <!-- /.description-block -->
+                                </div>
+                                <!-- /.col -->
+                                <div class="col-sm-3 col-6">
+                                    <div class="description-block">
+                                        <div class="description-block">
+                                            {% if datos.total.0.porc >= 45 %}
+                                            <span class='description-percentage text-success'>{{ datos.total.0.porc|floatformat:2 }} %</span>
+                                            {% else %}
+                                                <span class='description-percentage text-danger'>{{ datos.total.0.porc|floatformat:2 }} %</span>
+                                            {% endif %}
+                                            <h5 class="description-header">${{ datos.total.0.util|floatformat:0|intcomma}}</h5>
+                                            <span class="description-text">Util. General</span>
+                                        </div>
+                                    </div>
+                                    <!-- /.description-block -->
+                                </div>
+                            </div>
+                        </div>	
+
+                        <div class="row">
+                            <div class="col-sm-3 col-lg-12">
+                                <!-- Reporte por tipo de precio -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card card-outline card-primary"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4 col-lg-4">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <table class="table table-sm">
+                                                        <tr style="font-size: 12px">
+                                                            <th style="width: 30%; text-align:center">MANO DE OBRA</th>
+                                                        </tr>
+                                                </table>
+                                            
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr style="font-size: 12px">
+                                                            <th>Tipo Orden</th>
+                                                            <th></th>
+                                                            <th style="text-align: right">Venta</th>
+                                                            <th style="text-align: right">Utilidad</th>
+                                                            <th style="text-align: right">%</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>	
+                                                        {% for row in datos.grupomo %}
+                                                        {% if row.concepto == 'TOTAL' %}
+                                                        <tr style="font-size: 12px; font-weight:bold">
+                                                        {% else %}
+                                                        <tr style="font-size: 12px">
+                                                        {% endif %}
+                                                            <td style='font-size: 12px'>{{ row.concepto }}</td>
+                                                            <!-- Solo colocar el link de enlace a la pagina de detalle cuando no sea el total -->
+                                                            {% if row.concepto == 'TOTAL' %} 
+                                                                <td></td>
+                                                            {% else %}
+                                                                <td><a href="{% url 'detalleordenes' datos.empresa row.concepto datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                            {% endif %}
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.vtamo|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porc|floatformat:2|intcomma }}</td>
+                                                            
+                                                        </tr>
+                                                        {% endfor %}									
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-lg-4">	
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <table class="table table-sm">
+                                                        <tr style="font-size: 12px">
+                                                            <th style="width: 30%; text-align:center">TOT</th>
+                                                        </tr>
+                                                </table>
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr style="font-size: 12px">
+                                                            <th>Tipo Orden</th>
+                                                            <th></th>
+                                                            <th style="text-align: right">Venta</th>
+                                                            <th style="text-align: right">Utilidad</th>
+                                                            <th style="text-align: right">%</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>			
+                                                        {% for row in datos.grupotot %}
+                                                        {% if row.concepto == 'TOTAL' %}
+                                                        <tr style="font-size: 12px; font-weight:bold">
+                                                        {% else %}
+                                                        <tr style="font-size: 12px">
+                                                        {% endif %}
+                                                            <td style='font-size: 12px'>{{ row.concepto }}</td>
+                                                            <!-- Solo colocar el link de enlace a la pagina de detalle cuando no sea el total -->
+                                                            {% if row.concepto == 'TOTAL' %} 
+                                                                <td></td>
+                                                            {% else %}
+                                                                <td><a href="{% url 'detalleordenes' datos.empresa row.concepto datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                            {% endif %}
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.vtatot|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porc|floatformat:2|intcomma }}</td>
+                                                            
+                                                        </tr>
+                                                        {% endfor %}									
+                                                            
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-lg-4">	
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <table class="table table-sm">
+                                                        <tr style="font-size: 12px">
+                                                            <th style="width: 30%; text-align:center">INTERNAS</th>
+                                                        </tr>
+                                                </table>
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr style="font-size: 12px">
+                                                            <th>Tipo Orden</th>
+                                                            <th></th>
+                                                            <th style="text-align: right">Venta</th>
+                                                            <th style="text-align: right">Utilidad</th>
+                                                            <th style="text-align: right">%</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>										
+                                                        {% for row in datos.grupoint %}
+                                                        {% if row.concepto == 'TOTAL' %}
+                                                        <tr style="font-size: 12px; font-weight:bold">
+                                                        {% else %}
+                                                        <tr style="font-size: 12px">
+                                                        {% endif %}
+                                                            <td style='font-size: 12px'>{{ row.concepto }}</td>
+                                                            <!-- Solo colocar el link de enlace a la pagina de detalle cuando no sea el total -->
+                                                            {% if row.concepto == 'TOTAL' %} 
+                                                                <td></td>
+                                                            {% else %}
+                                                                <td><a href="{% url 'detalleordenes' datos.empresa row.concepto datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                            {% endif %}
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porc|floatformat:2|intcomma }}</td>
+                                                        </tr>
+                                                        {% endfor %}		
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- /.col -->
+                        </div>	
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card card-outline card-primary"></div>
+                            </div>
+                            <div class="col-sm-3 col-lg-12">
+                                <div class="row">
+                                    <div class="col-sm-12 col-lg-12">
+                                        <div class="card"> 
+                                            <div class="card-body">
+                                                <table class="table table-sm">
+                                                    <tr style="font-size: 12px">
+                                                        <th style="width: 30%; text-align:center">TICKET PROMEDIO</th>
+                                                    </tr>
+                                                    <h6 class="small text-muted"><i class="fas fa-exclamation-circle"></i> Resumen ticket promedio no se incluyen Internas</h6>
+                                                </table>
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr style="font-size: 12px">
+                                                            <th>Tipo Orden</th>
+                                                            <th style="text-align: right">Cant. OR.</th>
+                                                            <th style="text-align: right">Venta Ref.</th>
+                                                            <th style="text-align: right">Util. Ref</th>
+                                                            <th style="text-align: right">%</th>
+                                                            <th style="text-align: right">Venta Serv.</th>
+                                                            <th style="text-align: right">Util. Serv</th>
+                                                            <th style="text-align: right">%</th>
+                                                            <th style="text-align: right">Venta</th>
+                                                            <th style="text-align: right">Util.v</th>
+                                                            <th style="text-align: right">%</th>
+                                                            <th style="text-align: right">Promedio</th>
+                                                            <th style="text-align: right">Objetivo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>										
+                                                        {% for row in datos.tktorden %}
+                                                        {% if row.concepto == 'TOTAL' %}
+                                                        <tr style="font-size: 12px; font-weight:bold">
+                                                        {% else %}
+                                                        <tr style="font-size: 12px">
+                                                        {% endif %}
+                                                            <td style='font-size: 12px'>{{ row.concepto }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.cant|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.vtaref|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilrefa|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcrefa|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.ventaser|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilserv|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcserv|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.ventaneta|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilneta|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcneta|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.tktorden|floatformat:0|intcomma }}</td>
+                                                            {% if row.concepto == 'PUBLICA' %}
+                                                            <td style='font-size: 12px; text-align: right'>4,000</td>
+                                                            {% else %}
+                                                            <td style='font-size: 12px; text-align: right'>-</td>
+                                                            {% endif %}
+                                                        </tr>
+                                                        {% endfor %}	 
+                                                        {% for row in datos.df_totales %}
+                                                        {% if row.concepto == 'TOTAL' %}
+                                                        <tr style="font-size: 12px; font-weight:bold">
+                                                        {% else %}
+                                                        <tr style="font-size: 12px">
+                                                        {% endif %}
+                                                            <td style='font-size: 12px'>{{ row.concepto }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.cant|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.vtaref|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilrefa|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcrefa|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.ventaser|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilserv|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcserv|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.ventaneta|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilneta|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcneta|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.tktorden|floatformat:0|intcomma }}</td>
+                                                            {% if row.concepto == 'PUBLICA' %}
+                                                            <td style='font-size: 12px; text-align: right'>4,000</td>
+                                                            {% else %}
+                                                            <td style='font-size: 12px; text-align: right'>-</td>
+                                                            {% endif %}
+                                                        </tr>
+                                                        {% endfor %}	 
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card card-outline card-primary"></div>
+                            </div>
+                            <div class="col-sm-3 col-lg-12">
+                                <div class="row">
+                                    <div class="col-sm-12 col-lg-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <table class="table table-sm">
+                                                    <tr style="font-size: 12px">
+                                                        <th style="width: 30%; text-align:center">TICKET PROMEDIO X ASESOR [ ORD PUBLICO ]</th>
+                                                    </tr>
+                                                    <h6 class="small text-muted"><i class="fas fa-exclamation-circle"></i> Resumen ticket promedio por asesor, solo se consideran Or. Publico</h6>
+                                                </table>
+                                            
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr style="font-size: 12px">
+                                                            <th>Asesor de Servicio</th>
+                                                            <th></th>
+                                                            <th style="text-align: right">Cant. OR.</th>
+                                                            <th style="text-align: right">Venta Ref.</th>
+                                                            <th style="text-align: right">Util. Ref</th>
+                                                            <th style="text-align: right">%</th>
+                                                            <th style="text-align: right">Venta Serv.</th>
+                                                            <th style="text-align: right">Util. Serv</th>
+                                                            <th style="text-align: right">%</th>
+                                                            <th style="text-align: right">Venta</th>
+                                                            <th style="text-align: right">Util.v</th>
+                                                            <th style="text-align: right">%</th>
+                                                            <th style="text-align: right">Promedio</th>
+                                                            <th style="text-align: right">Objetivo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>										
+                                                        {% for row in datos.tktasesor %}
+                                                        {% if row.asesor == 'TOTAL' %}
+                                                        <tr style="font-size: 12px; font-weight:bold">
+                                                        {% else %}
+                                                        <tr style="font-size: 12px">
+                                                        {% endif %}
+                                                            <td style='font-size: 12px'>{{ row.asesor }}</td>
+                                                            <!-- Solo colocar el link de enlace a la pagina de detalle cuando no sea el total -->
+                                                            {% if row.concepto == 'TOTAL' %} 
+                                                                <td></td>
+                                                            {% else %}
+                                                                <td><a href="{% url 'detalleordenes' datos.empresa row.asesor datos.periodoselec datos.mes 2 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                            {% endif %}
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.cant|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.vtaref|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilrefa|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcrefa|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.ventaser|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilserv|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcserv|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.ventaneta|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilneta|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcneta|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.tktorden|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>4,000</td>
+                                                            
+                                                        </tr>
+                                                        {% endfor %}
+                                                        {% for row in datos.df_totalasesor %}
+                                                        {% if row.concepto == 'TOTAL' %}
+                                                        <tr style="font-size: 12px; font-weight:bold">
+                                                        {% else %}
+                                                        <tr style="font-size: 12px">
+                                                        {% endif %}
+                                                            <td style='font-size: 12px'>{{ row.concepto }}</td>
+                                                            <td style='font-size: 12px'></td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.cant|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.vtaref|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilrefa|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcrefa|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.ventaser|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilserv|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcserv|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.ventaneta|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.utilneta|floatformat:0|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.porcneta|floatformat:2|intcomma }}</td>
+                                                            <td style='font-size: 12px; text-align: right'>{{ row.tktorden|floatformat:0|intcomma }}</td>
+                                                            {% if row.concepto == 'PUBLICA' %}
+                                                            <td style='font-size: 12px; text-align: right'>4,000</td>
+                                                            {% else %}
+                                                            <td style='font-size: 12px; text-align: right'>-</td>
+                                                            {% endif %}
+                                                        </tr>
+                                                        {% endfor %}   
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /.col -->									
+                </div><!-- /.row -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
