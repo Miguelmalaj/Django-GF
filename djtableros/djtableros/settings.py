@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +30,7 @@ ALLOWED_HOSTS = ['*']
 
 ADMIN_SITE_HEADER = 'Administrador sistemas de tableros'
 
-# SESSION_COOKIE_AGE = 1200  # 20 min en segundos
+SESSION_COOKIE_AGE = 3600  # 60 min en segundos
 
 # Application definition
 
@@ -57,6 +58,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'djtableros.middleware.PrintClientIPMiddleware',
+    # 'djtableros.middleware.SessionTimeoutMiddleware',
 ]
 
 ROOT_URLCONF = "djtableros.urls"
@@ -88,7 +91,6 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
-     
 }
 
 
@@ -127,3 +129,5 @@ STATIC_ROOT = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+

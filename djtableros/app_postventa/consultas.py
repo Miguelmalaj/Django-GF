@@ -318,51 +318,74 @@ def obtiene_detalle_ordenes_facturadas(agencia, sucursal, concepto, periodo, mes
     conn = config.creaconeccion(agencia)
     c = conn.cursor()
 
-    strSQL = " SELECT O.ORSE_FOLIO, O.TIOR_CLAVE, T.TIOR_DESCRIPCION, TO_DATE(ORSE_FECHAENTRADA, 'DD/MM/YY'), ( to_char( SYSDATE - ORSE_FECHAENTRADA, '999' )) AS DIAS "
-    strSQL = strSQL + " , (FASE_RAZONSOCIAL) AS ORSE_RAZONSOCIALCLIENTE, nvl(ORSE_CLAVEMODELO,'NO ASIGNADO') AS ORSE_CLAVEMODELO, NVL(ORSE_NUMEROSERIE, ' ') AS ORSE_NUMEROSERIE,  nvl( ( to_char( SYSDATE - ORSE_FECHACIERRE, '999' )), 0) AS DIAS_Cerrada "
-    strSQL = strSQL + " , nvl(( to_char( ORSE_FECHACIERRE - ORSE_FECHAENTRADA, '999' )),0) AS DIAS_Taller  "
-    strSQL = strSQL + " , sum(O.FASE_MATERIALDIVERSO) AS VtaDiv, nvl(Sum(O.FASE_MANOOBRAMECANICO - O.FASE_DESCUENTOMECANICO) ,0) as VtaMO "
-    strSQL = strSQL + " , sum( O.FASE_COSTOMECANICO) as CtoMO, nvl(Sum(O.FASE_REFACCIONES - O.FASE_DESCUENTOREFACCIONES),0) as VtaRef, nvl(Sum(O.FASE_COSTOREFACCIONES),0) AS CtoRef "
-    strSQL = strSQL + " , nvl(Sum(O.FASE_TOTS - O.FASE_DESCUENTOTOTS + O.FASE_MATERIALDIVERSO),0) as VtaTOT, nvl(Sum(O.FASE_COSTOTOTS),0) as CtoTOT "
-    strSQL = strSQL + " , Sum((O.FASE_MATERIALDIVERSO + O.FASE_MANOOBRAMECANICO + O.FASE_REFACCIONES + O.FASE_TOTS) - (O.FASE_DESCUENTOMECANICO + O.FASE_DESCUENTOREFACCIONES + O.FASE_DESCUENTOTOTS )) as VtaTotal "
-    strSQL = strSQL + " , Sum(O.FASE_COSTOMECANICO + O.FASE_COSTOREFACCIONES + O.FASE_COSTOTOTS ) as CtoTotal,  NVL(ORSE_COMENTARIOS, ' ') AS ORSE_COMENTARIOS, O.Nombre, O.FASE_FECHA "
-    strSQL = strSQL + " FROM SE_VFACTURASERVICIOS O, SE_TIPOORDEN T "
-    strSQL = strSQL + " WHERE O.EMPR_EMPRESAID = " + str(bytempresa)
-    strSQL = strSQL + " AND O.AGEN_IDAGENCIA = " + str(sucursal)
-    strSQL = strSQL + " AND (Extract(Month from O.FASE_FECHA)) = " + str(mes)
-    strSQL = strSQL + " AND (Extract(Year from O.FASE_FECHA)) = " + str(periodo)	
-    if tipoconsulta == 1:
-        strSQL = strSQL + " AND T.TIOR_DESCRIPCION = '" + str(concepto) + "'"
+    if tipoconsulta != 3:
+        strSQL = " SELECT O.ORSE_FOLIO, O.TIOR_CLAVE, T.TIOR_DESCRIPCION, TO_DATE(ORSE_FECHAENTRADA, 'DD/MM/YY'), ( to_char( SYSDATE - ORSE_FECHAENTRADA, '999' )) AS DIAS "
+        strSQL = strSQL + " , (FASE_RAZONSOCIAL) AS ORSE_RAZONSOCIALCLIENTE, nvl(ORSE_CLAVEMODELO,'NO ASIGNADO') AS ORSE_CLAVEMODELO, NVL(ORSE_NUMEROSERIE, ' ') AS ORSE_NUMEROSERIE,  nvl( ( to_char( SYSDATE - ORSE_FECHACIERRE, '999' )), 0) AS DIAS_Cerrada "
+        strSQL = strSQL + " , nvl(( to_char( ORSE_FECHACIERRE - ORSE_FECHAENTRADA, '999' )),0) AS DIAS_Taller  "
+        strSQL = strSQL + " , sum(O.FASE_MATERIALDIVERSO) AS VtaDiv, nvl(Sum(O.FASE_MANOOBRAMECANICO - O.FASE_DESCUENTOMECANICO) ,0) as VtaMO "
+        strSQL = strSQL + " , sum( O.FASE_COSTOMECANICO) as CtoMO, nvl(Sum(O.FASE_REFACCIONES - O.FASE_DESCUENTOREFACCIONES),0) as VtaRef, nvl(Sum(O.FASE_COSTOREFACCIONES),0) AS CtoRef "
+        strSQL = strSQL + " , nvl(Sum(O.FASE_TOTS - O.FASE_DESCUENTOTOTS + O.FASE_MATERIALDIVERSO),0) as VtaTOT, nvl(Sum(O.FASE_COSTOTOTS),0) as CtoTOT "
+        strSQL = strSQL + " , Sum((O.FASE_MATERIALDIVERSO + O.FASE_MANOOBRAMECANICO + O.FASE_REFACCIONES + O.FASE_TOTS) - (O.FASE_DESCUENTOMECANICO + O.FASE_DESCUENTOREFACCIONES + O.FASE_DESCUENTOTOTS )) as VtaTotal "
+        strSQL = strSQL + " , Sum(O.FASE_COSTOMECANICO + O.FASE_COSTOREFACCIONES + O.FASE_COSTOTOTS ) as CtoTotal,  NVL(ORSE_COMENTARIOS, ' ') AS ORSE_COMENTARIOS, O.Nombre, O.FASE_FECHA "
+        strSQL = strSQL + " FROM SE_VFACTURASERVICIOS O, SE_TIPOORDEN T "
+        strSQL = strSQL + " WHERE O.EMPR_EMPRESAID = " + str(bytempresa)
+        strSQL = strSQL + " AND O.AGEN_IDAGENCIA = " + str(sucursal)
+        strSQL = strSQL + " AND (Extract(Month from O.FASE_FECHA)) = " + str(mes)
+        strSQL = strSQL + " AND (Extract(Year from O.FASE_FECHA)) = " + str(periodo)	
+        if tipoconsulta == 1:
+            strSQL = strSQL + " AND T.TIOR_DESCRIPCION = '" + str(concepto) + "'"
+        else:
+            strSQL = strSQL + " AND O.NOMBRE = '" + str(concepto) + "'"
+        strSQL = strSQL + " AND T.EMPR_EMPRESAID = O.EMPR_EMPRESAID "
+        strSQL = strSQL + " AND T.TIOR_CLAVE = O.TIOR_CLAVE "
+        strSQL = strSQL + " Group by  O.ORSE_FOLIO, O.TIOR_CLAVE, ORSE_FECHAENTRADA, ORSE_FECHACIERRE "
+        strSQL = strSQL + " , FASE_RAZONSOCIAL, ORSE_CLAVEMODELO, ORSE_NUMEROSERIE, ORSE_COMENTARIOS, T.TIOR_DESCRIPCION, O.Nombre, O.FASE_FECHA "
+        strSQL = strSQL + " UNION ALL "
+        strSQL = strSQL + " SELECT O.ORSE_FOLIO, O.TIOR_CLAVE, T.TIOR_DESCRIPCION, TO_DATE(ORSE_FECHAENTRADA, 'DD/MM/YY'), ( to_char( SYSDATE - ORSE_FECHAENTRADA, '999' )) AS DIAS "
+        strSQL = strSQL + " , (FASE_RAZONSOCIAL) AS ORSE_RAZONSOCIALCLIENTE, nvl(ORSE_CLAVEMODELO,'NO ASIGNADO') AS ORSE_CLAVEMODELO, NVL(ORSE_NUMEROSERIE, ' ') AS ORSE_NUMEROSERIE,  nvl( ( to_char( SYSDATE - ORSE_FECHACIERRE, '999' )), 0) AS DIAS_Cerrada "
+        strSQL = strSQL + " , nvl(( to_char( ORSE_FECHACIERRE - ORSE_FECHAENTRADA, '999' )),0) AS DIAS_Taller  "
+        strSQL = strSQL + " , sum(O.FASE_MATERIALDIVERSO  * -1) AS VtaDiv, nvl(Sum(O.FASE_MANOOBRAMECANICO - O.FASE_DESCUENTOMECANICO) * -1 ,0) as VtaMO "
+        strSQL = strSQL + " , sum( O.FASE_COSTOMECANICO  * -1) as CtoMO, nvl(Sum(O.FASE_REFACCIONES - O.FASE_DESCUENTOREFACCIONES)  * -1,0) as VtaRef, nvl(Sum(O.FASE_COSTOREFACCIONES)  * -1,0) AS CtoRef "
+        strSQL = strSQL + " , nvl(Sum(O.FASE_TOTS - O.FASE_DESCUENTOTOTS + O.FASE_MATERIALDIVERSO)  * -1,0) as VtaTOT, nvl(Sum(O.FASE_COSTOTOTS)  * -1,0) as CtoTOT "
+        strSQL = strSQL + " , Sum((O.FASE_MATERIALDIVERSO + O.FASE_MANOOBRAMECANICO + O.FASE_REFACCIONES + O.FASE_TOTS) - (O.FASE_DESCUENTOMECANICO + O.FASE_DESCUENTOREFACCIONES + O.FASE_DESCUENTOTOTS ) ) * -1 as VtaTotal "
+        strSQL = strSQL + " , Sum(O.FASE_COSTOMECANICO + O.FASE_COSTOREFACCIONES + O.FASE_COSTOTOTS )  * -1 as CtoTotal,  NVL(ORSE_COMENTARIOS, ' ') AS ORSE_COMENTARIOS, O.Nombre, O.FASE_FECHACANCELACION "
+        strSQL = strSQL + " FROM SE_VFACTURASERVICIOS O, SE_TIPOORDEN T "
+        strSQL = strSQL + " WHERE O.EMPR_EMPRESAID = " + str(bytempresa)
+        strSQL = strSQL + " AND O.AGEN_IDAGENCIA = " + str(sucursal)
+        strSQL = strSQL + " AND (Extract(Month from O.FASE_FECHACANCELACION)) = " + str(mes)
+        strSQL = strSQL + " AND (Extract(Year from O.FASE_FECHACANCELACION)) = " + str(periodo)	
+        if tipoconsulta == 1:
+            strSQL = strSQL + " AND T.TIOR_DESCRIPCION = '" + str(concepto) + "'"
+        else:
+            strSQL = strSQL + " AND O.NOMBRE = '" + str(concepto) + "'"
+        strSQL = strSQL + " AND T.EMPR_EMPRESAID = O.EMPR_EMPRESAID "
+        strSQL = strSQL + " AND T.TIOR_CLAVE = O.TIOR_CLAVE "
+        strSQL = strSQL + " Group by  O.ORSE_FOLIO, O.TIOR_CLAVE, ORSE_FECHAENTRADA, ORSE_FECHACIERRE "
+        strSQL = strSQL + " , FASE_RAZONSOCIAL, ORSE_CLAVEMODELO, ORSE_NUMEROSERIE, ORSE_COMENTARIOS, T.TIOR_DESCRIPCION, O.Nombre, O.FASE_FECHACANCELACION "
+        strSQL = strSQL + " ORDER BY DIAS DESC "
     else:
-        strSQL = strSQL + " AND O.NOMBRE = '" + str(concepto) + "'"
-    strSQL = strSQL + " AND T.EMPR_EMPRESAID = O.EMPR_EMPRESAID "
-    strSQL = strSQL + " AND T.TIOR_CLAVE = O.TIOR_CLAVE "
-    strSQL = strSQL + " Group by  O.ORSE_FOLIO, O.TIOR_CLAVE, ORSE_FECHAENTRADA, ORSE_FECHACIERRE "
-    strSQL = strSQL + " , FASE_RAZONSOCIAL, ORSE_CLAVEMODELO, ORSE_NUMEROSERIE, ORSE_COMENTARIOS, T.TIOR_DESCRIPCION, O.Nombre, O.FASE_FECHA "
-    strSQL = strSQL + " UNION ALL "
-    strSQL = strSQL + " SELECT O.ORSE_FOLIO, O.TIOR_CLAVE, T.TIOR_DESCRIPCION, TO_DATE(ORSE_FECHAENTRADA, 'DD/MM/YY'), ( to_char( SYSDATE - ORSE_FECHAENTRADA, '999' )) AS DIAS "
-    strSQL = strSQL + " , (FASE_RAZONSOCIAL) AS ORSE_RAZONSOCIALCLIENTE, nvl(ORSE_CLAVEMODELO,'NO ASIGNADO') AS ORSE_CLAVEMODELO, NVL(ORSE_NUMEROSERIE, ' ') AS ORSE_NUMEROSERIE,  nvl( ( to_char( SYSDATE - ORSE_FECHACIERRE, '999' )), 0) AS DIAS_Cerrada "
-    strSQL = strSQL + " , nvl(( to_char( ORSE_FECHACIERRE - ORSE_FECHAENTRADA, '999' )),0) AS DIAS_Taller  "
-    strSQL = strSQL + " , sum(O.FASE_MATERIALDIVERSO  * -1) AS VtaDiv, nvl(Sum(O.FASE_MANOOBRAMECANICO - O.FASE_DESCUENTOMECANICO) * -1 ,0) as VtaMO "
-    strSQL = strSQL + " , sum( O.FASE_COSTOMECANICO  * -1) as CtoMO, nvl(Sum(O.FASE_REFACCIONES - O.FASE_DESCUENTOREFACCIONES)  * -1,0) as VtaRef, nvl(Sum(O.FASE_COSTOREFACCIONES)  * -1,0) AS CtoRef "
-    strSQL = strSQL + " , nvl(Sum(O.FASE_TOTS - O.FASE_DESCUENTOTOTS + O.FASE_MATERIALDIVERSO)  * -1,0) as VtaTOT, nvl(Sum(O.FASE_COSTOTOTS)  * -1,0) as CtoTOT "
-    strSQL = strSQL + " , Sum((O.FASE_MATERIALDIVERSO + O.FASE_MANOOBRAMECANICO + O.FASE_REFACCIONES + O.FASE_TOTS) - (O.FASE_DESCUENTOMECANICO + O.FASE_DESCUENTOREFACCIONES + O.FASE_DESCUENTOTOTS ) ) * -1 as VtaTotal "
-    strSQL = strSQL + " , Sum(O.FASE_COSTOMECANICO + O.FASE_COSTOREFACCIONES + O.FASE_COSTOTOTS )  * -1 as CtoTotal,  NVL(ORSE_COMENTARIOS, ' ') AS ORSE_COMENTARIOS, O.Nombre, O.FASE_FECHACANCELACION "
-    strSQL = strSQL + " FROM SE_VFACTURASERVICIOS O, SE_TIPOORDEN T "
-    strSQL = strSQL + " WHERE O.EMPR_EMPRESAID = " + str(bytempresa)
-    strSQL = strSQL + " AND O.AGEN_IDAGENCIA = " + str(sucursal)
-    strSQL = strSQL + " AND (Extract(Month from O.FASE_FECHACANCELACION)) = " + str(mes)
-    strSQL = strSQL + " AND (Extract(Year from O.FASE_FECHACANCELACION)) = " + str(periodo)	
-    if tipoconsulta == 1:
-        strSQL = strSQL + " AND T.TIOR_DESCRIPCION = '" + str(concepto) + "'"
-    else:
-        strSQL = strSQL + " AND O.NOMBRE = '" + str(concepto) + "'"
-    strSQL = strSQL + " AND T.EMPR_EMPRESAID = O.EMPR_EMPRESAID "
-    strSQL = strSQL + " AND T.TIOR_CLAVE = O.TIOR_CLAVE "
-    strSQL = strSQL + " Group by  O.ORSE_FOLIO, O.TIOR_CLAVE, ORSE_FECHAENTRADA, ORSE_FECHACIERRE "
-    strSQL = strSQL + " , FASE_RAZONSOCIAL, ORSE_CLAVEMODELO, ORSE_NUMEROSERIE, ORSE_COMENTARIOS, T.TIOR_DESCRIPCION, O.Nombre, O.FASE_FECHACANCELACION "
-    strSQL = strSQL + " ORDER BY DIAS DESC "
-
+        # Obtiene el detalle de las ordenes de servicio dependiendo del Tipo de status
+        strSQL = " SELECT O.ORSE_FOLIO, ORSE_TIOR_CLAVE, T.TIOR_DESCRIPCION, TO_DATE(ORSE_FECHAENTRADA, 'DD/MM/YY'), ( to_char( SYSDATE - ORSE_FECHAENTRADA, '999' )) AS DIAS "
+        strSQL = strSQL + " , ORSE_RAZONSOCIALCLIENTE, nvl(ORSE_CLAVEMODELO,'NO ASIGNADO') AS ORSE_CLAVEMODELO, NVL(ORSE_NUMEROSERIE, ' ') AS ORSE_NUMEROSERIE,  nvl( ( to_char( SYSDATE - ORSE_FECHACIERRE, '999' )), 0) AS DIAS_Cerrada "
+        strSQL = strSQL + " , NVL(( to_char( ORSE_FECHACIERRE - ORSE_FECHAENTRADA, '999' )),0) AS DIAS_Taller  "
+        strSQL = strSQL + " , SUM(O.ORSE_MATERIALDIVERSO) AS VtaDiv, Sum(O.ORSE_TOTALMANOOBRA - O.ORSE_DESCUENTOMANOOBRA) as VtaMO "
+        strSQL = strSQL + " , SUM( O.ORSE_COSTOMANOOBRA) as CtoMO, Sum(O.ORSE_TOTALREFACCIONES - O.ORSE_DESCUENTOREFACCIONES ) as VtaRef, Sum( O.ORSE_COSTOREFACCIONES ) as CtoRef "
+        strSQL = strSQL + " , SUM( O.ORSE_TOTALTOTS - O.ORSE_DESCUENTOTOTS ) AS VtaTOT, Sum( O.ORSE_COSTOTOTS ) as CtoTOT "
+        strSQL = strSQL + " , SUM((O.ORSE_MATERIALDIVERSO + O.ORSE_TOTALMANOOBRA + O.ORSE_TOTALREFACCIONES + O.ORSE_TOTALTOTS) - (O.orse_descuentomanoobra + O.ORSE_DESCUENTOREFACCIONES + O.ORSE_DESCUENTOTOTS )) as VtaTotal "
+        strSQL = strSQL + " , SUM(O.ORSE_COSTOMANOOBRA + O.ORSE_COSTOREFACCIONES + O.ORSE_COSTOTOTS ) as CtoTotal,  NVL(ORSE_COMENTARIOS, ' ') AS ORSE_COMENTARIOS, (E.EMPL_NOMBRE) as Asesor, TO_DATE('01/01/1900', 'DD/MM/YY')"
+        strSQL = strSQL + " FROM SE_ORDENSERVICIO O, SE_TIPOORDEN T, EMPLEADOS E "
+        strSQL = strSQL + " WHERE O.EMPR_EMPRESAID = " + str(bytempresa)
+        strSQL = strSQL + " AND O.ORSE_IDAGENCIA = " + str(sucursal)
+        strSQL = strSQL + " AND O.ORSE_ESTATUS NOT IN ('FA', 'CA') "
+        strSQL = strSQL + " AND ORSE_ESTATUS = '" + str(concepto[:2]) + "'" #Obtener los primeros dos caracteres del estatus de la orden [PR, CE, ES]
+        strSQL = strSQL + " AND T.EMPR_EMPRESAID = O.EMPR_EMPRESAID "
+        strSQL = strSQL + " AND T.TIOR_CLAVE = O.ORSE_TIOR_CLAVE "
+        strSQL = strSQL + " AND E.EMPR_EMPRESAID = O.EMPR_EMPRESAID "
+        strSQL = strSQL + " AND E.EMPL_CLAVE = O.ORSE_EMPL_CLAVE "
+        strSQL = strSQL + " Group by  O.ORSE_FOLIO, ORSE_TIOR_CLAVE, ORSE_FECHAENTRADA, ORSE_FECHACIERRE, "
+        strSQL = strSQL + " ORSE_RAZONSOCIALCLIENTE, ORSE_CLAVEMODELO, ORSE_NUMEROSERIE, ORSE_COMENTARIOS, T.TIOR_DESCRIPCION, E.EMPL_NOMBRE "
+        strSQL = strSQL + " ORDER BY DIAS DESC "
+        
     c.execute(str(strSQL)) 
 
     df_consulta = pd.DataFrame.from_records(c)
@@ -387,7 +410,6 @@ def obtiene_detalle_ordenes_facturadas(agencia, sucursal, concepto, periodo, mes
     df_consulta['utiltot'] = df_consulta['vtot'] - df_consulta['ctot']
     df_consulta['porctot'] = df_consulta.apply(lambda row: calcula_porcentaje_valor(row['utiltot'], row['vtot']), axis=1)
     
-
     return df_consulta
 
 def obtener_resumen_ventarefacciones(bytAgencia, bytSucursal, mes, periodo):

@@ -7,7 +7,7 @@
     <div class="col-sm-12">
         <div class="card card-outline card-lightblue">
             <div class="card-header">						
-                <h3 class="card-title"><i class="fas fa-chart-line"></i> Resumen de Ventas de vehiculos anual </h3>
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>
                 <ul class='navbar-nav'>
                     <div class="row">
                         <div class="col-md-3">                                           
@@ -23,6 +23,7 @@
                                         {% if datos.empresa == '31' %}<option selected value="31">Felix Automotriz</option>{% else %}<option value="31">Felix Automotriz</option>{% endif%}
                                         {% if datos.empresa == '51' %}<option selected value="51">Culiacan Zapata</option>{% else %}<option value="51">Culiacan Zapata</option>{% endif%}
                                         {% if datos.empresa == '52' %}<option selected value="52">Culiacan Aeropuerto</option>{% else %}<option value="52">Culiacan Aeropuerto</option>{% endif%}
+                                        {% if datos.empresa == '53' %}<option selected value="53">Culiacan Flotillas</option>{% else %}<option value="53">Culiacan Flotillas</option>{% endif%}
                                         {% if datos.empresa == '71' %}<option selected value="71">Noroeste Motors</option>{% else %}<option value="71">Noroeste Motors</option>{% endif%}
                                     </select>
                                 </li>

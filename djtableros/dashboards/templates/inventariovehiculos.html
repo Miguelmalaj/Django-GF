@@ -8,7 +8,7 @@
     <div class="col-sm-12">
         <div class="card card-outline card-lightblue">
             <div class="card-header">						
-                <h3 class="card-title"><i class="far fa-list-alt"></i> Inventario de vehiculos por agencia </h3>
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} </h3>
                 <ul class='navbar-nav'>
                     <div class="row">
                         <div class="col-md-3">                                           
@@ -37,80 +37,82 @@
         <div class="row">
             <!-- Ciclo para recorrer los datos, y crear las tarjetas para cada empresa -->
             {% for empresa, detalles in datos.items %}
-            <div class="col-md-4">
-                <div class="card card-widget widget-user">
-                    <div class="widget-user-header {{ detalles.bg }}">
-                        <h3 class="widget-user-username">{{ detalles.nombre_empresa }}</h3>
-                        <h5 class="widget-user-desc">{{ detalles.totalinv }} Vehiculos en inventario</h5>
-                    </div>
-                    <div class="widget-user-image">
-                        <img class="img-circle elevation-2" src="{% static detalles.logo %}" alt="User Avatar">
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-sm-4 border-right">
-                                <div class="description-block">
-                                <h5 class="description-header">{{ detalles.nu }}</h5>
-                                <span class="description-text">NUEVOS</span>
+            {% if empresa != 'opcionmenu' %}
+                <div class="col-md-4">
+                    <div class="card card-widget widget-user">
+                        <div class="widget-user-header {{ detalles.bg }}">
+                            <h3 class="widget-user-username">{{ detalles.nombre_empresa }}</h3>
+                            <h5 class="widget-user-desc">{{ detalles.totalinv }} Vehiculos en inventario</h5>
+                        </div>
+                        <div class="widget-user-image">
+                            <img class="img-circle elevation-2" src="{% static detalles.logo %}" alt="User Avatar">
+                        </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-sm-4 border-right">
+                                    <div class="description-block">
+                                    <h5 class="description-header">{{ detalles.nu }}</h5>
+                                    <span class="description-text">NUEVOS</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 border-right">
+                                    <div class="description-block">
+                                    <h5 class="description-header">{{ detalles.de }}</h5>
+                                    <span class="description-text">DEMOS</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="description-block">
+                                    <h5 class="description-header">{{ detalles.us }}</h5>
+                                    <span class="description-text">SEMINVOS</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 border-right border-top d-flex justify-content-around">
+                                    <small class="mt-2"><i class="far fa-calendar-times"></i></small><small class="mt-2 mb-2"> {{ detalles.diasmas }} mas antiguo</small>
+                                </div>
+                                <div class="col-sm-6 border-top d-flex justify-content-around">
+                                    <small class="mt-2"><i class="far fa-calendar-alt"></i></small><small class="mt-2 mb-2"> {{ detalles.prom }} antig. prom.</small>
                                 </div>
                             </div>
-                            <div class="col-sm-4 border-right">
-                                <div class="description-block">
-                                <h5 class="description-header">{{ detalles.de }}</h5>
-                                <span class="description-text">DEMOS</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="description-block">
-                                <h5 class="description-header">{{ detalles.us }}</h5>
-                                <span class="description-text">SEMINVOS</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 border-right border-top d-flex justify-content-around">
-                                <small class="mt-2"><i class="far fa-calendar-times"></i></small><small class="mt-2 mb-2"> {{ detalles.diasmas }} mas antiguo</small>
-                            </div>
-                            <div class="col-sm-6 border-top d-flex justify-content-around">
-                                <small class="mt-2"><i class="far fa-calendar-alt"></i></small><small class="mt-2 mb-2"> {{ detalles.prom }} antig. prom.</small>
+                            <div class="col-sm-12 border-top d-flex justify-content-around">
+                                {% if detalles.empresa and detalles.sucursal %}
+                                <small class="mt-2"><a href="{% url 'inventario_detalle' detalles.empresa detalles.sucursal %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
+                                {% endif %}
                             </div>
                         </div>
-                        <div class="col-sm-12 border-top d-flex justify-content-around">
-                            {% if detalles.empresa and detalles.sucursal %}
-                            <small class="mt-2"><a href="{% url 'inventario_detalle' detalles.empresa detalles.sucursal %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
-                            {% endif %}
+                        
+                    </div>
+                    <div class="card card-outline card-lightblue">	
+                        <div class="card-body">
+                            <span><p class="text-center">{{ detalles.vencidos }} Unidades pagando PP </p></span>
+                            <div class="progress-group"><!-- 30 dias -->						
+                                +30 dias
+                                <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#{{ empresa }}_detalle30_modal"></i></a></span>
+                                <span class="float-right badge bg-warning">{{ detalles.30 }}</span>
+                                <div class="progress progress-sm">
+                                    <div class='progress-bar bg-warning' style='width: {{ detalles.30porc }}%'; aria-valuemax='{{ detalles.vencidos }}'></div> 
+                                </div>
+                            </div>	
+                            <div class="progress-group"><!-- 90 dias -->
+                                +90 dias
+                                <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#{{ empresa }}_detalle90_modal"></i></a></span>
+                                <span class="float-right badge bg-danger">{{ detalles.90 }}</span>
+                                <div class="progress progress-sm">
+                                    <div class='progress-bar bg-danger' style='width: {{ detalles.90porc }}%'; aria-valuemax='{{ detalles.vencidos }}'></div>            
+                                </div>
+                            </div>	
+                            <div class="progress-group"><!-- 180 dias -->
+                                +180 dias
+                                <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#{{ empresa }}_detalle180_modal"></i></a></span>
+                                <span class="float-right badge bg-danger">{{ detalles.180 }}</span>
+                                <div class="progress progress-sm">
+                                    <div class='progress-bar bg-danger' style='width: {{ detalles.180porc }}%'; aria-valuemax='{{ detalles.vencidos }}'></div>
+                                </div>
+                            </div>	
                         </div>
                     </div>
-                    
                 </div>
-                <div class="card card-outline card-lightblue">	
-                    <div class="card-body">
-                        <span><p class="text-center">{{ detalles.vencidos }} Unidades pagando PP </p></span>
-                        <div class="progress-group"><!-- 30 dias -->						
-                            +30 dias
-                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#{{ empresa }}_detalle30_modal"></i></a></span>
-                            <span class="float-right badge bg-warning">{{ detalles.30 }}</span>
-                            <div class="progress progress-sm">
-                                <div class='progress-bar bg-warning' style='width: {{ detalles.30porc }}%'; aria-valuemax='{{ detalles.vencidos }}'></div> 
-                            </div>
-                        </div>	
-                        <div class="progress-group"><!-- 90 dias -->
-                            +90 dias
-                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#{{ empresa }}_detalle90_modal"></i></a></span>
-                            <span class="float-right badge bg-danger">{{ detalles.90 }}</span>
-                            <div class="progress progress-sm">
-                                <div class='progress-bar bg-danger' style='width: {{ detalles.90porc }}%'; aria-valuemax='{{ detalles.vencidos }}'></div>            
-                            </div>
-                        </div>	
-                        <div class="progress-group"><!-- 180 dias -->
-                            +180 dias
-                            <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#{{ empresa }}_detalle180_modal"></i></a></span>
-                            <span class="float-right badge bg-danger">{{ detalles.180 }}</span>
-                            <div class="progress progress-sm">
-                                <div class='progress-bar bg-danger' style='width: {{ detalles.180porc }}%'; aria-valuemax='{{ detalles.vencidos }}'></div>
-                            </div>
-                        </div>	
-                    </div>
-                </div>
-            </div>   
+            {% endif %}   
             {% endfor %}
         </div>		
         
@@ -118,7 +120,7 @@
     {% for empresa, detalles in datos.items %}
             {% for rango, detalle in detalles.items %}
                 {% if "detalle" in rango %}
-                    <!-- Modal -->
+                    <!-- Ciclo para recorrer los detalles y crear los modales para cada vencimiento de cada empresa -->
                     <div class="modal fade" id="{{ empresa }}_{{ rango }}_modal" tabindex="-1" role="dialog" aria-labelledby="{{ empresa }}_{{ rango }}_label" aria-hidden="true">
                         <div class="modal-dialog modal-xl" role="document">
                             <div class="modal-content">

@@ -1,5 +1,5 @@
 import cx_Oracle
-from dashboards.models import empresas
+from dashboards.models import empresas, OpcionMenu
 
 encoding = "UTF-8"
 
@@ -29,13 +29,13 @@ def auntentifica_usuario(usuario, clave):
         conn = creaconeccion(numero)
         c = conn.cursor()
         
-        strSQL = "SELECT US_IDUSUARIO, US_PASSWORD, US_NOMBRE, NVL(US_PUESTO,'NOASIGNADO') AS US_PUESTO FROM SG_USUARIO"
+        strSQL = "SELECT US_IDUSUARIO, US_PASSWORD, US_NOMBRE, NVL(US_PUESTO,'NOASIGNADO') AS US_PUESTO, NVL(US_NEXTEL, 'user_0.png') AS ICONO FROM SG_USUARIO"
         strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytempresa)
         strSQL = strSQL + " AND US_IDUSUARIO = '" + str(usuario.upper()) + "'"
         c.execute(str(strSQL)) 
 
         for datos in c:
-            us_idusuario, us_password, us_nombre, us_puesto = datos
+            us_idusuario, us_password, us_nombre, us_puesto, us_icono = datos
 
             # Validar contraseña
             if clave.upper() == us_password.upper():
@@ -44,6 +44,7 @@ def auntentifica_usuario(usuario, clave):
                     'usuario': us_idusuario,
                     'nombre': us_nombre,
                     'puesto': us_puesto,
+                    'icono': us_icono.lower(),
                     'empresa': bytempresa
                 }
                 return usuario
@@ -63,6 +64,14 @@ def obtiene_empresa(bytempresa, bytsucursal):
         strempresa = "Empresa no encontrada"
 
     return strempresa
+
+def obtiene_opcionmenu(nombrevista):
+    try:
+        strmenu = OpcionMenu.objects.get(vista=nombrevista)
+    except OpcionMenu.DoesNotExist:
+        strmenu = "no encontrada"
+
+    return strmenu
 
 
 def obtiene_numero(bytEmpresa, bytSucursal):

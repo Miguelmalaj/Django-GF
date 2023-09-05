@@ -124,6 +124,7 @@
                                         <thead>
                                             <tr style="font-size: 12px">
                                                 <th>Concepto</th>
+                                                <th></th>
                                                 <th style="text-align: right"></th>
                                                 <th style="text-align: right">Cantidad</th>
                                                 <th style="text-align: right">Venta Ref.</th>
@@ -149,7 +150,7 @@
                                             {% for row in datos.status %}
                                             <tr style="font-size: 12px">
                                                 <td style='font-size: 12px'>{{ row.status }}</td>
-                                                <td style='font-size: 12px'></td>
+                                                <td><a href="{% url 'detalleordenes' datos.empresa row.status 0 0 3 %}"><i class='fas fa-list-ul'></i></a></td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.cant }}</td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.vtaref|floatformat:0|intcomma }}</td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.ctoref|floatformat:0|intcomma }}</td>

@@ -6,14 +6,12 @@
     <div class="col-sm-12">
         <div class="card card-outline card-lightblue">
             <div class="card-header">						
-                <h3 class="card-title"><i class="far fa-id-badge"></i> Funnel de Ventas x Asesor </h3>                
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>              
                 <ul class='navbar-nav'>
                     <div class="row">
-                        <div class="col-md-3">                                           
-                        </div>
                         <div class="col-md-3">
                         </div>
-                        <div class="col-md-6 align-content-lg-end text-right">
+                        <div class="col-md-9 align-content-lg-end text-right">
                             <ul class='navbar-nav ml-auto'>
                                 <form method="post" action="{% url 'funnelvendedor' %}">
                                 {% csrf_token %}

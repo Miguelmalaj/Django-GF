@@ -13,13 +13,15 @@ def obtiene_afluencia(bytEmpresa, bytSucursal, mes, periodo):
 
     intAfluencias =  0
     intSolicitudes =  0
+    intCitas = 0
     intDemos =  0
     intAprobadas =  0
     intContratos =  0
 
     # '******************************************************************************
     # 'ACUMULADOS AL DIA 
-    strSQL = "SELECT   Afluencia = ISNULL(Sum(af_fresh_n +  af_primera_cita_n ),0), "
+    strSQL = "SELECT   Afluencia = ISNULL(Sum(af_fresh_n),0), "
+    strSQL = strSQL + " Citas = ISNULL(Sum(af_primera_cita_n  ),0),"
     strSQL = strSQL + " Solicitudes = ISNULL(Sum(sol_gmf_n  ),0),"
     strSQL = strSQL + " Demos = 0, "
     strSQL = strSQL + " Aprobadas = isnull(Sum(sol_aprobaciones_gmf_n ),0), "
@@ -34,9 +36,10 @@ def obtiene_afluencia(bytEmpresa, bytSucursal, mes, periodo):
 
     for row in sql:
         intAfluencias =  int(row[0])
-        intSolicitudes =  int(row[1])
-        intAprobadas =  int(row[3])
-        intContratos =  int(row[4])
+        intCitas =  int(row[1])
+        intSolicitudes =  int(row[2])
+        intAprobadas =  int(row[4])
+        intContratos =  int(row[5])
 
     strperiodo = str(periodo) + str('0' + str(mes))[:2]
     objetivos = {
@@ -78,7 +81,7 @@ def obtiene_afluencia(bytEmpresa, bytSucursal, mes, periodo):
             'entregascont': int(row[8]),
         }
 
-    return intAfluencias, intSolicitudes, intAprobadas, intContratos, objetivos
+    return intAfluencias, intSolicitudes, intAprobadas, intContratos, objetivos, intCitas
 
 
 def obtiene_afluencia_vendedor(bytEmpresa, bytSucursal, mes, periodo):

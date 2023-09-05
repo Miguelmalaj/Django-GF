@@ -3,18 +3,19 @@
 {% load humanize %}
 
 {% block page_actions %}
+
+{% endblock %}
+
+{% block content %}
 <div class="row mb-2">
     <div class="col-sm-12">
         <div class="card card-outline card-lightblue">
             <div class="card-header">						
-                <h3 class="card-title"><i class="far fa-list-alt"></i> Detalle de Cuentas x Cobrar | {{ datos.nombreempresa }}</h3>                
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> Detalle {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>             
             </div>
         </div>
     </div><!-- /.col -->
 </div><!-- /.row -->
-{% endblock %}
-
-{% block content %}
 <div class="card card-outline card-lightblue">
     <div class="card-header">			
         <div class="row">
@@ -44,7 +45,7 @@
                         <tbody>
                                 {% for row in datos.cuentasxcobrar %}
                                 {% if row.nombre == 'TOTAL CARTERA' %}
-                                <tr style="font-size: 12px" class="table-warning">
+                                <tr style="font-size: 12px; font-weight:bold" class="table-warning">
                                 {% else %}
                                 <tr style="font-size: 12px">
                                 {% endif %}
@@ -76,7 +77,7 @@
       
       $("#inventarioveh").DataTable({
         "ordering": true,
-        "order":[[8, "desc"]],
+        "order":[[9, "desc"]],
         "responsive": true,
         "autoWidth": false,
         "searching":true,

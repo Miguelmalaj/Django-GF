@@ -27,6 +27,16 @@
                 
                     // Mostrar la fecha formateada en el elemento con el ID "current_date"
                     document.getElementById("current_date").innerHTML = fechaFormateada;
+
+                    //Función para cerrar sesión.
+                    function logout(){
+                        var url = "{% url 'logout' %}";
+                        window.location.href = url;
+                    }
+                    
+                    setTimeout(logout, 30000) //30000 = 30 segundos. || // 3600000 = 60 minutos
+    
+
                 </script>
             </div>
         </li>
@@ -34,7 +44,7 @@
             <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}                                                               
                 <li class='nav-item d-none d-sm-inline-block'>
-                    <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">Salir</button>
+                    <button type="submit" class="btn btn-primary float-right" style="margin-right: 5px;">Salir</button>
                 </li>
             </form>
         </div>

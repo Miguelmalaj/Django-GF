@@ -7,7 +7,7 @@
     <div class="col-sm-12">
         <div class="card card-outline card-lightblue">
             <div class="card-header sticky position-sticky top">						
-                <h3 class="card-title"><i class="fas fa-hand-holding-usd"></i> Ventas de Vehiculos | {{ datos.nombrempresa }} </h3>  			
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> Detalle {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>			
             </div>
         </div>
     </div><!-- /.col -->
@@ -97,6 +97,7 @@
                                             <div class="card-header">
                                                 <i class="fa fa-fw fa-tags"></i> <span class="info-box-text text-left"><strong> Ventas del dia</strong></span>
                                             </div>
+                                            <div class="card-body">
                                                 <table class="table table-sm">
                                                     <thead>
                                                         <tr style='font-size: 12px'>
@@ -129,7 +130,8 @@
                                                             </tr>
                                                             {% endfor %}
                                                     </tbody>
-                                                </table>											
+                                                </table>
+                                            </div>											
                                         </div><!-- card -->
                                     </div> <!-- /.col -->
                                 </div><!-- /.row ventas de dia -->
@@ -248,13 +250,67 @@
                                     </div>
                                 </div> <!-- row -->
 
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card card-outline card-primary collapsed-card table-responsive">
+                                        <div class="card-header">
+                                            <i class="far fa-trash-alt"></i> <span class="info-box-text text-left"><strong>{{ datos.mochis.1.1 }} Ventas Acumuladas</strong></span>
+                                            <div class="card-tools">
+                                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                                <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
+                                            </div><!-- /.card-tools -->
+                                        </div><!-- /.card-header -->
+                                        
+                                        <div class="card-body">
+                                            <table class="table table-sm">
+                                                    <thead>
+                                                        <tr style='font-size: 12px'>
+                                                            
+                                                            <th>Inventario</th>
+                                                            <th>Descripcion</th>
+                                                            <th>Factura</th>
+                                                            <th>Cliente</th>
+                                                            <th>Tipo Venta</th>
+                                                            <th>Vendedor</th>
+                                                            <th style='text-align: right'>Venta</th>
+                                                            <th style='text-align: right'>Costo</th>
+                                                            <th style='text-align: right'>Util</th>
+                                                            <th style='text-align: right'>%</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <!-- aqui va la tabla detalle de ventas por dia -->
+                                                            {% for row in datos.nuevosacum %}
+                                                            <tr style="font-size: 12px">
+                                                                {% for cell in row %}
+                                                                {% if forloop.counter > 1 %}
+                                                                    {% if forloop.counter < 8 %}
+                                                                        <td style='font-size: 12px'>{{ cell }}</td>
+                                                                    {% else %}
+                                                                        <td style='font-size: 12px; text-align: right'>{{ cell|floatformat:0|intcomma }}</td>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                                {% endfor %}
+                                                            </tr>
+                                                            {% endfor %}
+                                                    </tbody>
+                                                </table>	
+                                        </div><!-- /.card-body -->
+                                        </div><!-- /.card -->
+                                    </div><!-- /.col -->
+                                </div><!-- /.row ventas de dia -->
+
                                 <div class="row">	
                                     <div class="col-12 col-lg-12">
-                                        <div class="card card-outline card-danger table-responsive">
+                                        <div class="card card-outline card-danger collapsed-card table-responsive">
                                             <div class="card-header">
                                                 <i class="far fa-trash-alt"></i> <span class="info-box-text text-left"><strong> Ventas Canceladas</strong></span>
+                                                <div class="card-tools">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                                    <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
+                                                </div><!-- /.card-tools -->
                                             </div><!-- card-header -->
-                                            <div class="post">
+                                            <div class="card-body">
                                             
                                                 <table class="table table-sm">
                                                     <thead>
@@ -297,13 +353,17 @@
 
                                 <div class="row">	
                                     <div class="col-12 col-lg-12">
-                                        <div class="card card-outline card-success table-responsive">
+                                        <div class="card card-outline card-success collapsed-card table-responsive">
                                             <div class="card-header">
                                                 
                                                 <i class="far fa-hand-point-right"></i> <span class="info-box-text text-left"><strong> {{ datos.mochis.4.1 }} Unidades Entregadas</strong></span>
+                                                <div class="card-tools">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                                    <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
+                                                </div><!-- /.card-tools -->
                                                 
                                             </div><!-- card-header -->
-                                            <div class="post">
+                                            <div class="card-body">
                                             
                                                 <table class="table table-sm">
                                                     <thead>
@@ -344,11 +404,15 @@
 
                                 <div class="row">	
                                     <div class="col-12 col-lg-12">
-                                        <div class="card card-outline card-warning table-responsive">
+                                        <div class="card card-outline card-warning collapsed-card table-responsive">
                                             <div class="card-header">
                                                 <i class="fas fa-exclamation-circle"></i> <span class="info-box-text text-left"><strong> {{ datos.mochis.5.1 }} Facturadas No Entregadas</strong></span>
+                                                <div class="card-tools">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                                    <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
+                                                </div><!-- /.card-tools -->
                                             </div><!-- card-header -->
-                                            <div class="post">
+                                            <div class="card-body">
                                             
                                                 <table id='FNE' class="table table-sm">
                                                     <thead>

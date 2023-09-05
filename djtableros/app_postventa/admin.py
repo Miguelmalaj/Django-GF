@@ -5,7 +5,7 @@ from app_postventa.models import  OpcionMenu, Permisos
 
 @admin.register(OpcionMenu)
 class OpcionMenu_admin(admin.ModelAdmin):
-    list_display = ('nombre', 'vista', 'icono')
+    list_display = ('nombre', 'vista', 'icono', 'orden')
 
 
 @admin.register(Permisos)

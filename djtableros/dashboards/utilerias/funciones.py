@@ -27,32 +27,42 @@ def ventas_x_vehiculo_mes(bytAgencia, bytSucursal, periodo):
     conn = config.creaconeccion(bytAgencia)
     c = conn.cursor()
 
-    dic_gamabaja = {'AVEO', 'ONIX', 'CAVALIER', 'GROOVE', 'TRACKER', 'TRAX', 'CAPTIVA', 'TORNADO', 'S10', 'XT4', 'XT5'}
+    dic_gamabaja = {'AVEO', 'ONIX', 'CAVALIER', 'GROOVE', 'TRACKER', 'TRAX', 'CAPTIVA', 'TORNADO', 'S10', 'XT4', 'XT5', 'MONTANA'}
 
     #Obtener las Ventas por vehiculos. y agruparlas en la tabla temporal
     strSQL = " SELECT nvl((Case When INSTR(mode_basico, ' ') > 0 Then SUBSTR(mode_basico, 1, INSTR(mode_basico, ' ') - 1) else mode_basico end ),'*** N/E ***') as Concepto, "
-    strSQL = strSQL + " nvl((SUM(1)),0) as Cant, Extract(Month from FAAU_FECHA) as mes "
-    strSQL = strSQL + " FROM AUTOS.VT_VLIBRODEVENTAS " 
-    strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
-    strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
-    strSQL = strSQL + " AND (Extract(Month from FAAU_FECHA)) >= 1 " 
-    strSQL = strSQL + " AND (Extract(Month from FAAU_FECHA)) <= 12 "  
-    strSQL = strSQL + " AND (Extract(year from FAAU_FECHA)) = " + str(periodo)
-    strSQL = strSQL + " AND VEHI_CLASE = 'NU'"
-    strSQL = strSQL + " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
-    strSQL = strSQL + " GROUP BY MODE_BASICO, Extract(Month from FAAU_FECHA) "
-    strSQL = strSQL + " UNION ALL "
-    strSQL = strSQL + " SELECT nvl((Case When INSTR(mode_basico, ' ') > 0 Then SUBSTR(mode_basico, 1, INSTR(mode_basico, ' ') - 1) else mode_basico end ),'*** N/E ***') as Concepto, "
-    strSQL = strSQL + " nvl((SUM(-1)),0) as Cant, Extract(Month from FAAU_FECHACANCELACION) as mes "
-    strSQL = strSQL + " FROM AUTOS.VT_VLIBRODEVENTAS " 
-    strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
-    strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
-    strSQL = strSQL + " AND (Extract(Month from FAAU_FECHACANCELACION)) >=  1 "
-    strSQL = strSQL + " AND (Extract(Month from FAAU_FECHACANCELACION)) <=  12 "
-    strSQL = strSQL + " AND (Extract(year from FAAU_FECHACANCELACION)) = " + str(periodo)
-    strSQL = strSQL + " AND VEHI_CLASE = 'NU'"
-    strSQL = strSQL + " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
-    strSQL = strSQL + " GROUP BY MODE_BASICO, Extract(Month from FAAU_FECHACANCELACION) "
+    strSQL += " nvl((SUM(1)),0) as Cant, Extract(Month from FAAU_FECHA) as mes "
+    strSQL += " FROM AUTOS.VT_VLIBRODEVENTAS " 
+    strSQL += " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
+    strSQL += " AND (Extract(Month from FAAU_FECHA)) >= 1 " 
+    strSQL += " AND (Extract(Month from FAAU_FECHA)) <= 12 "  
+    strSQL += " AND (Extract(year from FAAU_FECHA)) = " + str(periodo)
+    strSQL += " AND VEHI_CLASE = 'NU'"
+    strSQL += " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
+    if bytSucursal != 3:
+        strSQL += " AND AGEN_IDAGENCIA = " + str(bytSucursal)
+        strSQL += " AND PEAU_TIPOVENTA not like '%FLOT%'"
+    else:
+        strSQL += " AND AGEN_IDAGENCIA = 1 "
+        strSQL += " AND PEAU_TIPOVENTA like '%FLOT%'"
+    strSQL += " GROUP BY MODE_BASICO, Extract(Month from FAAU_FECHA) "
+    strSQL += " UNION ALL "
+    strSQL += " SELECT nvl((Case When INSTR(mode_basico, ' ') > 0 Then SUBSTR(mode_basico, 1, INSTR(mode_basico, ' ') - 1) else mode_basico end ),'*** N/E ***') as Concepto, "
+    strSQL += " nvl((SUM(-1)),0) as Cant, Extract(Month from FAAU_FECHACANCELACION) as mes "
+    strSQL += " FROM AUTOS.VT_VLIBRODEVENTAS " 
+    strSQL += " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
+    strSQL += " AND (Extract(Month from FAAU_FECHACANCELACION)) >=  1 "
+    strSQL += " AND (Extract(Month from FAAU_FECHACANCELACION)) <=  12 "
+    strSQL += " AND (Extract(year from FAAU_FECHACANCELACION)) = " + str(periodo)
+    strSQL += " AND VEHI_CLASE = 'NU'"
+    strSQL += " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
+    if bytSucursal != 3:
+        strSQL += " AND AGEN_IDAGENCIA = " + str(bytSucursal)
+        strSQL += " AND PEAU_TIPOVENTA not like '%FLOT%'"
+    else:
+        strSQL += " AND AGEN_IDAGENCIA = 1 "
+        strSQL += " AND PEAU_TIPOVENTA like '%FLOT%'"
+    strSQL += " GROUP BY MODE_BASICO, Extract(Month from FAAU_FECHACANCELACION) "
 
     c.execute(str(strSQL)) 
 
@@ -151,25 +161,33 @@ def ventas_x_vend_mes(bytAgencia, bytSucursal, periodo):
     strSQL = strSQL + " SELECT nvl(SUBSTR(NOMVENDEDOR, 1,25),'*** N/E ***') as Concepto,  nvl((SUM(1)),0) as Cant, Extract(Month from FAAU_FECHA) as mes "
     strSQL = strSQL + " FROM AUTOS.VT_VLIBRODEVENTAS " 
     strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
-    strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
     strSQL = strSQL + " AND (Extract(Month from FAAU_FECHA)) >= 1 " 
     strSQL = strSQL + " AND (Extract(Month from FAAU_FECHA)) <= 12 "  
     strSQL = strSQL + " AND (Extract(year from FAAU_FECHA)) = " + str(periodo)
     strSQL = strSQL + " AND VEHI_CLASE = 'NU'"
     strSQL = strSQL + " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
-    # strSQL = strSQL + " AND PEAU_TIPOVENTA like '%FLOT%'"
+    if bytSucursal != 3:
+        strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
+        strSQL = strSQL + " AND PEAU_TIPOVENTA not like '%FLOT%'"
+    else:
+        strSQL = strSQL + " AND AGEN_IDAGENCIA = 1 "
+        strSQL = strSQL + " AND PEAU_TIPOVENTA like '%FLOT%'"
     strSQL = strSQL + " GROUP BY SUBSTR(NOMVENDEDOR, 1,25), Extract(Month from FAAU_FECHA) "
     strSQL = strSQL + " UNION ALL "
     strSQL = strSQL + " SELECT nvl(SUBSTR(NOMVENDEDOR, 1,25),'*** N/E ***') as Concepto,  nvl((SUM(-1)),0) as Cant, Extract(Month from FAAU_FECHACANCELACION) as mes "
     strSQL = strSQL + " FROM AUTOS.VT_VLIBRODEVENTAS " 
     strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
-    strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
     strSQL = strSQL + " AND (Extract(Month from FAAU_FECHACANCELACION)) >=  1 "
     strSQL = strSQL + " AND (Extract(Month from FAAU_FECHACANCELACION)) <=  12 "
     strSQL = strSQL + " AND (Extract(year from FAAU_FECHACANCELACION)) = " + str(periodo)
     strSQL = strSQL + " AND VEHI_CLASE = 'NU'"
     strSQL = strSQL + " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
-    # strSQL = strSQL + " AND PEAU_TIPOVENTA like '%FLOT%'"
+    if bytSucursal != 3:
+        strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
+        strSQL = strSQL + " AND PEAU_TIPOVENTA not like '%FLOT%'"
+    else:
+        strSQL = strSQL + " AND AGEN_IDAGENCIA = 1 "
+        strSQL = strSQL + " AND PEAU_TIPOVENTA like '%FLOT%'"
     strSQL = strSQL + " GROUP BY SUBSTR(NOMVENDEDOR, 1,25), Extract(Month from FAAU_FECHACANCELACION) "
 
     c.execute(str(strSQL)) 
@@ -340,6 +358,7 @@ def obtiene_ventasvehiculos(bytAgencia, bytSucursal, fechareporte):
     strSQL = strSQL + " Where ET.empr_empresaid =  " + str(bytEmpresa)
     strSQL = strSQL + " AND ET.ENTR_STATUS = 'AC' "
     strSQL = strSQL + " and ET.ENTR_VEHI_CLASE = 'NU' "
+    strSQL = strSQL + " AND NVL(ET.ENTR_SOFIACODE, ' ') <> ' ' "
     strSQL = strSQL + " AND (Extract(Month from ET.ENTR_FECHAENTREGAUNIDAD)) = " + str(periodo.month)
     strSQL = strSQL + " AND (Extract(year from ET.ENTR_FECHAENTREGAUNIDAD)) = " + str(periodo.year)
     strSQL = strSQL + " AND FAAU_FORM_TIPOVENTA not like '%INTER%' "
@@ -469,6 +488,12 @@ def obtiene_ventasvehiculos_detalle(bytAgencia, bytSucursal, fechareporte):
     dfn_hoy = dfn_hoy[(dfn_hoy['hoy_acum'] == 'HOY') & (dfn_hoy['clase'] == 'NU')]  #Filtrar por las columnas que necesitamos
     # Eliminar las columnas que no necesitamos
     dfn_hoy.drop(['clase', 'hoy_acum'], axis=1, inplace=True)
+
+    # Obtener los vehiculos usados Acumulados
+    dfn_acum = df_consulta[['inv', 'descm', 'factura', 'cliente', 'tipoventa', 'vendedor', 'venta', 'costo', 'utilidad', 'clase',  'hoy_acum', 'porcentaje']].copy(deep=True)
+    dfn_acum = dfn_acum[(dfn_acum['hoy_acum'] == 'ACUM') & (dfn_acum['clase'] == 'NU')]  #Filtrar por las columnas que necesitamos
+    # Eliminar las columnas que no necesitamos
+    dfn_acum.drop(['clase', 'hoy_acum'], axis=1, inplace=True)
 
     # Obtener los vehiculos nuevos Cancelados
     dfn_cancel = df_consulta[['inv', 'descm', 'factura', 'fecfactura', 'feccancelacion', 'vendedor', 'cliente', 'tipoventa', 'venta', 'costo', 'utilidad', 'porcentaje', 'status', 'clase']].copy(deep=True)
@@ -701,7 +726,7 @@ def obtiene_ventasvehiculos_detalle(bytAgencia, bytSucursal, fechareporte):
         dfn_fne = df_consulta
 
 
-    return dfn_hoy, dfn_cancel, dfn_modebasico, dfn_vendedor, dfn_tipoventa, dfn_entregas, dfn_fne, dfu_hoy, dfu_acum, dfu_cancel, dfu_modebasico, dfu_tipoventa, dfu_vendedor
+    return dfn_hoy, dfn_acum, dfn_cancel, dfn_modebasico, dfn_vendedor, dfn_tipoventa, dfn_entregas, dfn_fne, dfu_hoy, dfu_acum, dfu_cancel, dfu_modebasico, dfu_tipoventa, dfu_vendedor
 
 def obtiene_fact_entregas(bytAgencia, bytSucursal, mes, periodo):
     """
@@ -1063,13 +1088,69 @@ def resumen_inventario_x_paquete(bytAgencia, bytSucursal):
 
     # Crear el DataFrame
     df_consultaentrega = pd.DataFrame.from_records(c)
+    df_consultaentrega.columns = ['modelo', 'paq', 'cant']
 
     # Crear la tabla pivot en un nuevo DataFrame
-    df=df_consultaentrega.pivot(index=0, columns=1, values=2).fillna(0)
+    df=df_consultaentrega.pivot(index='modelo', columns='paq', values='cant').fillna(0)
 
     df_final = agregar_totales(df, "Total General")
 
     df_final.columns = [flatten_column_header(col) for col in df.columns]
+
+    conn.close
+
+    return df_final
+
+def resumen_inventario_x_paquete_consolidado():
+    """
+    Obtiene el resumen de inventario en existencia, por modelo basico y paquete.
+    y lo regresa en una tabla pivote
+    """
+
+    df_acumulado = pd.DataFrame()
+
+    empresas = ['1', '3', '5']
+    for empresa in empresas:
+        
+        bytEmpresa = 1
+        if empresa == cadillac:
+            bytEmpresa = 2
+
+        conn = None
+        conn = config.creaconeccion(empresa)
+        c = conn.cursor()
+
+        # Obtener el resultado 
+        strSQL = "Select (Case When INSTR(mode_basico, ' ') > 0 Then SUBSTR(mode_basico, 1, INSTR(mode_basico, ' ') - 1) else mode_basico end ) as modelobasico, "
+        strSQL = strSQL + " v.mode_tipo, count(v.vehi_numeroinventario) as cantidad "
+        strSQL = strSQL + " FROM vt_vinventarioautos v, vt_modelos m "
+        strSQL = strSQL + " WHERE V.Empr_Empresaid = " + str(bytEmpresa)
+        strSQL = strSQL + " and V.VEHI_STATUS = 'AC' "
+        strSQL = strSQL + " and V.VEHI_CLAS_CLAVE  <> 'US' "
+        strSQL = strSQL + " and m.empr_empresaid = v.empr_empresaid "
+        strSQL = strSQL + " and M.MODE_CLAVE = V.MODE_CLAVE "
+        strSQL = strSQL + " and m.mode_tipo = v.mode_tipo "
+        strSQL = strSQL + " group by (Case When INSTR(mode_basico, ' ') > 0 Then SUBSTR(mode_basico, 1, INSTR(mode_basico, ' ') - 1) else mode_basico end ), v.mode_tipo "
+        strSQL = strSQL + " order by (Case When INSTR(mode_basico, ' ') > 0 Then SUBSTR(mode_basico, 1, INSTR(mode_basico, ' ') - 1) else mode_basico end ), v.mode_tipo "
+
+        c.execute(str(strSQL)) 
+
+        # Crear el DataFrame
+        df_consulta = pd.DataFrame.from_records(c)
+        df_consulta.columns = ['modelo', 'paq', 'cant']
+        # Concatenar el DataFrame de la empresa actual al DataFrame consolidado
+        df_acumulado = pd.concat([df_acumulado, df_consulta], axis=0)
+
+    # Crear la tabla pivot en un nuevo DataFrame
+    # Realizar una agregación para evitar índices duplicados
+    df_acumulado = df_acumulado.groupby(['modelo', 'paq']).agg({'cant': 'sum'}).reset_index()
+    df=df_acumulado.pivot(index='modelo', columns='paq', values='cant').fillna(0)
+
+    df_final = agregar_totales(df, "Total General")
+
+    df_final.columns = [flatten_column_header(col) for col in df.columns]
+
+    conn.close
 
     return df_final
 
@@ -1087,35 +1168,35 @@ def inventario_detalle(bytAgencia, bytSucursal):
 
     # Obtener el resultado 
     strSQL = " SELECT (V.VEHI_CLASE || '-' || V.VEHI_ANIO || '-' || V.VEHI_NUMEROINVENTARIO) as INVENTARIO, V.MODE_DESCRIPCION, V.Mode_tipo,  V.VEHI_SERIE, "
-    strSQL = strSQL + " TO_DATE(V.VEHI_FECHAASIGNACION, 'DD/MM/YY') AS FECHAASIGN, TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY') AS FECHAINTERES, "
-    strSQL = strSQL + " (Trunc(Sysdate) - Trunc(TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY'))) as diasPP,  (Ve.Colo_descrip || ' | ' ||  VI.Colo_Descrip) as Color, "
-    strSQL = strSQL + " V.VEHI_ANIO_MODELO, v.UBIC_DESCRIPCION, NVL(V.vehi_ignitionkey, ' ') as Apartado , "
-    strSQL = strSQL + " nvl (( SELECT PP.PRIM_SALDO * -1 FROM VT_PRIMPLANPISO PP "
-    strSQL = strSQL + "         WHERE PP.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
-    strSQL = strSQL + "         AND PP.PRIM_VEHI_CLASE = V.VEHI_CLAS_CLAVE "
-    strSQL = strSQL + "         AND PP.PRIM_VEHI_ANIO = V.VEHI_ANIO "
-    strSQL = strSQL + "         AND PP.PRIM_VEHI_NUMEROINVENTARIO = V.VEHI_NUMEROINVENTARIO "
-    strSQL = strSQL + "     ), 0) AS PRIM_SALDO, V.VEHI_COSTOFACTURA "
-    strSQL = strSQL + " FROM  vt_vinventarioautos V, VT_Colores VE, vt_Colores VI "
-    strSQL = strSQL + " WHERE V.EMPR_EMPRESAID = " + str(bytEmpresa)
-    strSQL = strSQL + " AND V.VEHI_STATUS = 'AC' "
+    strSQL += " TO_DATE(V.VEHI_FECHAASIGNACION, 'DD/MM/YY') AS FECHAASIGN, TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY') AS FECHAINTERES, "
+    strSQL += " (Trunc(Sysdate) - Trunc(TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY'))) as diasPP,  (Ve.Colo_descrip || ' | ' ||  VI.Colo_Descrip) as Color, "
+    strSQL += " V.VEHI_ANIO_MODELO, v.UBIC_DESCRIPCION, NVL(V.vehi_ignitionkey, ' ') as Apartado , "
+    strSQL += " nvl (( SELECT PP.PRIM_SALDO * -1 FROM VT_PRIMPLANPISO PP "
+    strSQL += "         WHERE PP.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
+    strSQL += "         AND PP.PRIM_VEHI_CLASE = V.VEHI_CLAS_CLAVE "
+    strSQL += "         AND PP.PRIM_VEHI_ANIO = V.VEHI_ANIO "
+    strSQL += "         AND PP.PRIM_VEHI_NUMEROINVENTARIO = V.VEHI_NUMEROINVENTARIO "
+    strSQL += "     ), 0) AS PRIM_SALDO, V.VEHI_COSTOFACTURA, V.VEHI_CLASE "
+    strSQL += " FROM  vt_vinventarioautos V, VT_Colores VE, vt_Colores VI "
+    strSQL += " WHERE V.EMPR_EMPRESAID = " + str(bytEmpresa)
+    strSQL += " AND V.VEHI_STATUS = 'AC' "
     if bytSucursal == 3:
-        strSQL = strSQL + " AND V.UBIC_DESCRIPCION like ('%FLOT%') "
+        strSQL += " AND V.UBIC_DESCRIPCION like ('%FLOT%') "
     else:
-        strSQL = strSQL + " AND V.UBIC_DESCRIPCION not like ('%FLOT%') "
-    strSQL = strSQL + " AND VE.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
-    strSQL = strSQL + " AND VE.Colo_clave = V.Vehi_colo_Claveext1 "
-    strSQL = strSQL + " AND VE.Colo_Mode_clave = V.MODE_CLAVE "
-    strSQL = strSQL + " AND VI.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
-    strSQL = strSQL + " AND VI.Colo_clave = V.Vehi_colo_Claveext1 "
-    strSQL = strSQL + " AND VI.Colo_Mode_clave = V.MODE_CLAVE "
-    strSQL = strSQL + " ORDER BY diasPP DESC,  V.VEHI_CLASE, V.VEHI_ANIO, V.VEHI_NUMEROINVENTARIO "
+        strSQL += " AND V.UBIC_DESCRIPCION not like ('%FLOT%') "
+    strSQL += " AND VE.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
+    strSQL += " AND VE.Colo_clave = V.Vehi_colo_Claveext1 "
+    strSQL += " AND VE.Colo_Mode_clave = V.MODE_CLAVE "
+    strSQL += " AND VI.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
+    strSQL += " AND VI.Colo_clave = V.Vehi_colo_Claveext1 "
+    strSQL += " AND VI.Colo_Mode_clave = V.MODE_CLAVE "
+    strSQL += " ORDER BY diasPP DESC,  V.VEHI_CLASE, V.VEHI_ANIO, V.VEHI_NUMEROINVENTARIO "
 
-    c.execute(str(strSQL)) 
+    c.execute(strSQL) 
 
     # Crear el DataFrame
     df_consulta = pd.DataFrame.from_records(c)
-    df_consulta.columns =['inv', 'descm', 'paq', 'vin', 'fasignacion', 'finteres', 'diaspp', 'color', 'modelo', 'ubicacion', 'observaciones', 'saldopp', 'costo']
+    df_consulta.columns =['inv', 'descm', 'paq', 'vin', 'fasignacion', 'finteres', 'diaspp', 'color', 'modelo', 'ubicacion', 'observaciones', 'saldopp', 'costo', 'clase']
     # Convierte las columnas al tipo datetime
     df_consulta['fasignacion'] = pd.to_datetime(df_consulta['fasignacion'])
     df_consulta['finteres'] = pd.to_datetime(df_consulta['finteres'])
@@ -1125,9 +1206,14 @@ def inventario_detalle(bytAgencia, bytSucursal):
     df_consulta['descm'] = df_consulta['descm'].str[:30]
     df_consulta['vin'] = df_consulta['vin'].str[-8:]
 
+     # Separar los nuevos y los seminuevos
+    filtrousados = df_consulta["clase"].str.contains("US", case=False)
+    df_nuevos = df_consulta[~filtrousados].copy()
+    df_seminuevos = df_consulta[filtrousados].copy()
+
     conn.close
 
-    return df_consulta
+    return df_nuevos, df_seminuevos
 
 def resumeninvxagencia(bytAgencia, bytSucursal):
     """
@@ -1142,31 +1228,33 @@ def resumeninvxagencia(bytAgencia, bytSucursal):
     conn = config.creaconeccion(bytAgencia)
     c = conn.cursor()
 
+    strempresa = config.obtiene_empresa(bytAgencia, bytSucursal)
+
     # Obtener el resultado de la tabla del DMS
     strSQL = " SELECT (V.VEHI_CLASE || '-' || V.VEHI_ANIO || '-' || V.VEHI_NUMEROINVENTARIO) as INVENTARIO, V.MODE_DESCRIPCION, V.Mode_tipo,  V.VEHI_SERIE, "
-    strSQL = strSQL + " TO_DATE(V.VEHI_FECHAASIGNACION, 'DD/MM/YY') AS FECHAASIGN, TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY') AS FECHAINTERES, "
-    strSQL = strSQL + " (Trunc(Sysdate) - Trunc(TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY'))) as diasPP,  (Ve.Colo_descrip || ' | ' ||  VI.Colo_Descrip) as Color, "
-    strSQL = strSQL + " V.VEHI_ANIO_MODELO, v.UBIC_DESCRIPCION, NVL(V.vehi_ignitionkey, ' ') as Apartado , "
-    strSQL = strSQL + " nvl (( SELECT PP.PRIM_SALDO * -1 FROM VT_PRIMPLANPISO PP "
-    strSQL = strSQL + "         WHERE PP.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
-    strSQL = strSQL + "         AND PP.PRIM_VEHI_CLASE = V.VEHI_CLAS_CLAVE "
-    strSQL = strSQL + "         AND PP.PRIM_VEHI_ANIO = V.VEHI_ANIO "
-    strSQL = strSQL + "         AND PP.PRIM_VEHI_NUMEROINVENTARIO = V.VEHI_NUMEROINVENTARIO "
-    strSQL = strSQL + "     ), 0) AS PRIM_SALDO, V.VEHI_COSTOFACTURA, VEHI_CLAS_CLAVE, TO_DATE(VEHI_FECHAASIGNACION, 'DD/MM/YY') AS FECHA,  TO_DATE(VEHI_FECHAVENCIMIENTO, 'DD/MM/YY') AS FECHAVENCIMIENTO "
-    strSQL = strSQL + " FROM  vt_vinventarioautos V, VT_Colores VE, vt_Colores VI "
-    strSQL = strSQL + " WHERE V.EMPR_EMPRESAID = " + str(bytEmpresa)
-    strSQL = strSQL + " AND V.VEHI_STATUS = 'AC' "
+    strSQL += " TO_DATE(V.VEHI_FECHAASIGNACION, 'DD/MM/YY') AS FECHAASIGN, TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY') AS FECHAINTERES, "
+    strSQL += " (Trunc(Sysdate) - Trunc(TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY'))) as diasPP,  (Ve.Colo_descrip || ' | ' ||  VI.Colo_Descrip) as Color, "
+    strSQL += " V.VEHI_ANIO_MODELO, v.UBIC_DESCRIPCION, NVL(V.vehi_ignitionkey, ' ') as Apartado , "
+    strSQL += " nvl (( SELECT PP.PRIM_SALDO * -1 FROM VT_PRIMPLANPISO PP "
+    strSQL += "         WHERE PP.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
+    strSQL += "         AND PP.PRIM_VEHI_CLASE = V.VEHI_CLAS_CLAVE "
+    strSQL += "         AND PP.PRIM_VEHI_ANIO = V.VEHI_ANIO "
+    strSQL += "         AND PP.PRIM_VEHI_NUMEROINVENTARIO = V.VEHI_NUMEROINVENTARIO "
+    strSQL += "     ), 0) AS PRIM_SALDO, V.VEHI_COSTOFACTURA, VEHI_CLAS_CLAVE, TO_DATE(VEHI_FECHAASIGNACION, 'DD/MM/YY') AS FECHA,  TO_DATE(VEHI_FECHAVENCIMIENTO, 'DD/MM/YY') AS FECHAVENCIMIENTO "
+    strSQL += " FROM  vt_vinventarioautos V, VT_Colores VE, vt_Colores VI "
+    strSQL += " WHERE V.EMPR_EMPRESAID = " + str(bytEmpresa)
+    strSQL += " AND V.VEHI_STATUS = 'AC' "
     if bytSucursal == 3:
-        strSQL = strSQL + " AND V.UBIC_DESCRIPCION like ('%FLOT%') "
+        strSQL += " AND V.UBIC_DESCRIPCION like ('%FLOT%') "
     else:
-        strSQL = strSQL + " AND V.UBIC_DESCRIPCION not like ('%FLOT%') "
-    strSQL = strSQL + " AND VE.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
-    strSQL = strSQL + " AND VE.Colo_clave = V.Vehi_colo_Claveext1 "
-    strSQL = strSQL + " AND VE.Colo_Mode_clave = V.MODE_CLAVE "
-    strSQL = strSQL + " AND VI.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
-    strSQL = strSQL + " AND VI.Colo_clave = V.Vehi_colo_Claveext1 "
-    strSQL = strSQL + " AND VI.Colo_Mode_clave = V.MODE_CLAVE "
-    strSQL = strSQL + " ORDER BY diasPP DESC,  V.VEHI_CLASE, V.VEHI_ANIO, V.VEHI_NUMEROINVENTARIO "
+        strSQL += " AND V.UBIC_DESCRIPCION not like ('%FLOT%') "
+    strSQL += " AND VE.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
+    strSQL += " AND VE.Colo_clave = V.Vehi_colo_Claveext1 "
+    strSQL += " AND VE.Colo_Mode_clave = V.MODE_CLAVE "
+    strSQL += " AND VI.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
+    strSQL += " AND VI.Colo_clave = V.Vehi_colo_Claveext1 "
+    strSQL += " AND VI.Colo_Mode_clave = V.MODE_CLAVE "
+    strSQL += " ORDER BY diasPP DESC,  V.VEHI_CLASE, V.VEHI_ANIO, V.VEHI_NUMEROINVENTARIO "
 
     c.execute(str(strSQL)) 
 
@@ -1207,14 +1295,126 @@ def resumeninvxagencia(bytAgencia, bytSucursal):
     vencidos_90_180 = df_consulta[(df_consulta['DiasVencidos'] >= 90) & (df_consulta['DiasVencidos'] < 180)]
     vencidos_mas_180 = df_consulta[df_consulta['DiasVencidos'] >= 180]
 
-    strlogo = "admin-lte/dist/img/logo_chevrolet.jpg"
-    strbg = "bg-lightblue"
+    strlogo = strempresa.logo
+    strbg = strempresa.bg_color
     if bytEmpresa == 2:
         strlogo = "admin-lte/dist/img/logo_cadillac.jpg"
         strbg = "bg-warning"
 
     datos = {
-        'nombre_empresa': config.obtiene_empresa(bytAgencia, bytSucursal),
+        'nombre_empresa': strempresa.nombre_empresa,
+        'empresa': str(bytAgencia), 
+        'sucursal': str(bytSucursal),
+        'totalinv': total_registros,
+        'nu': total_nu,
+        'de': total_de,
+        'us': total_us,
+        'diasmas': dias_mas_antiguo,
+        'prom': antiguedad_promedio,
+        'vencidos': vencidos_total,
+        '30': vencidos_30_90.shape[0],
+        '30porc': utilerias.calcula_porcentaje_valor(vencidos_30_90.shape[0], vencidos_total),
+        '90': vencidos_90_180.shape[0],
+        '90porc': utilerias.calcula_porcentaje_valor(vencidos_90_180.shape[0], vencidos_total),
+        '180': vencidos_mas_180.shape[0],
+        '180porc':utilerias.calcula_porcentaje_valor(vencidos_mas_180.shape[0], vencidos_total),
+        'detalle30': vencidos_30_90.to_dict(orient='records'), 
+        'detalle90': vencidos_90_180.to_dict(orient='records'), 
+        'detalle180': vencidos_mas_180.to_dict(orient='records'),
+        'logo': strlogo,
+        'bg': strbg
+        }
+
+    return datos
+
+def resumen_planpiso(bytAgencia, bytSucursal):
+    """
+    Obtiene el resumen de inventario en existencia, por tipo de vehiculo, dias de antiguedad y antiguedad promedio
+    y lo regresa en una tabla pivote
+    """
+    bytEmpresa = 1
+    if bytAgencia == cadillac:
+        bytEmpresa = 2
+
+    conn = None
+    conn = config.creaconeccion(bytAgencia)
+    c = conn.cursor()
+
+    strempresa = config.obtiene_empresa(bytAgencia, bytSucursal)
+
+    # Obtener el resultado de la tabla del DMS
+    strSQL = " SELECT (V.VEHI_CLASE || '-' || V.VEHI_ANIO || '-' || V.VEHI_NUMEROINVENTARIO) as INVENTARIO, V.MODE_DESCRIPCION, V.Mode_tipo,  V.VEHI_SERIE, "
+    strSQL += " TO_DATE(V.VEHI_FECHAASIGNACION, 'DD/MM/YY') AS FECHAASIGN, TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY') AS FECHAINTERES, "
+    strSQL += " (Trunc(Sysdate) - Trunc(TO_DATE(V.VEHI_FECHAVENCIMIENTO, 'DD/MM/YY'))) as diasPP,  (Ve.Colo_descrip || ' | ' ||  VI.Colo_Descrip) as Color, "
+    strSQL += " V.VEHI_ANIO_MODELO, v.UBIC_DESCRIPCION, NVL(V.vehi_ignitionkey, ' ') as Apartado , "
+    strSQL += " nvl (( SELECT PP.PRIM_SALDO * -1 FROM VT_PRIMPLANPISO PP "
+    strSQL += "         WHERE PP.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
+    strSQL += "         AND PP.PRIM_VEHI_CLASE = V.VEHI_CLAS_CLAVE "
+    strSQL += "         AND PP.PRIM_VEHI_ANIO = V.VEHI_ANIO "
+    strSQL += "         AND PP.PRIM_VEHI_NUMEROINVENTARIO = V.VEHI_NUMEROINVENTARIO "
+    strSQL += "     ), 0) AS PRIM_SALDO, V.VEHI_COSTOFACTURA, VEHI_CLAS_CLAVE, TO_DATE(VEHI_FECHAASIGNACION, 'DD/MM/YY') AS FECHA,  TO_DATE(VEHI_FECHAVENCIMIENTO, 'DD/MM/YY') AS FECHAVENCIMIENTO "
+    strSQL += " FROM  vt_vinventarioautos V, VT_Colores VE, vt_Colores VI "
+    strSQL += " WHERE V.EMPR_EMPRESAID = " + str(bytEmpresa)
+    strSQL += " AND V.VEHI_STATUS = 'AC' "
+    if bytSucursal == 3:
+        strSQL += " AND V.UBIC_DESCRIPCION like ('%FLOT%') "
+    else:
+        strSQL += " AND V.UBIC_DESCRIPCION not like ('%FLOT%') "
+    strSQL += " AND VE.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
+    strSQL += " AND VE.Colo_clave = V.Vehi_colo_Claveext1 "
+    strSQL += " AND VE.Colo_Mode_clave = V.MODE_CLAVE "
+    strSQL += " AND VI.EMPR_EMPRESAID = V.EMPR_EMPRESAID "
+    strSQL += " AND VI.Colo_clave = V.Vehi_colo_Claveext1 "
+    strSQL += " AND VI.Colo_Mode_clave = V.MODE_CLAVE "
+    strSQL += " ORDER BY diasPP DESC,  V.VEHI_CLASE, V.VEHI_ANIO, V.VEHI_NUMEROINVENTARIO "
+
+    c.execute(str(strSQL)) 
+
+    # Crear el DataFrame
+    df_consulta = pd.DataFrame.from_records(c)
+    df_consulta.columns =['inv', 'descm', 'paq', 'vin', 'fasignacion', 'finteres', 'diaspp', 'color', 'modelo', 'ubicacion', 'observaciones', 'saldopp', 'costo', 'Clase', 'Fecha', 'FechaVencimiento']
+    # Convierte las columnas al tipo datetime
+    df_consulta['fasignacion'] = pd.to_datetime(df_consulta['fasignacion'])
+    df_consulta['finteres'] = pd.to_datetime(df_consulta['finteres'])
+    # Cambia el formato de las columnas 'fecfactura' y 'feccancelacion' en el mismo DataFrame
+    df_consulta[['fasignacion', 'finteres']] = df_consulta[['fasignacion', 'finteres']].applymap(lambda x: x.strftime('%d/%m/%y'))
+    # Limitar el numero de caracteres por columna
+    df_consulta['descm'] = df_consulta['descm'].str[:30]
+    df_consulta['vin'] = df_consulta['vin'].str[-8:]
+
+    
+    # Convertir la columna 'Fecha' al tipo datetime
+    df_consulta['Fecha'] = pd.to_datetime(df_consulta['Fecha'], format='%d/%m/%Y')
+    df_consulta['FechaVencimiento'] = pd.to_datetime(df_consulta['FechaVencimiento'], format='%d/%m/%Y')
+
+    # Estadísticas
+    total_registros = len(df_consulta)
+    total_nu = len(df_consulta[df_consulta['Clase'] == 'NU'])
+    total_de = len(df_consulta[df_consulta['Clase'] == 'DE'])
+    total_us = len(df_consulta[df_consulta['Clase'] == 'US'])
+    dias_mas_antiguo = (datetime.now() - df_consulta['Fecha'].min()).days
+    antiguedad_promedio = (datetime.now() - df_consulta['Fecha']).mean().days
+
+    # Fecha actual
+    fecha_actual = datetime.now()
+
+    # Calcula los días vencidos para cada fecha
+    df_consulta['DiasVencidos'] = (fecha_actual - df_consulta['FechaVencimiento']).dt.days
+
+    # Filtrar los registros vencidos
+    vencidos_total = df_consulta[df_consulta['DiasVencidos'] > 0].shape[0]
+    vencidos_30_90 = df_consulta[(df_consulta['DiasVencidos'] >= 30) & (df_consulta['DiasVencidos'] < 90)]
+    vencidos_90_180 = df_consulta[(df_consulta['DiasVencidos'] >= 90) & (df_consulta['DiasVencidos'] < 180)]
+    vencidos_mas_180 = df_consulta[df_consulta['DiasVencidos'] >= 180]
+
+    strlogo = strempresa.logo
+    strbg = strempresa.bg_color
+    if bytEmpresa == 2:
+        strlogo = "admin-lte/dist/img/logo_cadillac.jpg"
+        strbg = "bg-warning"
+
+    datos = {
+        'nombre_empresa': strempresa.nombre_empresa,
         'empresa': str(bytAgencia), 
         'sucursal': str(bytSucursal),
         'totalinv': total_registros,
@@ -1264,6 +1464,10 @@ def resumen_cuentasxcobrar(bytAgencia, bytSucursal):
     strSQL += " and cp.prim_saldo <> 0 "
     if strempresa.ref_cartera != "*":
         strSQL += " AND CP.PRIM_REFERENCIA3 LIKE ('%" + str(strempresa.ref_cartera) + "%')"
+    if bytSucursal == 3:
+        strSQL += " AND CP.PRIM_TIPOVENTA LIKE ('%FLOT%')"
+    else:
+        strSQL += " AND CP.PRIM_TIPOVENTA NOT LIKE ('%FLOT%')"
     strSQL += " AND TC.EMPR_EMPRESAID = Cp.EMPR_EMPRESAID "
     strSQL += " AND TC.TIPO_CARTERA = CP.PRIM_CARTERA "
     strSQL += " Order by c.Clie_clave "
@@ -1301,14 +1505,11 @@ def resumen_cuentasxcobrar(bytAgencia, bytSucursal):
     saldo_vencido = vencidos_total['saldo'].sum()
     saldo_total = df_consulta['saldo'].sum()
 
-    strlogo = "admin-lte/dist/img/logo_chevrolet.jpg"
-    strbg = "bg-lightblue"
-    if bytEmpresa == 2:
-        strlogo = "admin-lte/dist/img/logo_cadillac.jpg"
-        strbg = "bg-warning"
+    strlogo = strempresa.logo
+    strbg = strempresa.bg_color
 
     datos = {
-        'nombre_empresa': config.obtiene_empresa(bytAgencia, bytSucursal),
+        'nombre_empresa': strempresa.nombre_empresa,
         'empresa': str(bytAgencia), 
         'sucursal': str(bytSucursal),
         'totalcartera': df_consulta['saldo'].sum(),
@@ -1370,9 +1571,15 @@ def detalle_cuentasxcobrar(bytAgencia, bytSucursal):
     strSQL += " and cp.prim_saldo <> 0 "
     if strempresa.ref_cartera != "*":
         strSQL += " AND CP.PRIM_REFERENCIA3 LIKE ('%" + str(strempresa.ref_cartera) + "%')"
+    if bytSucursal == 3:
+        strSQL += " AND CP.PRIM_TIPOVENTA LIKE ('%FLOT%')"
+    else:
+        strSQL += " AND CP.PRIM_TIPOVENTA NOT LIKE ('%FLOT%')"
     strSQL += " AND TC.EMPR_EMPRESAID = Cp.EMPR_EMPRESAID "
     strSQL += " AND TC.TIPO_CARTERA = CP.PRIM_CARTERA "
     strSQL += " Order by c.Clie_clave "
+
+    print(str(bytSucursal))
 
     c.execute(str(strSQL)) 
 
@@ -1394,7 +1601,20 @@ def detalle_cuentasxcobrar(bytAgencia, bytSucursal):
         'comentarios': concat_unique_comments  # Utilizar la función de concatenación de comentarios únicos
     }).reset_index()
 
-    return df_grouped_totals
+   # Calcular los totales para la fila "TOTAL"
+    total_row = df_grouped_totals.drop(['cliente', 'grupocartera', 'comentarios'], axis=1).sum().fillna(0)
+    total_row['nombre'] = 'TOTAL CARTERA'  # Agregar el nombre "TOTAL"
+
+    # Crear un DataFrame con la fila "TOTAL"
+    df_total_row = pd.DataFrame([total_row], columns=df_grouped_totals.columns)
+
+    # Concatenar df_grouped_totals y df_total_row
+    df_final = pd.concat([df_grouped_totals, df_total_row], ignore_index=True).fillna(' ')
+
+    # Concatenar df_final con df_total usando concat
+    # df_final = pd.concat([df_final, df_total], axis=1)
+
+    return df_final
 
 def completar_columnas(df, nombretotal="TOTAL", cuantas = 12):
     """

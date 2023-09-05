@@ -10,22 +10,28 @@ class empresas(models.Model):
     usuario = models.CharField(max_length=100)
     clave_acceso = models.CharField(max_length=100)
     ref_cartera = models.CharField(max_length=30, default='*', help_text="Referencia en el campo PRIM_REFERENCIA3 en GlobalDMS para separar la cartera de CXC")
-
-    # def save(self, *args, **kwargs):
-    #     # Hasheamos la clave de acceso antes de guardarla
-    #     self.clave_acceso = make_password(self.clave_acceso)
-    #     super().save(*args, **kwargs)
+    logo = models.CharField(max_length=100, default='', help_text="logo a mostrar en los tableros resumen")
+    bg_color = models.CharField(max_length=50, default='', help_text="color de fondo para los tableros resumen")
 
     def __str__(self):
         return self.nombre_empresa
+    
+    class Meta:
+        verbose_name = 'Empresas del Sistema'
+        ordering = ['empresa', 'sucursal']  # Ordenar los registros por el campo empresa y sucursal
     
 class OpcionMenu(models.Model):
     nombre = models.CharField(max_length=50)
     vista = models.CharField(max_length=100)  # Nombre de la vista
     icono = models.CharField(max_length=50)   # Nombre de la clase de icono
+    orden = models.IntegerField(default=0, help_text="Indica el orden en que se mostrara en el menu")  # Campo para el orden
 
     def __str__(self):
         return self.nombre
+    
+    class Meta:
+        verbose_name = 'Opciones del menu'
+        ordering = ['orden']  # Ordenar los registros por el campo 'orden'
     
 class Permisos(models.Model):
     nombre = models.CharField(max_length=50)
@@ -35,3 +41,6 @@ class Permisos(models.Model):
     def __str__(self):
         return self.nombre
     
+    class Meta:
+        verbose_name = 'Permisos x usuario'
+        
