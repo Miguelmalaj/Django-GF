@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+<div class="row mb-2">
+    <div class="col-sm-12">
+        <div class="card card-outline card-lightblue">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>
+                <ul class='navbar-nav'>
+                    <div class="row">
+                        <div class="col-md-3">                                           
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-6 align-content-lg-end text-right">
+                            <form method="post" action="{% url 'resumeninvveh' %}">
+                            {% csrf_token %}
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <select  class='form-control select2' id="empresas" name="empresas">
+                                        {% if datos.empresa == '11' %}<option selected value="11">Felix Automotores</option>{% else %}<option value="11">Felix Automotores</option>{% endif%}
+                                        {% if datos.empresa == '31' %}<option selected value="31">Felix Automotriz</option>{% else %}<option value="31">Felix Automotriz</option>{% endif%}
+                                        {% if datos.empresa == '51' %}<option selected value="51">Culiacan Zapata</option>{% else %}<option value="51">Culiacan Zapata</option>{% endif%}
+                                        {% if datos.empresa == '71' %}<option selected value="71">Noroeste Motors</option>{% else %}<option value="71">Noroeste Motors</option>{% endif%}
+                                        {% if datos.empresa == '00' %}<option selected value="00">Consolidado Chevrolet</option>{% else %}<option value="00">Consolidado Chevrolet</option>{% endif%}
+                                    </select>
+                                </li>
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <button type='submit' class='btn btn-primary btn-block'><i class="far fa-hand-point-right"></i> Actualizar</button>
+                                </li>
+                            </form>
+                        </div>
+                    </div>
+                </ul>						
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-lightblue">
+    <div class="card-header">			
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-12 col-sm-6">
+                <div class="card card-lightblue direct-chat direct-chat-lightblue">
+                    <div class="card-header">
+                        <i class="fas fa-car"></i><span class="info-box-text"> Resumen de inventario de vehiculos por modelo</span>
+                    </div>
+                    <table id="inventarioveh" class="table table-sm">
+                        <thead>
+                            <tr style="font-size: 12px">
+                                <th>Modelo</th>
+                                {% for columna in datos.columnas %}
+                                <th style='text-align:center'>{{ columna }}</th>
+                                {% endfor %}
+                            </tr>
+                            <tbody>
+                                    {% for row in datos.datos %}
+                                    <tr style="font-size: 12px">
+                                        {% for cell in row %}
+                                            {% if forloop.first %}
+                                                <td>{{ cell }}</td>
+                                            {% else%}
+                                            <td style='text-align:center'>{{ cell|floatformat:0 }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

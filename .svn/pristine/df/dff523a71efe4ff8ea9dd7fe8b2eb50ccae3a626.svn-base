@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+<div class="row">
+    <div class="col-sm-12 col-12 table-responsive">
+        <div class="card card-outline card-primary">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="fas fas fa-tasks"></i> Ordenes en Proceso | {{ datos.nombreempresa }} </h3>	
+                <ul class='navbar-nav'>
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-9 align-content-lg-end text-right">
+                            <ul class='navbar-nav ml-auto'>
+                                <form method="post" action="{% url 'ordenesproceso' %}">
+                                {% csrf_token %}
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select  class='form-control select2' id="empresas" name="empresas">
+                                            {% if datos.empresa == '11' %}<option selected value="11">Felix Automotores</option>{% else %}<option value="11">Felix Automotores</option>{% endif%}
+                                            {% if datos.empresa == '31' %}<option selected value="31">Felix Automotriz</option>{% else %}<option value="31">Felix Automotriz</option>{% endif%}
+                                            {% if datos.empresa == '51' %}<option selected value="51">Culiacan Zapata</option>{% else %}<option value="51">Culiacan Zapata</option>{% endif%}
+                                            {% if datos.empresa == '52' %}<option selected value="52">Culiacan Aeropuerto</option>{% else %}<option value="52">Culiacan Aeropuerto</option>{% endif%}
+                                            {% if datos.empresa == '71' %}<option selected value="71">Noroeste Motors</option>{% else %}<option value="71">Noroeste Motors</option>{% endif%}
+                                        </select>
+                                    </li>
+                                   
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <button type='submit' class='btn btn-primary btn-block'>Actualizar</button>
+                                    </li>
+                                </form>
+                            </ul>
+                        </div>
+                    </div>
+                </ul>				
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+{% endblock %}
+
+{% block content %}
+<div class="card-body">
+    <div class="row">
+        <div class="col-12 col-sm-3 col-lg-12 order-2 order-md-2">					
+            <div class="row">
+                <div class="col-sm-3 col-lg-12">
+                    <!-- Cantidad de ordenes en proceso -->
+                    <div class="row">
+                        <div class="col-sm-12 col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <tr style="font-size: 12px">
+                                            <th style="width: 30%; text-align:center">ORDENES EN PROCESO</th>
+                                        </tr>
+                                    </table>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr style="font-size: 12px">
+                                                <th>Concepto</th>
+                                                <th style="text-align: right">Cantidad</th>
+                                                <th style="text-align: right">Venta Ref.</th>
+                                                <th style="text-align: right">Costo Ref.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                                <th style="text-align: right">Venta MO.</th>
+                                                <th style="text-align: right">Costo MO.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                                <th style="text-align: right">Venta TOT.</th>
+                                                <th style="text-align: right">Costo TOT.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                                <th style="text-align: right">Venta Div.</th>
+                                                <th style="text-align: right">Venta Total.</th>
+                                                <th style="text-align: right">Costo Total.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in datos.total %}
+                                            <tr style="font-size: 12px">
+                                                <td style='font-size: 12px'>{{ row.concepto }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.cant }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtaref|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctoref|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilref|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porcref|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtamo|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctomo|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilmo|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porcmo|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtatot|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctotot|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utiltot|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porctot|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtadiv|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtaneta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctoneto|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilneta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porcneto|floatformat:2|intcomma }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12 col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <tr style="font-size: 12px">
+                                            <th style="width: 30%; text-align:center">ORDENES POR STATUS</th>
+                                        </tr>
+                                    </table>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr style="font-size: 12px">
+                                                <th>Concepto</th>
+                                                <th></th>
+                                                <th style="text-align: right"></th>
+                                                <th style="text-align: right">Cantidad</th>
+                                                <th style="text-align: right">Venta Ref.</th>
+                                                <th style="text-align: right">Costo Ref.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                                <th style="text-align: right">Venta MO.</th>
+                                                <th style="text-align: right">Costo MO.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                                <th style="text-align: right">Venta TOT.</th>
+                                                <th style="text-align: right">Costo TOT.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                                <th style="text-align: right">Venta Div.</th>
+                                                <th style="text-align: right">Venta Total.</th>
+                                                <th style="text-align: right">Costo Total.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>										
+                                            {% for row in datos.status %}
+                                            <tr style="font-size: 12px">
+                                                <td style='font-size: 12px'>{{ row.status }}</td>
+                                                <td><a href="{% url 'detalleordenes' datos.empresa row.status 0 0 3 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.cant }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtaref|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctoref|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilref|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porcref|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtamo|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctomo|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilmo|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porcmo|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtatot|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctotot|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utiltot|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porctot|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtadiv|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtaneta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctoneto|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilneta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porcneto|floatformat:2|intcomma }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12 col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <tr style="font-size: 12px">
+                                            <th style="width: 30%; text-align:center">ORDENES POR TIPO DE OR</th>
+                                        </tr>
+                                    </table>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr style="font-size: 12px">
+                                                <th>Concepto</th>
+                                                <th style="text-align: right">Cantidad</th>
+                                                <th style="text-align: right">Venta Ref.</th>
+                                                <th style="text-align: right">Costo Ref.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                                <th style="text-align: right">Venta MO.</th>
+                                                <th style="text-align: right">Costo MO.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                                <th style="text-align: right">Venta TOT.</th>
+                                                <th style="text-align: right">Costo TOT.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                                <th style="text-align: right">Venta Div.</th>
+                                                <th style="text-align: right">Venta Total.</th>
+                                                <th style="text-align: right">Costo Total.</th>
+                                                <th style="text-align: right">Utilidad</th>
+                                                <th style="text-align: right">%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in datos.concepto %}
+                                            <tr style="font-size: 12px">
+                                                <td style='font-size: 12px'>{{ row.concepto }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.cant }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtaref|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctoref|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilref|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porcref|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtamo|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctomo|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilmo|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porcmo|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtatot|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctotot|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utiltot|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porctot|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtadiv|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.vtaneta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.ctoneto|floatformat:2|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilneta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porcneto|floatformat:2|intcomma }}</td>
+                                            </tr>
+                                            {% endfor %}									
+                                               
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /.col -->
+            </div>	<!-- /.row -->
+        </div><!-- /.col -->									
+    </div><!-- /.row -->
+</div><!-- /.card-body -->	
+{% endblock %}
