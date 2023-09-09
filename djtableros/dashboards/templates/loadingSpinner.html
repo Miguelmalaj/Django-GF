@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block spinner_loader %}
+
+<!--<div class="d-flex justify-content-center text-lightblue">
+    <div id="spinner" class="spinner-border not-visible" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>-->
+
+<!-- Button trigger modal -->
+<div>
+    <button id="buttonModalOpen" type="button" class="btn btn-primary not-visible" data-toggle="modal" data-target="#exampleModalCenter">
+        Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop='static'>
+       
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        
+        <!-- Spinner Template-->
+            <div class="modal-content backgroundModal styleModal">
+                <div class="modal-body">
+                    <div>
+                        <i class="fas fa-10x fa-sync-alt fa-spin"></i>
+                        <div class="text-center text-bold pt-4 mt-2">Cargando...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+<!-- Rejol con puntos -->
+<!--<div class="modal-content backgroundModal styleModal">
+    <div class="modal-body">
+        <div class="pl">
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+            <div class="pl__dot"></div>
+        </div>
+    </div>
+</div>-->
+
+<!-- Spinner Verde tech-->
+<!--<div class="modal-content backgroundModal styleModal">
+    <div class="modal-body">
+        <div id='h'>
+            <div id='a'></div>
+            <div id='m'></div>
+            <div id='l'></div>
+        </div>
+    </div>
+</div>-->
+{% comment %} Clase css adminlt3/lib/spinner.css {% endcomment %}

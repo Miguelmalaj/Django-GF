@@ -55,7 +55,7 @@
                 <ul class="nav nav-treeview">
                     {% for opcion in request.session.opciones_menu.ventas %}
                         <li class="nav-item" id="{{ opcion.vista }}">
-                            <a href="{% url opcion.vista %}"  class="{% if opcion.vista in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                            <a name="opcionvista" href="{% url opcion.vista %}"  class="{% if opcion.vista in request.path %}nav-link active{% else %}nav-link{% endif %}">
                                 <i class="nav-icon {{ opcion.icono }}"></i>
                                 <p>{{ opcion.nombre }}</p>
                             </a>
@@ -75,7 +75,7 @@
                 <ul class="nav nav-treeview">
                     {% for opcion in request.session.opciones_menu.postventa %}
                         <li class="nav-item" id="{{ opcion.vista }}">
-                            <a href="{% url opcion.vista %}"  class="{% if opcion.vista in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                            <a name="opcionvista" href="{% url opcion.vista %}"  class="{% if opcion.vista in request.path %}nav-link active{% else %}nav-link{% endif %}">
                                 <i class="nav-icon {{ opcion.icono }}"></i>
                                 <p>{{ opcion.nombre }}</p>
                             </a>

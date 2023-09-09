@@ -16,6 +16,9 @@
     {% block stylesheets %}
         {% include 'adminlte/lib/_styles.html' %}
         {% block style_sheets %}{% endblock %}
+        <style>
+            
+        </style>
     {% endblock %}
 
     {% block extra_head %}{% endblock %}
@@ -31,6 +34,7 @@
         {% block nav_sidebar %}
             {% include '_mainsidebar.html' %}
         {% endblock %}
+
 
         {% block content_wrapper %}
         <div class="content-wrapper">
@@ -60,7 +64,27 @@
                 {% endblock %}
 
                 {% block content_block_wrap %}
+
+    	            <!-- código spinner -->
+                    <button id="buttonModalOpen" type="button" class="btn btn-primary not-visible" data-toggle="modal" data-target="#exampleModalCenter"></button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop='static'>
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                        <!-- Spinner Template-->
+                            <div class="modal-content backgroundModal styleModal">
+                                <div class="modal-body">
+                                    <div>
+                                        <i class="fas fa-10x fa-sync-alt fa-spin"></i>
+                                        <div class="text-center text-bold pt-4 mt-2">Cargando...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- código spinner -->
+
                     {% block content %}{% endblock %}
+
                 {% endblock %}
             </section>
             {% endblock %}
