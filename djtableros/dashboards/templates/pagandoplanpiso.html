@@ -19,7 +19,7 @@
                             <form method="post" action="{% url 'inventariovehiculos' %}">
                             {% csrf_token %}                                                               
                                 <li class='nav-item d-none d-sm-inline-block'>
-                                    <button id="botonactualizar" type='submit' class='btn btn-primary btn-block'><i class="far fa-hand-point-right"></i> Actualizar</button>
+                                    <button type='submit' class='btn btn-primary btn-block'><i class="far fa-hand-point-right"></i> Actualizar</button>
                                 </li>
                             </form>
                         </div>
@@ -76,7 +76,7 @@
                             </div>
                             <div class="col-sm-12 border-top d-flex justify-content-around">
                                 {% if detalles.empresa and detalles.sucursal %}
-                                <small class="mt-2"><a name="botonmostrardetalle" href="{% url 'inventario_detalle' detalles.empresa detalles.sucursal %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
+                                <small class="mt-2"><a href="{% url 'inventario_detalle' detalles.empresa detalles.sucursal %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
                                 {% endif %}
                             </div>
                         </div>
@@ -120,7 +120,7 @@
     {% for empresa, detalles in datos.items %}
             {% for rango, detalle in detalles.items %}
                 {% if "detalle" in rango %}
-                    <!-- Ciclo para recorrer los detalles y crear los modales para cada vencimiento de cada empresa -->
+                    <!-- Modal de los detalles por cada periodo de vencimiento -->
                     <div class="modal fade" id="{{ empresa }}_{{ rango }}_modal" tabindex="-1" role="dialog" aria-labelledby="{{ empresa }}_{{ rango }}_label" aria-hidden="true">
                         <div class="modal-dialog modal-xl" role="document">
                             <div class="modal-content">

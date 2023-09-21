@@ -142,12 +142,31 @@ def detalle_ordenes(request, empresa, tipo_orden, year, mes, tipoconsulta):
     bytEmpresa = int(empresa[:1])
     bytSucursal = int(empresa[-1:])
 
+    # obtener el nombre del menu dependiendo del tipo de consulta que se esta ejecutando.
+    opcionmenu = 'ventaservicio'
+    if tipoconsulta == 3:  
+         opcionmenu = 'ordenesproceso'
+
     df_resultado = consultas.obtiene_detalle_ordenes_facturadas(bytEmpresa, bytSucursal, tipo_orden, year, mes, tipoconsulta)
     datos = {
         'nombreempresa': config.obtiene_empresa(bytEmpresa, bytSucursal),
-        'opcionmenu': utils.obtiene_opcionmenu('ordenesproceso'),
+        'opcionmenu': utils.obtiene_opcionmenu(opcionmenu),
         'tipoorden': tipo_orden,
         'tablaordenes': df_resultado.to_dict(orient='records')
     }
 
     return render(request, 'detalle_ordenes.html', {'datos':datos})
+
+def detalle_mostrador(request, empresa, concepto, year, mes, tipoconsulta):
+    bytEmpresa = int(empresa[:1])
+    bytSucursal = int(empresa[-1:])
+
+    df_resultado = consultas.obtener_detalleventarefacciones(bytEmpresa, bytSucursal, concepto, year, mes, tipoconsulta)
+    datos = {
+        'nombreempresa': config.obtiene_empresa(bytEmpresa, bytSucursal),
+        'opcionmenu': utils.obtiene_opcionmenu('ventarefacciones'),
+        'concepto': concepto,
+        'tablaordenes': df_resultado.to_dict(orient='records')
+    }
+
+    return render(request, 'detalle_refacciones.html', {'datos':datos}) 

@@ -162,7 +162,7 @@
                                                             {% if row.concepto == 'TOTAL' %} 
                                                                 <td></td>
                                                             {% else %}
-                                                                <td><a href="{% url 'detalleordenes' datos.empresa row.concepto datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                                <td><a name="iconodetalleordenes" href="{% url 'detalleordenes' datos.empresa row.concepto datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
                                                             {% endif %}
                                                             <td style='font-size: 12px; text-align: right'>{{ row.vtamo|floatformat:0|intcomma }}</td>
                                                             <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
@@ -206,7 +206,7 @@
                                                             {% if row.concepto == 'TOTAL' %} 
                                                                 <td></td>
                                                             {% else %}
-                                                                <td><a href="{% url 'detalleordenes' datos.empresa row.concepto datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                                <td><a name="iconodetalleordenes" href="{% url 'detalleordenes' datos.empresa row.concepto datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
                                                             {% endif %}
                                                             <td style='font-size: 12px; text-align: right'>{{ row.vtatot|floatformat:0|intcomma }}</td>
                                                             <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
@@ -250,7 +250,7 @@
                                                             {% if row.concepto == 'TOTAL' %} 
                                                                 <td></td>
                                                             {% else %}
-                                                                <td><a href="{% url 'detalleordenes' datos.empresa row.concepto datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                                <td><a name="iconodetalleordenes" href="{% url 'detalleordenes' datos.empresa row.concepto datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
                                                             {% endif %}
                                                             <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
                                                             <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
@@ -406,7 +406,7 @@
                                                             {% if row.concepto == 'TOTAL' %} 
                                                                 <td></td>
                                                             {% else %}
-                                                                <td><a href="{% url 'detalleordenes' datos.empresa row.asesor datos.periodoselec datos.mes 2 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                                <td><a name="iconodetalleordenes" href="{% url 'detalleordenes' datos.empresa row.asesor datos.periodoselec datos.mes 2 %}"><i class='fas fa-list-ul'></i></a></td>
                                                             {% endif %}
                                                             <td style='font-size: 12px; text-align: right'>{{ row.cant|floatformat:0|intcomma }}</td>
                                                             <td style='font-size: 12px; text-align: right'>{{ row.vtaref|floatformat:0|intcomma }}</td>

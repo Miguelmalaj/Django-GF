@@ -40,6 +40,8 @@ def obtener_ventaservicio(bytAgencia, bytSucursal, mes, periodo):
     strSQL = strSQL + " AND (Extract(Year from VS.FASE_FECHACANCELACION)) =  " + str(periodo)
 
     c.execute(strSQL) 
+    conn.close
+
     df = pd.DataFrame.from_records(c)
     df.columns =["asesor", "concepto", "cant", "vtaref", "ctoref", "vtamo", "ctomo", "vtatot", "ctotot"]
 
@@ -268,6 +270,9 @@ def obtener_ordenesproceso(bytAgencia, bytSucursal):
     strSQL = strSQL + " AND T.EMPR_EMPRESAID = O.EMPR_EMPRESAID "
     strSQL = strSQL + " AND T.TIOR_CLAVE = O.ORSE_TIOR_CLAVE "
     c.execute(strSQL) 
+    conn.close
+
+
     df = pd.DataFrame.from_records(c)
     df.columns =["concepto", "status", "cant", "vtadiv", "vtamo", "ctomo", "vtaref", "ctoref", "vtatot", "ctotot", "vtaneta", "ctoneto"]
 
@@ -387,6 +392,7 @@ def obtiene_detalle_ordenes_facturadas(agencia, sucursal, concepto, periodo, mes
         strSQL = strSQL + " ORDER BY DIAS DESC "
         
     c.execute(str(strSQL)) 
+    conn.close
 
     df_consulta = pd.DataFrame.from_records(c)
     df_consulta.columns =['orden', 'clave', 'tipoorden', 'fentrada', 'dias', 'cliente', 'modelo', 'vin', 'dcerrada', 'dtaller', 'vdiv', 'vmo', 'cmo', 'vref', 'cref','vtot', 'ctot', 'vneta', 'cneto', 'coment', 'asesor', 'fecha']
@@ -437,6 +443,8 @@ def obtener_resumen_ventarefacciones(bytAgencia, bytSucursal, mes, periodo):
     strSQL = strSQL + " Order by PEDI_FECHAFACTURA Desc "
 
     c.execute(strSQL) 
+    conn.close
+
     df = pd.DataFrame.from_records(c)
     df.columns =["fecha", "factura", "cliente", "codigo", "articulo", "cant", "venta", "costo", "utilidad", "grupo", "tipovta", "depto", "canalvta" ]
 
@@ -481,7 +489,7 @@ def obtener_ventarefacciones(bytAgencia, bytSucursal, mes, periodo):
     c = conn.cursor()
 
     strSQL = " SELECT TO_DATE(PEDI_FECHAFACTURA, 'DD/MM/YY') AS FECHA, PEDI_NUMEROFACTURA, PEDI_RAZONFACTURA, PROD_CLAVE, PROD_DESCRIPCION1, CANTIDAD, PRECIO, COSTO, UTILIDAD, "
-    strSQL = strSQL + " TIPO_DESCRIPCION, TIPOCTES_DESCRIPCION, DEPTO, CANALVTA, EMPLEADO "
+    strSQL = strSQL + " TIPO_DESCRIPCION, nvl((Case When INSTR(TIPOCTES_DESCRIPCION, ' ') > 0 Then SUBSTR(TIPOCTES_DESCRIPCION, 1, INSTR(TIPOCTES_DESCRIPCION, ' ') - 1) else TIPOCTES_DESCRIPCION end ),'*** N/E ***'), DEPTO, CANALVTA, EMPLEADO "
     strSQL = strSQL + " FROM RE_VCBOANALISISMOSTRADOR  "	
     strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
     strSQL = strSQL + " AND PEDI_ALMA_CLAVE = " + str(bytSucursal)
@@ -492,6 +500,8 @@ def obtener_ventarefacciones(bytAgencia, bytSucursal, mes, periodo):
     strSQL = strSQL + " Order by PEDI_FECHAFACTURA Desc "
 
     c.execute(strSQL) 
+    conn.close
+
     df = pd.DataFrame.from_records(c)
     df.columns =["fecha", "factura", "cliente", "codigo", "articulo", "cant", "venta", "costo", "utilidad", "grupo", "tipovta", "depto", "canalvta", "empleado" ]
 
@@ -514,7 +524,6 @@ def obtener_ventarefacciones(bytAgencia, bytSucursal, mes, periodo):
     df_refacciones_tipovta.loc['Suma', 'tipovta'] = 'TOTAL'  # Cambiar el valor de concepto en el renglón de suma
     df_refacciones_tipovta['porc'] = (df_refacciones_tipovta['utilidad'] / df_refacciones_tipovta['venta']) * 100
 
-
     # 2. Suma de la venta y utilidad por tipovta en SERVICIO (excluyendo INTERNA)
     df_servicio_externo_tipovta = df_servicio_externo.groupby('tipovta').agg({'venta': 'sum', 'utilidad': 'sum', 'tipovta':'first'})
     df_servicio_externo_tipovta['porc'] = (df_servicio_externo_tipovta['utilidad'] / df_servicio_externo_tipovta['venta']) * 100
@@ -532,7 +541,7 @@ def obtener_ventarefacciones(bytAgencia, bytSucursal, mes, periodo):
     df_servicio_interno_tipovta.loc['Suma', 'tipovta'] = 'TOTAL'  # Cambiar el valor de concepto en el renglón de suma
     df_servicio_interno_tipovta['porc'] = (df_servicio_interno_tipovta['utilidad'] / df_servicio_interno_tipovta['venta']) * 100
 
-    # 4. Suma de la venta y utilidad por empleado en REFACCIONES y VENTA MOSTRADOR
+    # 4. Suma de la venta y utilidad por empleado en REFACCIONES y VENTA MOSTRADOR, solo los empleados que contengan el caracter '!'
     df_refacciones_ventamostrador = df_refacciones[(df_refacciones['canalvta'] == 'VENTA MOSTRADOR') & (df_refacciones['empleado'].str.contains('!'))]
     df_refacciones_ventamostrador_empleado = df_refacciones_ventamostrador.groupby('empleado').agg({'venta': 'sum', 'utilidad': 'sum', 'empleado':'first'})
     df_refacciones_ventamostrador_empleado = df_refacciones_ventamostrador_empleado.sort_values(by='venta', ascending=False)
@@ -544,3 +553,45 @@ def obtener_ventarefacciones(bytAgencia, bytSucursal, mes, periodo):
     # df_refacciones_final = df_refacciones_ventamostrador_empleado['empleado'].str.contains('*')
 
     return df_refacciones_tipovta, df_servicio_externo_tipovta, df_servicio_interno_tipovta, df_refacciones_ventamostrador_empleado
+
+def obtener_detalleventarefacciones(bytAgencia, bytSucursal, concepto,  periodo, mes, tipoconsulta):
+    """
+    Obtiene la informacion de venta de refacciones, porcentajes de utilidad y detalles por area
+    ademas de obtener el tktpromedio por asesor.
+    """
+    bytEmpresa = 1
+    if bytAgencia == cadillac:
+        bytEmpresa = 2
+
+    conn = None
+    conn = config.creaconeccion(bytAgencia)
+    c = conn.cursor()
+
+    strSQL = " SELECT TO_DATE(PEDI_FECHAFACTURA, 'DD/MM/YY') AS FECHA, PEDI_NUMEROFACTURA, PEDI_RAZONFACTURA, PROD_CLAVE, PROD_DESCRIPCION1, CANTIDAD, PRECIO, COSTO, UTILIDAD, "
+    strSQL = strSQL + " TIPO_DESCRIPCION, nvl((Case When INSTR(TIPOCTES_DESCRIPCION, ' ') > 0 Then SUBSTR(TIPOCTES_DESCRIPCION, 1, INSTR(TIPOCTES_DESCRIPCION, ' ') - 1) else TIPOCTES_DESCRIPCION end ),'*** N/E ***'), DEPTO, CANALVTA, EMPLEADO "
+    strSQL = strSQL + " FROM RE_VCBOANALISISMOSTRADOR  "	
+    strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
+    strSQL = strSQL + " AND PEDI_ALMA_CLAVE = " + str(bytSucursal)
+    strSQL = strSQL + " AND Depto IN (' REFACCIONES') "
+    strSQL = strSQL + " AND CanalVta = 'VENTA MOSTRADOR' "
+    strSQL = strSQL + " AND (Extract(Month from PEDI_FECHAFACTURA)) = " + str(mes)
+    strSQL = strSQL + " AND (Extract(Year from PEDI_FECHAFACTURA)) = " + str(periodo)
+    if tipoconsulta == 1:
+        strSQL = strSQL + " AND TIPOCTES_DESCRIPCION like '" + str(concepto) + "%'"
+    else:
+        strSQL = strSQL + " AND EMPLEADO = '" + str(concepto) + "'"
+    strSQL = strSQL + " Order by PEDI_FECHAFACTURA Desc "
+
+    c.execute(strSQL) 
+    df_consulta = pd.DataFrame.from_records(c)
+    df_consulta.columns =["fecha", "factura", "cliente", "codigo", "articulo", "cant", "venta", "costo", "utilidad", "grupo", "tipovta", "depto", "canalvta", "empleado" ]
+
+    df_consulta['fecha'] = pd.to_datetime(df_consulta['fecha'])
+    # Cambia el formato de las columnas 'fecfactura' y 'feccancelacion' en el mismo DataFrame
+    df_consulta[['fecha']] = df_consulta[['fecha']].applymap(lambda x: x.strftime('%d/%m/%y'))
+
+    df_consulta['porcutil'] = df_consulta.apply(lambda row: calcula_porcentaje_valor(row['utilidad'], row['venta']), axis=1)
+    
+    conn.close()
+
+    return df_consulta

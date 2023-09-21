@@ -30,7 +30,16 @@ ALLOWED_HOSTS = ['*']
 
 ADMIN_SITE_HEADER = 'Administrador sistemas de tableros'
 
-SESSION_COOKIE_AGE = 3600  # 60 min en segundos
+SESSION_COOKIE_AGE =  36000 # 60 min en segundos 
+# Utiliza cookies de sesión
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+
+# Nombre de la cookie de sesión
+SESSION_COOKIE_NAME = 'tablerosoperativos'
+
+# Redirección cuando se cierra sesión
+# LOGIN_URL = 'ventas/login/'
+# LOGIN_REDIRECT_URL = 'login'
 
 # Application definition
 
@@ -122,8 +131,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
-STATIC_ROOT = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

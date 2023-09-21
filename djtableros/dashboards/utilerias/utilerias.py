@@ -23,9 +23,10 @@ def nombre_mes(numero_mes):
     meses_espanol = ['***', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
     return meses_espanol[numero_mes]     
 
-def calcula_porcentaje(real, objetivo):
+def calcula_porcentaje(real, objetivo, hoy):
     """
     funcion para calcular el porcentaje y regresar un diccionario de datos con el real, objetivo y porcentaje
+    y lo que va en el dia
     """
     porcentaje = 0
     if (objetivo !=0):
@@ -34,7 +35,8 @@ def calcula_porcentaje(real, objetivo):
     datos = {
             'real': real,
             'objetivo': objetivo,
-            'porcentaje': porcentaje
+            'porcentaje': porcentaje,
+            'hoy': hoy
     } 
 
     return datos

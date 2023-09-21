@@ -728,7 +728,7 @@ def obtiene_ventasvehiculos_detalle(bytAgencia, bytSucursal, fechareporte):
 
     return dfn_hoy, dfn_acum, dfn_cancel, dfn_modebasico, dfn_vendedor, dfn_tipoventa, dfn_entregas, dfn_fne, dfu_hoy, dfu_acum, dfu_cancel, dfu_modebasico, dfu_tipoventa, dfu_vendedor
 
-def obtiene_fact_entregas(bytAgencia, bytSucursal, mes, periodo):
+def obtiene_fact_entregas(bytAgencia, bytSucursal, mes, periodo, dia):
     """
     Obtiene la informacion de vehiculos, ventas, entregas, cancelaciones para el funnel de ventas
     """
@@ -736,17 +736,94 @@ def obtiene_fact_entregas(bytAgencia, bytSucursal, mes, periodo):
     if bytAgencia == cadillac:
         bytEmpresa = 2
 
-    intVentasAcum = 0
-    intCanceladas = 0
-    intdemos = 0
-    intEntregasGMF = 0
-    intEntregasCont = 0
+    ventashoy = 0
+    cancelhoy = 0
+    demoshoy = 0
+    entregmfhoy = 0
+    entreconthoy = 0
+    ventasacum = 0
+    canclacum = 0
+    demosacum = 0
+    entregmfacum = 0
+    entrecontacum = 0
 
     conn = None
     conn = config.creaconeccion(bytAgencia)
     c = conn.cursor()
     
-    # Ventas Acumuladas del ejercicio actual
+    # Ventas Acumuladas del dia
+    strSQL = "SELECT   nvl(SUM(1), 0) as Cant,  NVL(SUM(FAU_Venta),0) as Total, ('') as tipoVenta FROM VT_VLIBRODEVENTAS "
+    strSQL = strSQL + "WHERE EMPR_EMPRESAID =  " + str(bytEmpresa)
+    strSQL = strSQL + " AND (Extract(Month from FAAU_FECHA)) = " + str(mes)
+    strSQL = strSQL + " AND (Extract(year from FAAU_FECHA)) = " + str(periodo)
+    strSQL = strSQL + " AND (Extract(day from FAAU_FECHA)) = " + str(dia)
+    strSQL = strSQL + " AND VEHI_CLASE = 'NU'"
+    strSQL = strSQL + " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
+    if bytSucursal != 3:    
+        strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
+        strSQL = strSQL + " AND PEAU_TIPOVENTA not like '%FLOT%'"
+    else:
+        strSQL = strSQL + " AND AGEN_IDAGENCIA = 1 "
+        strSQL = strSQL + " AND PEAU_TIPOVENTA like '%FLOT%'"
+    strSQL = strSQL + " UNION ALL "   #Agregar las Canceladas 
+    strSQL = strSQL + " SELECT  nvl(SUM(1), 0) as Cant,  NVL(SUM(FAU_Venta),0) as Total, ('') as tipoVenta FROM VT_VLIBRODEVENTAS "
+    strSQL = strSQL + " WHERE EMPR_EMPRESAID =  " + str(bytEmpresa)
+    strSQL = strSQL + " AND (Extract(Month from FAAU_FECHACANCELACION)) = " + str(mes)
+    strSQL = strSQL + " AND (Extract(year from FAAU_FECHACANCELACION)) = " + str(periodo)
+    strSQL = strSQL + " AND (Extract(day from FAAU_FECHACANCELACION)) = " + str(dia)
+    strSQL = strSQL + " AND VEHI_CLASE = 'NU'"
+    strSQL = strSQL + " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
+    if bytSucursal != 3:    
+        strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
+        strSQL = strSQL + " AND PEAU_TIPOVENTA not like '%FLOT%'"
+    else:
+        strSQL = strSQL + " AND AGEN_IDAGENCIA = 1 "
+        strSQL = strSQL + " AND PEAU_TIPOVENTA like '%FLOT%'"
+    strSQL = strSQL + " UNION ALL "   #Agregar las Demos 
+    strSQL = strSQL + " SELECT nvl(COUNT (SAAD_FOLIO),0) as Cant, (0) as Total, ('') as tipoVenta from VT_VSALIDAAUTOSDEMO "
+    strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
+    strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
+    strSQL = strSQL + " AND (Extract(Month from FECHAALTA)) = " + str(mes)
+    strSQL = strSQL + " AND (Extract(year from FECHAALTA)) = " + str(periodo)
+    strSQL = strSQL + " AND (Extract(day from FECHAALTA)) = " + str(dia)
+    strSQL = strSQL + " AND SAAD_VEHI_CLASE <> 'US' "
+    strSQL = strSQL + " UNION ALL "   #Agregar las Entregas del mes 
+    strSQL = strSQL + " Select  nvl(COUNT(ET.ENTR_FOLIOENTREGA), 0) AS Entregados, NVL(SUM(FAU_Venta),0) as Total, NVL(V.PEAU_TipoVenta,'') AS PEAU_TipoVenta "
+    strSQL = strSQL + " From GM_ENTREGAUNIDAD  ET, VT_VLIBRODEVENTAS V "
+    strSQL = strSQL + " Where ET.empr_empresaid =  " + str(bytEmpresa)
+    strSQL = strSQL + " AND ET.ENTR_STATUS = 'AC' "
+    strSQL = strSQL + " and ET.ENTR_VEHI_CLASE = 'NU' "
+    strSQL = strSQL + " AND (Extract(Month from ET.ENTR_FECHAENTREGAUNIDAD)) = " + str(mes)
+    strSQL = strSQL + " AND (Extract(year from ET.ENTR_FECHAENTREGAUNIDAD)) = " + str(periodo)
+    strSQL = strSQL + " AND (Extract(day from ET.ENTR_FECHAENTREGAUNIDAD)) = " + str(dia)
+    strSQL = strSQL + " AND ET.empr_empresaid = v.Empr_empresaid "
+    strSQL = strSQL + " AND ET.ENTR_FAAU_NOFACTURA = V.FAAU_NOFACTURA "
+    strSQL = strSQL + " AND V.PEAU_TIPOVENTA <> 'INTERCAMB' "
+    if bytSucursal != 3:
+        strSQL = strSQL + " AND ET.AGEN_IDAGENCIA  = " + str(bytSucursal)
+        strSQL = strSQL + " AND V.PEAU_TIPOVENTA not like '%FLOT%'"
+    else:
+        strSQL = strSQL + " AND ET.AGEN_IDAGENCIA  = 1 "
+        strSQL = strSQL + " AND V.PEAU_TIPOVENTA like '%FLOT%'"
+    strSQL = strSQL + " GROUP BY V.PEAU_TipoVenta"
+
+    c.execute(str(strSQL)) 
+    numero_registro =0
+    for row in c:
+        numero_registro +=1
+        if numero_registro == 1:
+            ventashoy =  int(row[0])
+        elif numero_registro == 2:
+            cancelhoy = int(row[0]) 
+        elif numero_registro == 3:
+            demoshoy = int(row[0]) 
+        elif numero_registro >= 4:
+            if row[2][:3] == 'GMF':
+                entregmfhoy = int(row[0]) 
+            else:
+                entreconthoy = entreconthoy + int(row[0])
+
+    # Ventas Acumuladas del mes
     strSQL = "SELECT   nvl(SUM(1), 0) as Cant,  NVL(SUM(FAU_Venta),0) as Total, ('') as tipoVenta FROM VT_VLIBRODEVENTAS "
     strSQL = strSQL + "WHERE EMPR_EMPRESAID =  " + str(bytEmpresa)
     strSQL = strSQL + " AND (Extract(Month from FAAU_FECHA)) = " + str(mes)
@@ -780,7 +857,7 @@ def obtiene_fact_entregas(bytAgencia, bytSucursal, mes, periodo):
     strSQL = strSQL + " AND (Extract(year from FECHAALTA)) = " + str(periodo)
     strSQL = strSQL + " AND SAAD_VEHI_CLASE <> 'US' "
     strSQL = strSQL + " UNION ALL "   #Agregar las Entregas del mes 
-    strSQL = strSQL + " Select  nvl(COUNT(ET.ENTR_FOLIOENTREGA), 0) AS Entregados, NVL(SUM(FAU_Venta),0) as Total, NVL(V.PEAU_TipoVenta,'') AS PEAU_TipoVenta "
+    strSQL = strSQL + " Select  COUNT(ET.ENTR_FOLIOENTREGA) AS Entregados, NVL(SUM(FAU_Venta),0) as Total, NVL(V.PEAU_TipoVenta,'') AS PEAU_TipoVenta "
     strSQL = strSQL + " From GM_ENTREGAUNIDAD  ET, VT_VLIBRODEVENTAS V "
     strSQL = strSQL + " Where ET.empr_empresaid =  " + str(bytEmpresa)
     strSQL = strSQL + " AND ET.ENTR_STATUS = 'AC' "
@@ -800,95 +877,35 @@ def obtiene_fact_entregas(bytAgencia, bytSucursal, mes, periodo):
 
     c.execute(str(strSQL)) 
     numero_registro =0
-    
+    entrecontacum = 0
     for row in c:
         numero_registro +=1
         if numero_registro == 1:
-            intVentasAcum =  int(row[0])
+            ventasacum =  int(row[0])
         elif numero_registro == 2:
-            intCanceladas = int(row[0]) 
+            canclacum = int(row[0]) 
         elif numero_registro == 3:
-            intdemos = int(row[0]) 
+            demosacum = int(row[0]) 
         elif numero_registro >= 4:
             if row[2][:3] == 'GMF':
-                intEntregasGMF = int(row[0]) 
+                entregmfacum = int(row[0]) 
             else:
-                intEntregasCont = intEntregasCont + int(row[0])
-
-    # Ventas Acumuladas del ejercicio anterior
-    strSQL = "SELECT   SUM(1) as Cant,  NVL(SUM(FAU_Venta),0) as Total, ('') as tipoVenta FROM VT_VLIBRODEVENTAS "
-    strSQL = strSQL + "WHERE EMPR_EMPRESAID =  " + str(bytEmpresa)
-    strSQL = strSQL + " AND (Extract(Month from FAAU_FECHA)) = " + str(mes)
-    strSQL = strSQL + " AND (Extract(year from FAAU_FECHA)) = " + str(periodo - 1)
-    strSQL = strSQL + " AND VEHI_CLASE = 'NU'"
-    strSQL = strSQL + " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
-    if bytSucursal != 3:    
-        strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
-        strSQL = strSQL + " AND PEAU_TIPOVENTA not like '%FLOT%'"
-    else:
-        strSQL = strSQL + " AND AGEN_IDAGENCIA = 1 "
-        strSQL = strSQL + " AND PEAU_TIPOVENTA like '%FLOT%'"
-    strSQL = strSQL + " UNION ALL "   #Agregar las Canceladas 
-    strSQL = strSQL + " SELECT  SUM(1) as Cant,  NVL(SUM(FAU_Venta),0) as Total, ('') as tipoVenta FROM VT_VLIBRODEVENTAS "
-    strSQL = strSQL + " WHERE EMPR_EMPRESAID =  " + str(bytEmpresa)
-    strSQL = strSQL + " AND (Extract(Month from FAAU_FECHACANCELACION)) = " + str(mes)
-    strSQL = strSQL + " AND (Extract(year from FAAU_FECHACANCELACION)) = " + str(periodo -1)
-    strSQL = strSQL + " AND VEHI_CLASE = 'NU'"
-    strSQL = strSQL + " AND PEAU_TIPOVENTA <> 'INTERCAMB'"
-    if bytSucursal != 3:    
-        strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
-        strSQL = strSQL + " AND PEAU_TIPOVENTA not like '%FLOT%'"
-    else:
-        strSQL = strSQL + " AND AGEN_IDAGENCIA = 1 "
-        strSQL = strSQL + " AND PEAU_TIPOVENTA like '%FLOT%'"
-    strSQL = strSQL + " UNION ALL "   #Agregar las Demos 
-    strSQL = strSQL + " SELECT nvl(COUNT (SAAD_FOLIO),0) as Cant, (0) as Total, ('') as tipoVenta from VT_VSALIDAAUTOSDEMO "
-    strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
-    strSQL = strSQL + " AND AGEN_IDAGENCIA = " + str(bytSucursal)
-    strSQL = strSQL + " AND (Extract(Month from FECHAALTA)) = " + str(mes)
-    strSQL = strSQL + " AND (Extract(year from FECHAALTA)) = " + str(periodo -1)
-    strSQL = strSQL + " AND SAAD_VEHI_CLASE <> 'US' "
-    strSQL = strSQL + " UNION ALL "   #Agregar las Entregas del mes 
-    strSQL = strSQL + " Select  COUNT(ET.ENTR_FOLIOENTREGA) AS Entregados, NVL(SUM(FAU_Venta),0) as Total, NVL(V.PEAU_TipoVenta,'') AS PEAU_TipoVenta "
-    strSQL = strSQL + " From GM_ENTREGAUNIDAD  ET, VT_VLIBRODEVENTAS V "
-    strSQL = strSQL + " Where ET.empr_empresaid =  " + str(bytEmpresa)
-    strSQL = strSQL + " AND ET.ENTR_STATUS = 'AC' "
-    strSQL = strSQL + " and ET.ENTR_VEHI_CLASE = 'NU' "
-    strSQL = strSQL + " AND (Extract(Month from ET.ENTR_FECHAENTREGAUNIDAD)) = " + str(mes)
-    strSQL = strSQL + " AND (Extract(year from ET.ENTR_FECHAENTREGAUNIDAD)) = " + str(periodo -1)
-    strSQL = strSQL + " AND ET.empr_empresaid = v.Empr_empresaid "
-    strSQL = strSQL + " AND ET.ENTR_FAAU_NOFACTURA = V.FAAU_NOFACTURA "
-    strSQL = strSQL + " AND V.PEAU_TIPOVENTA <> 'INTERCAMB' "
-    if bytSucursal != 3:
-        strSQL = strSQL + " AND ET.AGEN_IDAGENCIA  = " + str(bytSucursal)
-        strSQL = strSQL + " AND V.PEAU_TIPOVENTA not like '%FLOT%'"
-    else:
-        strSQL = strSQL + " AND ET.AGEN_IDAGENCIA  = 1 "
-        strSQL = strSQL + " AND V.PEAU_TIPOVENTA like '%FLOT%'"
-    strSQL = strSQL + " GROUP BY V.PEAU_TipoVenta"
-
-    c.execute(str(strSQL)) 
-    numero_registro =0
-    entregasant = 0
-    for row in c:
-        numero_registro +=1
-        if numero_registro == 1:
-            fecturasant =  int(row[0])
-        elif numero_registro == 2:
-            canceladasant = int(row[0]) 
-        elif numero_registro == 3:
-            intdemosant = int(row[0]) 
-        elif numero_registro >= 4:
-            entregasant = entregasant + int(row[0])
-
+                entrecontacum = entrecontacum + int(row[0])
     
     conn.close()  
 
-    intVentasAcum = intVentasAcum - intCanceladas
-
-    facturasacumant = fecturasant - canceladasant
+    datos = {
+        'ventas': ventashoy - cancelhoy,
+        'entregasgm': entregmfhoy,
+        'entregascont': entreconthoy,
+        'demos': demoshoy,
+        'ventasacum': ventasacum - canclacum,
+        'entregasgmfacum': entregmfacum,
+        'entregascontacum': entrecontacum,
+        'demosacum': demosacum
+    }
    
-    return intVentasAcum, intEntregasGMF, intEntregasCont, facturasacumant, entregasant, intdemos, intdemosant
+    return datos
 
 def obtiene_funel_asesores(bytAgencia, bytSucursal, mes, periodo):
     funel_dms = obtiene_fact_entregas_vendedor(bytAgencia, bytSucursal, mes, periodo)
@@ -1611,8 +1628,8 @@ def detalle_cuentasxcobrar(bytAgencia, bytSucursal):
     # Concatenar df_grouped_totals y df_total_row
     df_final = pd.concat([df_grouped_totals, df_total_row], ignore_index=True).fillna(' ')
 
-    # Concatenar df_final con df_total usando concat
-    # df_final = pd.concat([df_final, df_total], axis=1)
+    # Ordenar primero por la columna 'Edad' de forma descendente y luego por 'Puntuación' de forma ascendente
+    df_final = df_final.sort_values(by=['totalvencido', 'totalcxc'], ascending=[False, False])
 
     return df_final
 

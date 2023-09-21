@@ -1,5 +1,6 @@
 {% load adminlte_helpers i18n %}
 {% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,9 +17,6 @@
     {% block stylesheets %}
         {% include 'adminlte/lib/_styles.html' %}
         {% block style_sheets %}{% endblock %}
-        <style>
-            
-        </style>
     {% endblock %}
 
     {% block extra_head %}{% endblock %}
@@ -67,6 +65,7 @@
 
     	            <!-- código spinner -->
                     <button id="buttonModalOpen" type="button" class="btn btn-primary not-visible" data-toggle="modal" data-target="#exampleModalCenter"></button>
+                    <button id="buttonModalClose" type="button" class="btn btn-secondary not-visible" data-dismiss="modal"></button>
                     <!-- Modal -->
                     <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop='static'>
                         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -102,10 +101,12 @@
 {% block javascript %}
 {% include 'adminlte/lib/_scripts.html' %}
 {% block js %}{% endblock %}
+
 {% endblock %}
 
 {% block extra_js %}{% endblock %}
 
 {% block extra_foot %}{% endblock %}
+
 </body>
 </html>

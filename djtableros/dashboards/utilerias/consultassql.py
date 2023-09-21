@@ -1,7 +1,7 @@
 from dashboards.utilerias import configsql
 import pandas as pd
 
-def obtiene_afluencia(bytEmpresa, bytSucursal, mes, periodo):
+def obtiene_afluencia(bytEmpresa, bytSucursal, mes, periodo, fechahoy):
 
     # Crear la coneccion a sqlserver
 
@@ -10,18 +10,55 @@ def obtiene_afluencia(bytEmpresa, bytSucursal, mes, periodo):
 
     sql = connsql.cursor()
 
-
     intAfluencias =  0
     intSolicitudes =  0
     intCitas = 0
-    intDemos =  0
     intAprobadas =  0
     intContratos =  0
+
+    # '******************************************************************************
+    # 'AL DIA 
+    strSQL = "SELECT   Afluencia = ISNULL(Sum(af_fresh_n),0), "
+    strSQL = strSQL + " Citas = ISNULL(Sum(af_primera_cita_n  ),0),"
+    strSQL = strSQL + " CitasAgend = ISNULL(Sum(cit_agendadas_n  ),0),"
+    strSQL = strSQL + " CitasCump = ISNULL(Sum(cit_cumplidas_n  ),0),"
+    strSQL = strSQL + " Solicitudes = ISNULL(Sum(sol_gmf_n  ),0),"
+    strSQL = strSQL + " Demos = 0, "
+    strSQL = strSQL + " Aprobadas = isnull(Sum(sol_aprobaciones_gmf_n ),0), "
+    strSQL = strSQL + " Contratos = isnull(Sum(sol_contratos_comprados_n  ),0) "
+    strSQL = strSQL + "FROM REPORTES_DIARIOS "
+    strSQL = strSQL + " WHERE Empresa = " + str(bytEmpresa)
+    strSQL = strSQL + " and Sucursal = " + str(bytSucursal)
+    strSQL = strSQL + " AND id_fecha = '" + str(fechahoy) + "'"
+    
+    sql.execute(strSQL)
+
+    for row in sql:
+        intAfluencias =  int(row[0])
+        intCitas =  int(row[1])
+        intAgend =  int(row[2])
+        intCumplidas =  int(row[3])
+        intSolicitudes =  int(row[4])
+        intAprobadas =  int(row[6])
+        intContratos =  int(row[7])
+
+    datoshoy = {
+        'afluencia': intAfluencias,
+        'citas': intCitas,
+        'agendadas': intAgend,
+        'cumplidas': intCumplidas,
+        'solicitudes': intSolicitudes,
+        'aprobadas': intAprobadas,
+        'contratos': intContratos
+    }
+
 
     # '******************************************************************************
     # 'ACUMULADOS AL DIA 
     strSQL = "SELECT   Afluencia = ISNULL(Sum(af_fresh_n),0), "
     strSQL = strSQL + " Citas = ISNULL(Sum(af_primera_cita_n  ),0),"
+    strSQL = strSQL + " CitasAgend = ISNULL(Sum(cit_agendadas_n  ),0),"
+    strSQL = strSQL + " CitasCump = ISNULL(Sum(cit_cumplidas_n  ),0),"
     strSQL = strSQL + " Solicitudes = ISNULL(Sum(sol_gmf_n  ),0),"
     strSQL = strSQL + " Demos = 0, "
     strSQL = strSQL + " Aprobadas = isnull(Sum(sol_aprobaciones_gmf_n ),0), "
@@ -37,9 +74,21 @@ def obtiene_afluencia(bytEmpresa, bytSucursal, mes, periodo):
     for row in sql:
         intAfluencias =  int(row[0])
         intCitas =  int(row[1])
-        intSolicitudes =  int(row[2])
-        intAprobadas =  int(row[4])
-        intContratos =  int(row[5])
+        intAgend =  int(row[2])
+        intCumplidas =  int(row[3])
+        intSolicitudes =  int(row[4])
+        intAprobadas =  int(row[6])
+        intContratos =  int(row[7])
+
+    datosacum = {
+        'afluencia': intAfluencias,
+        'citas': intCitas,
+        'agendadas': intAgend,
+        'cumplidas': intCumplidas,
+        'solicitudes': intSolicitudes,
+        'aprobadas': intAprobadas,
+        'contratos': intContratos
+    }
 
     strperiodo = str(periodo) + str('0' + str(mes))[:2]
     objetivos = {
@@ -81,8 +130,9 @@ def obtiene_afluencia(bytEmpresa, bytSucursal, mes, periodo):
             'entregascont': int(row[8]),
         }
 
-    return intAfluencias, intSolicitudes, intAprobadas, intContratos, objetivos, intCitas
+    connsql.close
 
+    return datoshoy, datosacum, objetivos
 
 def obtiene_afluencia_vendedor(bytEmpresa, bytSucursal, mes, periodo):
 

@@ -144,6 +144,7 @@
                                         <thead>
                                             <tr style="font-size: 12px">
                                                 <th>Tipo Cliente</th>
+                                                <th></th>
                                                 <th style="text-align: center">Venta</th>
                                                 <th style="text-align: center">Utilidad</th>
                                                 <th style="text-align: center">%</th>
@@ -157,6 +158,11 @@
                                             <tr style="font-size: 12px">
                                             {% endif %}
                                                 <td style='font-size: 12px'>{{ row.tipovta }}</td>
+                                                {% if row.tipovta == 'TOTAL' %} 
+                                                    <td></td>
+                                                {% else %}
+                                                    <td><a name="iconodetalleordenes" href="{% url 'detallemostrador' datos.empresa row.tipovta datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td> 
+                                                {% endif %}
                                                 <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.porc|floatformat:2|intcomma }}</td>
@@ -193,7 +199,11 @@
                                             <tr style="font-size: 12px">
                                             {% endif %}
                                                 <td style='font-size: 12px'>{{ row.empleado }}</td>
-                                                <td></td>
+                                                {% if row.empleado == 'TOTAL' %} 
+                                                    <td></td>
+                                                {% else %}
+                                                    <td><a name="iconodetalleordenes" href="{% url 'detallemostrador' datos.empresa row.empleado datos.periodoselec datos.mes 2 %}"><i class='fas fa-list-ul'></i></a></td> 
+                                                {% endif %}
                                                 <td style='font-size: 12px; text-align: right'>500,000</td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
@@ -232,10 +242,10 @@
                                             {% endif %}
                                                 <td style='font-size: 12px'>{{ row.tipovta }}</td>
                                                 <!-- Solo colocar el link de enlace a la pagina de detalle cuando no sea el total -->
-                                                {% if row.concepto == 'TOTAL' %} 
+                                                {% if row.tipovta == 'TOTAL' %} 
                                                     <td></td>
                                                 {% else %}
-                                                    <td><a href="{% url 'detalleordenes' datos.empresa row.tipovta datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                    <td><a name="iconodetalleordenes" href="{% url 'detalleordenes' datos.empresa row.tipovta datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
                                                 {% endif %}
                                                 <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
@@ -251,14 +261,15 @@
                             <div class="card">
                                 <div class="card-body">
                                     <table class="table table-sm">
-                                            <tr style="font-size: 12px">
-                                                <th style="width: 30%; text-align:center">INTERNAS</th>
-                                            </tr>
+                                        <tr style="font-size: 12px">
+                                            <th style="width: 30%; text-align:center">INTERNAS</th>
+                                        </tr>
                                     </table>
                                     <table class="table table-sm">
                                         <thead>
                                             <tr style="font-size: 12px">
                                                 <th>Tipo Cliente</th>
+                                                <th></th>
                                                 <th style="text-align: center">Venta</th>
                                                 <th style="text-align: center">Utilidad</th>
                                                 <th style="text-align: center">%</th>
@@ -272,6 +283,12 @@
                                             <tr style="font-size: 12px">
                                             {% endif %}
                                                 <td style='font-size: 12px'>{{ row.tipovta }}</td>
+                                                <!-- Solo colocar el link de enlace a la pagina de detalle cuando no sea el total -->
+                                                {% if row.tipovta == 'TOTAL' %} 
+                                                    <td></td>
+                                                {% else %}
+                                                    <td><a name="iconodetalleordenes" href="{% url 'detalleordenes' datos.empresa row.tipovta datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                {% endif %}
                                                 <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
                                                 <td style='font-size: 12px; text-align: right'>{{ row.porc|floatformat:2|intcomma }}</td>

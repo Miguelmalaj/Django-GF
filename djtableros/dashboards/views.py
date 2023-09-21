@@ -1,9 +1,9 @@
 import pandas as pd
+import calendar
 from django.shortcuts import render, redirect
 from dashboards.utilerias import funciones, utilerias, consultassql, config
 from app_postventa.utils import obtener_opcion_default
 from app_postventa.utils import obtener_opciones_menu_postventa
-from django.http import JsonResponse
 from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -83,34 +83,46 @@ def funnel_chart(request):
                 bytEmpresa = 1
                 bytSucursal = 1  
 
+        dia = datetime.now().day
+        # Validar si el mes a consultar es diferente del actual, para en ese caso, dar el dia ultimo de cada mes.
+        if mes != datetime.now().month:
+                resultado = calendar.monthrange(2023, 4)  # Cambia el año (2023) y el mes (4) según tus necesidades
+                # El resultado es una tupla con el último día del mes y el número de días en el mes
+                dia = resultado[1]
+        
+        fecha_actual = datetime.now() # Obtener la fecha actual
+        fechahoy = fecha_actual.strftime("%m/%d/%y") # Formatear la fecha en mm/dd/yy
+
         cboperiodos = utilerias.periodos()
         cbomeses = utilerias.llenar_combo_meses
         mesperiodo = str(utilerias.nombre_mes(mes)[:3]) + " " +str(year)[-2:]
         mesperiodant = str(utilerias.nombre_mes(mes)[:3]) + " " +str(year -1)[-2:]
 
-        intfacturas, intEntregasGMF, intEntregascont, facturasant, entregasant, intdemos, intdemosant = funciones.obtiene_fact_entregas(bytEmpresa, bytSucursal, mes, year)
-        intAfluencias, intSolicitudes, intAprobadas, intContratos, objetivos, intcitas = consultassql.obtiene_afluencia(bytEmpresa, bytSucursal, mes, year)
+        # intfacturas, intEntregasGMF, intEntregascont, facturasant, entregasant, intdemos, intdemosant = funciones.obtiene_fact_entregas(bytEmpresa, bytSucursal, mes, year, dia)
+        datosdms = funciones.obtiene_fact_entregas(bytEmpresa, bytSucursal, mes, year, dia)
+        datoshoy, datosacum, objetivos = consultassql.obtiene_afluencia(bytEmpresa, bytSucursal, mes, year, fechahoy)
 
         # Formatear los valores en cada diccionario de datos
-        afluencia = utilerias.calcula_porcentaje(intAfluencias + intcitas,objetivos['afluencia'])
-        solicitudes = utilerias.calcula_porcentaje(intSolicitudes,objetivos['solicitudes'])
-        demos = utilerias.calcula_porcentaje(intdemos,objetivos['demos'])
-        aprobadas = utilerias.calcula_porcentaje(intAprobadas,objetivos['aprobadas'])
-        facturas = utilerias.calcula_porcentaje(intfacturas,objetivos['facturas'])
-        contratos = utilerias.calcula_porcentaje(intContratos,objetivos['contratos'])
-        entregasgmf = utilerias.calcula_porcentaje(intEntregasGMF,objetivos['entregasgmf'])
-        entregascont = utilerias.calcula_porcentaje(intEntregascont,objetivos['entregascont'])
+        afluencia = utilerias.calcula_porcentaje(datosacum['afluencia'] + datosacum['citas'],objetivos['afluencia'], datoshoy['afluencia'] + datoshoy['citas'])
+        solicitudes = utilerias.calcula_porcentaje(datosacum['solicitudes'],objetivos['solicitudes'], datoshoy['solicitudes'] )
+        demos = utilerias.calcula_porcentaje(datosdms['demosacum'],objetivos['demos'], datosdms['demos'])
+        aprobadas = utilerias.calcula_porcentaje(datosacum['aprobadas'],objetivos['aprobadas'], datoshoy['aprobadas'])
+        facturas = utilerias.calcula_porcentaje(datosdms['ventasacum'],objetivos['facturas'], datosdms['ventas'])
+        contratos = utilerias.calcula_porcentaje(datosacum['contratos'],objetivos['contratos'], datoshoy['contratos'])
+        entregasgmf = utilerias.calcula_porcentaje(datosdms['entregasgmfacum'],objetivos['entregasgmf'], datosdms['entregasgm'])
+        entregascont = utilerias.calcula_porcentaje(datosdms['entregascontacum'],objetivos['entregascont'], datosdms['entregascont'])
         
         # ******************************************
         # ENTREGAS TOTALES
         porcentajeentregas = 0
         if (objetivos['entregascont'] + objetivos['entregasgmf']) != 0:
-                porcentajeentregas = f"{((intEntregascont + intEntregasGMF) / (objetivos['entregascont'] + objetivos['entregasgmf'])) * 100:.2f}"
+                porcentajeentregas = f"{((datosdms['entregascontacum'] + datosdms['entregasgmfacum']) / (objetivos['entregascont'] + objetivos['entregasgmf'])) * 100:.2f}"
 
         datosentregastotales = {
-                'real': intEntregascont + intEntregasGMF,
+                'real': datosdms['entregascontacum'] + datosdms['entregasgmfacum'],
                 'objetivo': objetivos['entregascont'] + objetivos['entregasgmf'],
-                'porcentaje': porcentajeentregas
+                'porcentaje': porcentajeentregas,
+                'hoy': datosdms['entregascont'] + datosdms['entregasgm'],
         }
 
         datos = {
@@ -125,19 +137,17 @@ def funnel_chart(request):
                 'entregasgmf':entregasgmf,
                 'entregascont': entregascont,
                 'afluencia': afluencia,
-                'freshup': intAfluencias,
-                'citascump': intcitas,
+                'freshup': datosacum['afluencia'],
+                'citascump': datosacum['citas'],
+                'agendadas': datosacum['agendadas'],
+                'cumplidas': datosacum['cumplidas'],
                 'solicitudes': solicitudes,
                 'demos': demos,
-                'demosant': intdemosant,
                 'aprobadas': aprobadas,
                 'contratos':contratos,
                 'entregastotales': datosentregastotales,
-                'facturasant': facturasant,
-                'entregasant': entregasant,
                 'mesperiodo': mesperiodo,
                 'mesperiodoant' : mesperiodant
-
         }
         return render(request, 'funnel_chart.html', {'datos':datos})
 

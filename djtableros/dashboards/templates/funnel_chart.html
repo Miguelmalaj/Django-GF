@@ -66,47 +66,56 @@
                             <th style="width: 10%;  text-align:center">Objetivos</th>
                             <th style="width: 100%; text-align:center">{{ datos.mesperiodo }}</th>
                             <th style="width: 10%; text-align:center">Real</th>
+                            
                         </tr>
                     <tbody>
                         <tr class="width: 100px">
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.afluencia.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/afluencia1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.afluencia.real }} </td>
+                            
                         </tr>
                         <tr class="width: 100px">
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.solicitudes.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/solicitudes1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.solicitudes.real }} </td>
+                            
                         </tr>
                         <tr class="p-0 m-0 pt-0 mt-0 pb-0 ml-0">
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.demos.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/demos1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.demos.real }} </td>
+                            
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.aprobadas.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/aprobadas1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.aprobadas.real }} </td>
+                            
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.facturas.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/facturadas1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.facturas.real }} </td>
+                            
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.contratos.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/contratos1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.contratos.real }} </td>
+                            
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.entregasgmf.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/entregasgmf1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.entregasgmf.real }} </td>
+                            
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.entregascont.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/entregascont1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.entregascont.real }} </td>
+                            
                         </tr>
                     </tbody>
                 </table>
@@ -116,110 +125,126 @@
 
             <!-- Tabla de valores -->
             <div class="col-md-6">
-                <table class="table table-striped table-sm">
-                        <tr style="font-size: 12px">
-                            <th style="text-align:center"></th>
-                            <th style="text-align:right">{{ datos.mesperiodo }}</th>
-                            <th style="text-align:right">Objetivo</th>
-                            <th style="text-align:left">Cumplimiento</th>
-                            <th style="text-align:right">%</th>
-                            <th style="text-align:right">{{ datos.mesperiodoant }}</th>
-                        </tr>
-                    <tbody>
-                        <tr style="font-size: 12px">
-                            <td style="text-align:left">AFLUENCIA</td>
-                            <td style="text-align:right">{{ datos.afluencia.real }}</td>
-                            <td style="text-align:right">{{ datos.afluencia.objetivo }}</td>
-                            <td>
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar progress-bar-danger" style="width: {{ datos.afluencia.porcentaje }}%"></div>
-                                </div>
-                            </td>
-                            <td style="text-align:right">{{ datos.afluencia.porcentaje }} %</td>
-                            <td style="text-align:right">-</td>
-                        </tr>
-                        <tr style="font-size: 12px">
-                            <td style="text-align:left">SOLICITUDES</td>
-                            <td style="text-align:right">{{ datos.solicitudes.real }}</td>
-                            <td style="text-align:right">{{ datos.solicitudes.objetivo }}</td>
-                            <td>
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar progress-bar-danger" style="width: {{ datos.solicitudes.porcentaje }}%"></div>
-                                </div>
-                            </td>
-                            <td style="text-align:right">{{ datos.solicitudes.porcentaje }} %</td>
-                            <td style="text-align:right">-</td>
-                        </tr>
-                        <tr style="font-size: 12px">
-                            <td style="text-align:left">DEMOS</td>
-                            <td style="text-align:right">{{ datos.demos.real }}</td>
-                            <td style="text-align:right">{{ datos.demos.objetivo }}</td>
-                            <td style="text-align:left">
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar progress-bar-danger" style="width: {{ datos.demos.porcentaje }}%"></div>
-                                </div>
-                            </td>
-                            <td style="text-align:right">{{ datos.demos.porcentaje }} %</td>
-                            <td style="text-align:right">{{ datos.demosant }}</td>
-                        </tr>
-                        <tr style="font-size: 12px">
-                            <td style="text-align:left">APROBACIONES</td>
-                            <td style="text-align:right">{{ datos.aprobadas.real }}</td>
-                            <td style="text-align:right">{{ datos.aprobadas.objetivo }}</td>
-                            <td>
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar progress-bar-danger" style="width: {{ datos.aprobadas.porcentaje }}%"></div>
-                                </div>
-                            </td>
-                            <td style="text-align:right">{{ datos.aprobadas.porcentaje }} %</td>
-                            <td style="text-align:right">-</td>
-                        </tr>
-                        <tr style="font-size: 12px">
-                            <td style="text-align:left">FACTURACION</td>
-                            <td style="text-align:right">{{ datos.facturas.real }}</td>
-                            <td style="text-align:right">{{ datos.facturas.objetivo }}</td>
-                            <td>
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar progress-bar-danger" style="width: {{ datos.facturas.porcentaje }}%"></div>
-                                </div>
-                            </td>
-                            <td style="text-align:right">{{ datos.facturas.porcentaje }} %</td>
-                            <td style="text-align:right">{{ datos.facturasant }}</td>
-                        </tr>
-                        <tr style="font-size: 12px">
-                            <td style="text-align:left">CONTRATOS</td>
-                            <td style="text-align:right">{{ datos.contratos.real }}</td>
-                            <td style="text-align:right">{{ datos.contratos.objetivo }}</td>
-                            <td>
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar progress-bar-danger" style="width: {{ datos.contratos.porcentaje }}%"></div>
-                                </div>
-                            </td>
-                            <td style="text-align:right">{{ datos.contratos.porcentaje }} %</td>
-                            <td style="text-align:right">-</td>
-                        </tr>
-                        <tr style="font-size: 12px">
-                            <td style="text-align:left">ENTREGAS</td>
-                            <td style="text-align:right">{{ datos.entregastotales.real }}</td>
-                            <td style="text-align:right">{{ datos.entregastotales.objetivo }}</td>
-                            <td>
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar progress-bar-danger" style="width: {{ datos.entregastotales.porcentaje }}%"></div>
-                                </div> 
-                            </td>
-                            <td style="text-align:right">{{ datos.entregastotales.porcentaje }} %</td>
-                            <td style="text-align:right">{{ datos.entregasant }}</td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
-                <div class="col-12 col-sm-6 col-md-6">
-                    <div class="info-box mb-3">
-                        <span class="info-box-icon bg-lightblue elevation-1"><i class="fas fa-users"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-number">Afluencia</span>
-                            <span class="info-box-text">{{ datos.freshup }} - Fresh Up</span>
-                            <span class="info-box-text">{{ datos.citascump }} - Citas Cumplidas</span>
+                <div class="row">
+                    <table class="table table-striped table-sm">
+                            <tr style="font-size: 12px">
+                                <th style="text-align:center"></th>
+                                <th style="text-align:right">Hoy</th>
+                                <th style="text-align:right">{{ datos.mesperiodo }}</th>
+                                <th style="text-align:right">Objetivo</th>
+                                <th style="text-align:left">Cumplimiento</th>
+                                <th style="text-align:right">%</th>
+                            </tr>
+                        <tbody>
+                            <tr style="font-size: 12px">
+                                <td style="text-align:left">AFLUENCIA</td>
+                                <td style="text-align:right">{{ datos.afluencia.hoy }}</td>
+                                <td style="text-align:right">{{ datos.afluencia.real }}</td>
+                                <td style="text-align:right">{{ datos.afluencia.objetivo }}</td>
+                                <td>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar progress-bar-danger" style="width: {{ datos.afluencia.porcentaje }}%"></div>
+                                    </div>
+                                </td>
+                                <td style="text-align:right">{{ datos.afluencia.porcentaje }} %</td>
+                                
+                            </tr>
+                            <tr style="font-size: 12px">
+                                <td style="text-align:left">SOLICITUDES</td>
+                                <td style="text-align:right">{{ datos.solicitudes.hoy }}</td>
+                                <td style="text-align:right">{{ datos.solicitudes.real }}</td>
+                                <td style="text-align:right">{{ datos.solicitudes.objetivo }}</td>
+                                <td>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar progress-bar-danger" style="width: {{ datos.solicitudes.porcentaje }}%"></div>
+                                    </div>
+                                </td>
+                                <td style="text-align:right">{{ datos.solicitudes.porcentaje }} %</td>
+                                
+                            </tr>
+                            <tr style="font-size: 12px">
+                                <td style="text-align:left">DEMOS</td>
+                                <td style="text-align:right">{{ datos.demos.hoy }}</td>
+                                <td style="text-align:right">{{ datos.demos.real }}</td>
+                                <td style="text-align:right">{{ datos.demos.objetivo }}</td>
+                                <td style="text-align:left">
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar progress-bar-danger" style="width: {{ datos.demos.porcentaje }}%"></div>
+                                    </div>
+                                </td>
+                                <td style="text-align:right">{{ datos.demos.porcentaje }} %</td>                                
+                            </tr>
+                            <tr style="font-size: 12px">
+                                <td style="text-align:left">APROBACIONES</td>
+                                <td style="text-align:right">{{ datos.aprobadas.hoy }}</td>
+                                <td style="text-align:right">{{ datos.aprobadas.real }}</td>
+                                <td style="text-align:right">{{ datos.aprobadas.objetivo }}</td>
+                                <td>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar progress-bar-danger" style="width: {{ datos.aprobadas.porcentaje }}%"></div>
+                                    </div>
+                                </td>
+                                <td style="text-align:right">{{ datos.aprobadas.porcentaje }} %</td>
+                            </tr>
+                            <tr style="font-size: 12px">
+                                <td style="text-align:left">FACTURACION</td>
+                                <td style="text-align:right">{{ datos.facturas.hoy }}</td>
+                                <td style="text-align:right">{{ datos.facturas.real }}</td>
+                                <td style="text-align:right">{{ datos.facturas.objetivo }}</td>
+                                <td>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar progress-bar-danger" style="width: {{ datos.facturas.porcentaje }}%"></div>
+                                    </div>
+                                </td>
+                                <td style="text-align:right">{{ datos.facturas.porcentaje }} %</td>
+                            </tr>
+                            <tr style="font-size: 12px">
+                                <td style="text-align:left">CONTRATOS</td>
+                                <td style="text-align:right">{{ datos.contratos.hoy }}</td>
+                                <td style="text-align:right">{{ datos.contratos.real }}</td>
+                                <td style="text-align:right">{{ datos.contratos.objetivo }}</td>
+                                <td>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar progress-bar-danger" style="width: {{ datos.contratos.porcentaje }}%"></div>
+                                    </div>
+                                </td>
+                                <td style="text-align:right">{{ datos.contratos.porcentaje }} %</td>
+                            </tr>
+                            <tr style="font-size: 12px">
+                                <td style="text-align:left">ENTREGAS</td>
+                                <td style="text-align:right">{{ datos.entregastotales.hoy }}</td>
+                                <td style="text-align:right">{{ datos.entregastotales.real }}</td>
+                                <td style="text-align:right">{{ datos.entregastotales.objetivo }}</td>
+                                <td>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar progress-bar-danger" style="width: {{ datos.entregastotales.porcentaje }}%"></div>
+                                    </div> 
+                                </td>
+                                <td style="text-align:right">{{ datos.entregastotales.porcentaje }} %</td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-6 col-sm-6 col-md-6">
+                        <div class="info-box mb-3">
+                            <span class="info-box-icon bg-lightblue elevation-1"><i class="fas fa-users"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-number">Afluencia</span>
+                                <span class="info-box-text">{{ datos.freshup }} - Fresh Up</span>
+                                <span class="info-box-text">{{ datos.citascump }} - Citas Cumplidas</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-6 col-md-6">
+                        <div class="info-box mb-3">
+                            <span class="info-box-icon bg-lightblue elevation-1"><i class="far fa-list-alt"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-number">Citas</span>
+                                <span class="info-box-text">{{ datos.agendadas }} - Agendadas</span>
+                                <span class="info-box-text">{{ datos.cumplidas }} - Cumplidas</span>
+                            </div>
                         </div>
                     </div>
                 </div>
