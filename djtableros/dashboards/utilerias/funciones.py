@@ -312,13 +312,7 @@ def obtiene_ventasvehiculos(bytAgencia, bytSucursal, fechareporte):
     Obtiene la informacion de vehiculos, ventas, entregas, cancelaciones y unidades
     facturadas no entregadas 
     """
-    strFechaini = fechareporte
     periodo = fechareporte
-
-    
-    strFechaFin = strFechaini + timedelta(days=1)
-    strFechaFin = strFechaFin.strftime("%d/%m/%Y")
-    strFechaini = strFechaini.strftime("%d/%m/%Y")
 
     bytEmpresa = 1
     if bytAgencia == cadillac:
@@ -336,6 +330,7 @@ def obtiene_ventasvehiculos(bytAgencia, bytSucursal, fechareporte):
     strSQL = strSQL + " nvl(FAU_Venta, 0) as venta "
     strSQL = strSQL + " From VT_VLIBRODEVENTASCAN VT "
     strSQL = strSQL + " WHERE vt.EMPR_EMPRESAID = " + str(bytEmpresa)
+    strSQL = strSQL + " AND (Extract(day from vt.FAAU_FECHAREPORTE)) <= " + str(periodo.day) 
     strSQL = strSQL + " AND (Extract(Month from vt.FAAU_FECHAREPORTE)) = " + str(periodo.month) 
     strSQL = strSQL + " AND (Extract(year from vt.FAAU_FECHAREPORTE)) = " + str(periodo.year) 
     strSQL = strSQL + " AND vt.PEAU_TIPOVENTA <> 'INTERCAMB' "
@@ -359,6 +354,7 @@ def obtiene_ventasvehiculos(bytAgencia, bytSucursal, fechareporte):
     strSQL = strSQL + " AND ET.ENTR_STATUS = 'AC' "
     strSQL = strSQL + " and ET.ENTR_VEHI_CLASE = 'NU' "
     strSQL = strSQL + " AND NVL(ET.ENTR_SOFIACODE, ' ') <> ' ' "
+    strSQL = strSQL + " AND (Extract(day from ET.ENTR_FECHAENTREGAUNIDAD)) <= " + str(periodo.day) 
     strSQL = strSQL + " AND (Extract(Month from ET.ENTR_FECHAENTREGAUNIDAD)) = " + str(periodo.month)
     strSQL = strSQL + " AND (Extract(year from ET.ENTR_FECHAENTREGAUNIDAD)) = " + str(periodo.year)
     strSQL = strSQL + " AND FAAU_FORM_TIPOVENTA not like '%INTER%' "
@@ -437,13 +433,7 @@ def obtiene_ventasvehiculos_detalle(bytAgencia, bytSucursal, fechareporte):
     Obtiene la informacion de vehiculos, ventas, entregas, cancelaciones y unidades
     facturadas no entregadas 
     """
-    strFechaini = fechareporte
     periodo = fechareporte
-
-    
-    strFechaFin = strFechaini + timedelta(days=1)
-    strFechaFin = strFechaFin.strftime("%d/%m/%Y")
-    strFechaini = strFechaini.strftime("%d/%m/%Y")
 
     bytEmpresa = 1
     if bytAgencia == cadillac:
@@ -486,12 +476,16 @@ def obtiene_ventasvehiculos_detalle(bytAgencia, bytSucursal, fechareporte):
     # Obtener los vehiculos nuevos de hoy
     dfn_hoy = df_consulta[['inv', 'descm', 'factura', 'cliente', 'tipoventa', 'vendedor', 'venta', 'costo', 'utilidad', 'clase',  'hoy_acum', 'porcentaje']].copy(deep=True)
     dfn_hoy = dfn_hoy[(dfn_hoy['hoy_acum'] == 'HOY') & (dfn_hoy['clase'] == 'NU')]  #Filtrar por las columnas que necesitamos
-    # Eliminar las columnas que no necesitamos
-    dfn_hoy.drop(['clase', 'hoy_acum'], axis=1, inplace=True)
+    
+    dfn_hoy.drop(['clase', 'hoy_acum'], axis=1, inplace=True)   # Eliminar las columnas que no necesitamos
 
     # Obtener los vehiculos usados Acumulados
-    dfn_acum = df_consulta[['inv', 'descm', 'factura', 'cliente', 'tipoventa', 'vendedor', 'venta', 'costo', 'utilidad', 'clase',  'hoy_acum', 'porcentaje']].copy(deep=True)
+    dfn_acum = df_consulta[['inv', 'descm', 'factura', 'fecfactura', 'cliente', 'tipoventa', 'vendedor', 'venta', 'costo', 'utilidad', 'clase',  'hoy_acum', 'porcentaje']].copy(deep=True)
     dfn_acum = dfn_acum[(dfn_acum['hoy_acum'] == 'ACUM') & (dfn_acum['clase'] == 'NU')]  #Filtrar por las columnas que necesitamos
+    dfn_acum['fecfactura'] = pd.to_datetime(dfn_acum['fecfactura'])
+
+    # Cambia el formato de las columnas 'fecfactura' y 'feccancelacion' en el mismo DataFrame
+    dfn_acum[['fecfactura']] = dfn_acum[['fecfactura']].applymap(lambda x: x.strftime('%d/%m/%y'))
     # Eliminar las columnas que no necesitamos
     dfn_acum.drop(['clase', 'hoy_acum'], axis=1, inplace=True)
 
@@ -556,8 +550,12 @@ def obtiene_ventasvehiculos_detalle(bytAgencia, bytSucursal, fechareporte):
     dfu_hoy.drop(['clase', 'hoy_acum'], axis=1, inplace=True)
 
     # Obtener los vehiculos usados Acumulados
-    dfu_acum = df_consulta[['inv', 'descm', 'factura', 'cliente', 'tipoventa', 'vendedor', 'venta', 'costo', 'utilidad', 'clase',  'hoy_acum', 'porcentaje']].copy(deep=True)
+    dfu_acum = df_consulta[['inv', 'descm', 'factura', 'fecfactura', 'cliente', 'tipoventa', 'vendedor', 'venta', 'costo', 'utilidad', 'clase',  'hoy_acum', 'porcentaje']].copy(deep=True)
     dfu_acum = dfu_acum[(dfu_acum['hoy_acum'] == 'ACUM') & (dfu_acum['clase'] == 'US')]  #Filtrar por las columnas que necesitamos
+    dfu_acum['fecfactura'] = pd.to_datetime(dfu_acum['fecfactura'])
+
+    # Cambia el formato de las columnas 'fecfactura' y 'feccancelacion' en el mismo DataFrame
+    dfu_acum[['fecfactura']] = dfu_acum[['fecfactura']].applymap(lambda x: x.strftime('%d/%m/%y'))
     # Eliminar las columnas que no necesitamos
     dfu_acum.drop(['clase', 'hoy_acum'], axis=1, inplace=True)
 
@@ -1223,14 +1221,18 @@ def inventario_detalle(bytAgencia, bytSucursal):
     df_consulta['descm'] = df_consulta['descm'].str[:30]
     df_consulta['vin'] = df_consulta['vin'].str[-8:]
 
+    df_consulta['propio'] = df_consulta.apply(lambda row: 'propio' if row['saldopp'] != row['costo'] else '', axis=1)
+
      # Separar los nuevos y los seminuevos
     filtrousados = df_consulta["clase"].str.contains("US", case=False)
     df_nuevos = df_consulta[~filtrousados].copy()
     df_seminuevos = df_consulta[filtrousados].copy()
 
+    propios_nuevos = (df_nuevos['propio'].str.count('propio')).sum()
+
     conn.close
 
-    return df_nuevos, df_seminuevos
+    return df_nuevos, df_seminuevos, propios_nuevos
 
 def resumeninvxagencia(bytAgencia, bytSucursal):
     """
@@ -1274,6 +1276,7 @@ def resumeninvxagencia(bytAgencia, bytSucursal):
     strSQL += " ORDER BY diasPP DESC,  V.VEHI_CLASE, V.VEHI_ANIO, V.VEHI_NUMEROINVENTARIO "
 
     c.execute(str(strSQL)) 
+    conn.close
 
     # Crear el DataFrame
     df_consulta = pd.DataFrame.from_records(c)
@@ -1286,11 +1289,22 @@ def resumeninvxagencia(bytAgencia, bytSucursal):
     # Limitar el numero de caracteres por columna
     df_consulta['descm'] = df_consulta['descm'].str[:30]
     df_consulta['vin'] = df_consulta['vin'].str[-8:]
-
     
     # Convertir la columna 'Fecha' al tipo datetime
     df_consulta['Fecha'] = pd.to_datetime(df_consulta['Fecha'], format='%d/%m/%Y')
     df_consulta['FechaVencimiento'] = pd.to_datetime(df_consulta['FechaVencimiento'], format='%d/%m/%Y')
+    # Agregar la columna para saber si el vehiculo es propio
+    df_consulta['propio'] = df_consulta.apply(lambda row: 'propio' if row['saldopp'] != row['costo'] else '', axis=1)
+
+    # Obtener un DF con los vehiculos que son propios
+    df_propios = df_consulta[df_consulta['propio'] == 'propio']
+    propios_importe = df_propios['costo'].sum()
+     # Estadísticas de propios
+    total_propios = len(df_propios)
+    propios_nu = len(df_propios[df_propios['Clase'] == 'NU'])
+    propios_de = len(df_propios[df_propios['Clase'] == 'DE'])
+    propios_us = len(df_propios[df_propios['Clase'] == 'US'])
+    
 
     # Estadísticas
     total_registros = len(df_consulta)
@@ -1302,7 +1316,6 @@ def resumeninvxagencia(bytAgencia, bytSucursal):
 
     # Fecha actual
     fecha_actual = datetime.now()
-
     # Calcula los días vencidos para cada fecha
     df_consulta['DiasVencidos'] = (fecha_actual - df_consulta['FechaVencimiento']).dt.days
 
@@ -1314,9 +1327,6 @@ def resumeninvxagencia(bytAgencia, bytSucursal):
 
     strlogo = strempresa.logo
     strbg = strempresa.bg_color
-    if bytEmpresa == 2:
-        strlogo = "admin-lte/dist/img/logo_cadillac.jpg"
-        strbg = "bg-warning"
 
     datos = {
         'nombre_empresa': strempresa.nombre_empresa,
@@ -1338,6 +1348,11 @@ def resumeninvxagencia(bytAgencia, bytSucursal):
         'detalle30': vencidos_30_90.to_dict(orient='records'), 
         'detalle90': vencidos_90_180.to_dict(orient='records'), 
         'detalle180': vencidos_mas_180.to_dict(orient='records'),
+        'propios': total_propios,
+        'propios_nu': propios_nu,
+        'propios_de': propios_de,
+        'propios_us': propios_us,
+        'propios_importe': propios_importe,
         'logo': strlogo,
         'bg': strbg
         }
@@ -1386,6 +1401,7 @@ def resumen_planpiso(bytAgencia, bytSucursal):
     strSQL += " ORDER BY diasPP DESC,  V.VEHI_CLASE, V.VEHI_ANIO, V.VEHI_NUMEROINVENTARIO "
 
     c.execute(str(strSQL)) 
+    conn.close
 
     # Crear el DataFrame
     df_consulta = pd.DataFrame.from_records(c)
@@ -1456,182 +1472,7 @@ def resumen_planpiso(bytAgencia, bytSucursal):
 
     return datos
 
-def resumen_cuentasxcobrar(bytAgencia, bytSucursal):
-    """
-    Obtiene el resumen de las cuentas x cobrar por antiguedad 
-    y lo regresa en una tabla pivote
-    """
-    bytEmpresa = 1
-    if bytAgencia == cadillac:
-        bytEmpresa = 2
-
-    conn = None
-    conn = config.creaconeccion(bytAgencia)
-    c = conn.cursor()
-
-    strempresa = config.obtiene_empresa(bytAgencia, bytSucursal)
-
-    # Obtener el resultado de la tabla del DMS
-    strSQL = " Select c.Clie_clave, (Case when nvl(c.clie_razonsocial, ' ') <> ' ' then c.clie_razonsocial else c.Clie_nombre || ' ' || c.clie_apellidopaterno end) as Nombre, "
-    strSQL += " TO_DATE(CP.PRIM_FECHAVENCIMIENTO) as VENCIMIENTO, cp.prim_saldo, CP.PRIM_OBSERVACIONES, TC.TIPO_DESCRIPCION, TC.TIPO_CARTERASDO "
-    strSQL += " From CLIENTES C ,  CC_PRIMCLIENTES CP, CC_TIPOSCARTERA TC "
-    strSQL += " where C.empr_empresaid  = " + str(bytEmpresa)
-    strSQL += " and cp.empr_empresaid = c.empr_empresaid "
-    strSQL += " and CP.PRIM_CLIE_CLAVE = c.Clie_clave "
-    strSQL += " and cp.prim_saldo <> 0 "
-    if strempresa.ref_cartera != "*":
-        strSQL += " AND CP.PRIM_REFERENCIA3 LIKE ('%" + str(strempresa.ref_cartera) + "%')"
-    if bytSucursal == 3:
-        strSQL += " AND CP.PRIM_TIPOVENTA LIKE ('%FLOT%')"
-    else:
-        strSQL += " AND CP.PRIM_TIPOVENTA NOT LIKE ('%FLOT%')"
-    strSQL += " AND TC.EMPR_EMPRESAID = Cp.EMPR_EMPRESAID "
-    strSQL += " AND TC.TIPO_CARTERA = CP.PRIM_CARTERA "
-    strSQL += " Order by c.Clie_clave "
-
-    c.execute(str(strSQL)) 
-
-    # Crear el DataFrame
-    df_consulta = pd.DataFrame.from_records(c)
-    df_consulta.columns =['cliente', 'nombre', 'fvencimiento', 'saldo', 'comentarios', 'tipocartera', 'grupocartera']
-    # Convierte las columnas al tipo datetime
-    df_consulta['fvencimiento'] = pd.to_datetime(df_consulta['fvencimiento'])
-    # Cambia el formato de las columnas 'fecfactura' y 'feccancelacion' en el mismo DataFrame
-    # df_consulta[['fvencimiento']] = df_consulta[['fvencimiento']].applymap(lambda x: x.strftime('%d/%m/%y'))
-
-    # Fecha actual
-    fecha_actual = datetime.now()
-    # Calcula los días vencidos para cada fecha
-    df_consulta['DiasVencidos'] = (fecha_actual - df_consulta['fvencimiento']).dt.days
-    # Filtrar los registros vencidos
-    vencidos_total = df_consulta[df_consulta['DiasVencidos'] > 0]
-
-    df_auto = vencidos_total[vencidos_total['grupocartera'] == 'AUTO']
-    df_refa = vencidos_total[vencidos_total['grupocartera'] == 'REFA']
-    df_serv = vencidos_total[vencidos_total['grupocartera'] == 'SERV']
-
-    dias_mas_antiguo = (datetime.now() - vencidos_total['fvencimiento'].min()).days
-    antiguedad_promedio = (datetime.now() - vencidos_total['fvencimiento']).mean().days
-
-    vencidos_0 = df_consulta[df_consulta['DiasVencidos'] <= 0]
-    vencidos_1_30 = df_consulta[(df_consulta['DiasVencidos'] >= 1) & (df_consulta['DiasVencidos'] < 30)]
-    vencidos_30_60 = df_consulta[(df_consulta['DiasVencidos'] >= 30) & (df_consulta['DiasVencidos'] < 60)]
-    vencidos_60_90 = df_consulta[(df_consulta['DiasVencidos'] >= 60) & (df_consulta['DiasVencidos'] < 90)]
-    vencidos_mas_90 = df_consulta[df_consulta['DiasVencidos'] >= 90]
-
-    saldo_vencido = vencidos_total['saldo'].sum()
-    saldo_total = df_consulta['saldo'].sum()
-
-    strlogo = strempresa.logo
-    strbg = strempresa.bg_color
-
-    datos = {
-        'nombre_empresa': strempresa.nombre_empresa,
-        'empresa': str(bytAgencia), 
-        'sucursal': str(bytSucursal),
-        'totalcartera': df_consulta['saldo'].sum(),
-        'totalvencido': vencidos_total['saldo'].sum(),
-        'auto': df_auto['saldo'].sum(),
-        'refa': df_refa['saldo'].sum(),
-        'serv': df_serv['saldo'].sum(),
-        'diasmas': dias_mas_antiguo,
-        'prom': antiguedad_promedio,
-        'vigente': vencidos_0['saldo'].sum(),
-        'vigentep': utilerias.calcula_porcentaje_valor(vencidos_0['saldo'].sum(), saldo_total),
-        '1a30': vencidos_1_30['saldo'].sum(),
-        '1a30p': utilerias.calcula_porcentaje_valor(vencidos_1_30['saldo'].sum(), saldo_total),
-        '30a60': vencidos_30_60['saldo'].sum(),
-        '30a60p': utilerias.calcula_porcentaje_valor(vencidos_30_60['saldo'].sum(), saldo_total),
-        '60a90': vencidos_60_90['saldo'].sum(),
-        '60a90p': utilerias.calcula_porcentaje_valor(vencidos_60_90['saldo'].sum(), saldo_total),
-        '90': vencidos_mas_90['saldo'].sum(),
-        '90p': utilerias.calcula_porcentaje_valor(vencidos_mas_90['saldo'].sum(), saldo_total),
-        'logo': strlogo,
-        'bg': strbg
-        }
-
-    return datos
-
-def concat_unique_comments(comments):
-    unique_comments = set(filter(None, comments))  # Filtrar comentarios no nulos y eliminar duplicados
-    return ' - '.join(unique_comments)  # Concatenar comentarios únicos
         
-def detalle_cuentasxcobrar(bytAgencia, bytSucursal):
-    """
-    Obtiene el resumen de las cuentas x cobrar por antiguedad 
-    y lo regresa en una tabla pivote
-    """
-    bytEmpresa = 1
-    if bytAgencia == cadillac:
-        bytEmpresa = 2
-
-    conn = None
-    conn = config.creaconeccion(bytAgencia)
-    c = conn.cursor()
-
-    strempresa = config.obtiene_empresa(bytAgencia, bytSucursal)
-
-    # Obtener el resultado de la tabla del DMS
-    strSQL = " Select c.Clie_clave, (Case when nvl(c.clie_razonsocial, ' ') <> ' ' then c.clie_razonsocial else c.Clie_nombre || ' ' || c.clie_apellidopaterno end) as Nombre, "
-    strSQL += " CP.PRIM_IMPORTE, cp.prim_saldo, "
-    strSQL += " (Case when (Trunc(Sysdate) - Trunc(TO_DATE(cp.PRIM_FECHAVENCIMIENTO, 'DD/MM/YY'))) < 0 Then cp.prim_saldo else 0 end ) as vigente, "
-    strSQL += " (Case when (Trunc(Sysdate) - Trunc(TO_DATE(cp.PRIM_FECHAVENCIMIENTO, 'DD/MM/YY'))) > 0 AND (Trunc(Sysdate) - Trunc(TO_DATE(cp.PRIM_FECHAVENCIMIENTO, 'DD/MM/YY'))) <= 30 Then cp.prim_saldo else 0 end ) as dias30, "
-    strSQL += " (Case when (Trunc(Sysdate) - Trunc(TO_DATE(cp.PRIM_FECHAVENCIMIENTO, 'DD/MM/YY'))) > 30 AND (Trunc(Sysdate) - Trunc(TO_DATE(cp.PRIM_FECHAVENCIMIENTO, 'DD/MM/YY'))) <= 60 Then cp.prim_saldo else 0 end ) as dias60, "
-    strSQL += " (Case when (Trunc(Sysdate) - Trunc(TO_DATE(cp.PRIM_FECHAVENCIMIENTO, 'DD/MM/YY'))) > 60 AND (Trunc(Sysdate) - Trunc(TO_DATE(cp.PRIM_FECHAVENCIMIENTO, 'DD/MM/YY'))) <= 90 Then cp.prim_saldo else 0 end ) as dias90, "
-    strSQL += " (Case when (Trunc(Sysdate) - Trunc(TO_DATE(cp.PRIM_FECHAVENCIMIENTO, 'DD/MM/YY'))) > 90 Then cp.prim_saldo else 0 end ) as mas90, "
-    strSQL += " (Case when (Trunc(Sysdate) - Trunc(TO_DATE(cp.PRIM_FECHAVENCIMIENTO, 'DD/MM/YY'))) > 0 Then cp.prim_saldo else 0 end ) as totalvencido, "
-    strSQL += " CP.PRIM_OBSERVACIONES, TC.TIPO_CARTERASDO "
-    strSQL += " From CLIENTES C ,  CC_PRIMCLIENTES CP, CC_TIPOSCARTERA TC "
-    strSQL += " where C.empr_empresaid  = " + str(bytEmpresa)
-    strSQL += " and cp.empr_empresaid = c.empr_empresaid "
-    strSQL += " and CP.PRIM_CLIE_CLAVE = c.Clie_clave "
-    strSQL += " and cp.prim_saldo <> 0 "
-    if strempresa.ref_cartera != "*":
-        strSQL += " AND CP.PRIM_REFERENCIA3 LIKE ('%" + str(strempresa.ref_cartera) + "%')"
-    if bytSucursal == 3:
-        strSQL += " AND CP.PRIM_TIPOVENTA LIKE ('%FLOT%')"
-    else:
-        strSQL += " AND CP.PRIM_TIPOVENTA NOT LIKE ('%FLOT%')"
-    strSQL += " AND TC.EMPR_EMPRESAID = Cp.EMPR_EMPRESAID "
-    strSQL += " AND TC.TIPO_CARTERA = CP.PRIM_CARTERA "
-    strSQL += " Order by c.Clie_clave "
-
-    print(str(bytSucursal))
-
-    c.execute(str(strSQL)) 
-
-    # Crear el DataFrame
-    df_consulta = pd.DataFrame.from_records(c)
-    df_consulta.columns = ['cliente', 'nombre', 'importe', 'totalcxc', 'vigente', '30','60', '90', 'mas_90', 'totalvencido', 'comentarios', 'grupocartera']
-
-    # Agrupar el DataFrame df_totals por cliente y grupocartera, concatenando los comentarios
-    df_grouped_totals = df_consulta.groupby(['cliente', 'grupocartera']).agg({
-        'nombre': 'first',  # Tomar el primer valor del nombre
-        'importe': 'sum',
-        'totalcxc': 'sum',
-        'vigente': 'sum',
-        '30': 'sum',
-        '60': 'sum',
-        '90': 'sum',
-        'mas_90': 'sum',
-        'totalvencido': 'sum',
-        'comentarios': concat_unique_comments  # Utilizar la función de concatenación de comentarios únicos
-    }).reset_index()
-
-   # Calcular los totales para la fila "TOTAL"
-    total_row = df_grouped_totals.drop(['cliente', 'grupocartera', 'comentarios'], axis=1).sum().fillna(0)
-    total_row['nombre'] = 'TOTAL CARTERA'  # Agregar el nombre "TOTAL"
-
-    # Crear un DataFrame con la fila "TOTAL"
-    df_total_row = pd.DataFrame([total_row], columns=df_grouped_totals.columns)
-
-    # Concatenar df_grouped_totals y df_total_row
-    df_final = pd.concat([df_grouped_totals, df_total_row], ignore_index=True).fillna(' ')
-
-    # Ordenar primero por la columna 'Edad' de forma descendente y luego por 'Puntuación' de forma ascendente
-    df_final = df_final.sort_values(by=['totalvencido', 'totalcxc'], ascending=[False, False])
-
-    return df_final
 
 def completar_columnas(df, nombretotal="TOTAL", cuantas = 12):
     """

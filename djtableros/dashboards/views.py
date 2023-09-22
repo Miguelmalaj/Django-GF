@@ -2,8 +2,8 @@ import pandas as pd
 import calendar
 from django.shortcuts import render, redirect
 from dashboards.utilerias import funciones, utilerias, consultassql, config
-from app_postventa.utils import obtener_opcion_default
-from app_postventa.utils import obtener_opciones_menu_postventa
+from app_postventa.utils import obtener_opciones_menu_postventa, obtener_opcion_default
+from app_contabilidad.utils import obtener_opciones_menu_contabilidad
 from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -29,9 +29,11 @@ def login_view(request):
                 # Obtener las opciones de menú para el usuario
                 opciones_menuvta = utilerias.obtener_opciones_menu(username)
                 opciones_menu_postventa = obtener_opciones_menu_postventa(username)
+                opciones_menu_contabilidad = obtener_opciones_menu_contabilidad(username)
                 opciones_menu = {
                         'ventas': opciones_menuvta,
-                        'postventa': opciones_menu_postventa
+                        'postventa': opciones_menu_postventa,
+                        'contable': opciones_menu_contabilidad
                 }
                 # Almacenar las opciones de menú en la sesión
                 request.session['opciones_menu'] = opciones_menu
@@ -346,14 +348,14 @@ def inventariovehiculos_detalle(request, empresa, sucursal):
         sucursal = int(sucursal)
         if agencia != 0:
                 strnombreempresa = config.obtiene_empresa(agencia, sucursal)
-                df_inventario, df_usados = funciones.inventario_detalle(agencia,sucursal)
+                df_inventario, df_usados, propios_nuevos = funciones.inventario_detalle(agencia,sucursal)
         else:
                 strnombreempresa = "CONSOLIDADO"
-                df_lmm, df_lmmus = funciones.inventario_detalle(1,1)
-                df_gve, df_gveus = funciones.inventario_detalle(3,1)
-                df_cln, df_clnus = funciones.inventario_detalle(5,1)
-                df_flo, df_flous = funciones.inventario_detalle(5,3)
-                df_cad, df_cadus = funciones.inventario_detalle(7,1)
+                df_lmm, df_lmmus, propios_lm = funciones.inventario_detalle(1,1)
+                df_gve, df_gveus, propios_gve = funciones.inventario_detalle(3,1)
+                df_cln, df_clnus, propios_clnz = funciones.inventario_detalle(5,1)
+                df_flo, df_flous, propios_flot = funciones.inventario_detalle(5,3)
+                df_cad, df_cadus, propios_cad = funciones.inventario_detalle(7,1)
                 df_lmm["agencia"] = "MOC"
                 df_gve["agencia"] = "GVE"
                 df_cln["agencia"] = "CLN"
@@ -366,6 +368,7 @@ def inventariovehiculos_detalle(request, empresa, sucursal):
 
                 df_inventario = pd.concat([df_lmm, df_gve, df_cln, df_flo, df_cad], axis= 0)
                 df_usados = pd.concat([df_lmmus, df_gveus, df_clnus, df_flous, df_cadus], axis= 0)
+                propios_nuevos = propios_lm + propios_gve + propios_clnz + propios_flot + propios_cad
 
         # Se regresa el inventario en diccionario de datos, para que en el template podamos 
         # accesar a cada registro por su nombre de columna. ( modificado el 14 de Agosto )
@@ -378,6 +381,7 @@ def inventariovehiculos_detalle(request, empresa, sucursal):
                 'totalveh':df_inventario.shape[0],
                 'usados':df_usados.to_dict(orient='records'), 
                 'totalusados':df_usados.shape[0],
+                'propiosnuevos': propios_nuevos
         }
         return render(request, 'inventariovehdetalle.html', {'datos':datos})
 
@@ -418,6 +422,11 @@ def inventarioveh(request):
         '90porc': (datoslmm['90porc'] + datosgve['90porc'] + datoscln['90porc'] + datoscad['90porc']) / 4,
         '180': datoslmm['180'] + datosgve['180'] + datoscln['180'] + datoscad['180'],
         '180porc': (datoslmm['180porc'] + datosgve['180porc'] + datoscln['180porc'] + datoscad['180porc']) / 4,
+        'propios': datoslmm['propios'] + datosgve['propios'] + datoscln['propios'] + datoscad['propios'],
+        'propios_nu': datoslmm['propios_nu'] + datosgve['propios_nu'] + datoscln['propios_nu'] + datoscad['propios_nu'],
+        'propios_de': datoslmm['propios_de'] + datosgve['propios_de'] + datoscln['propios_de'] + datoscad['propios_de'],
+        'propios_us': datoslmm['propios_us'] + datosgve['propios_us'] + datoscln['propios_us'] + datoscad['propios_us'],
+        'propios_importe': datoslmm['propios_importe'] + datosgve['propios_importe'] + datoscln['propios_importe'] + datoscad['propios_importe'],
         'logo':"admin-lte/dist/img/logo_cadchev.jpg",
         'bg': "bg-lightblue"
         }
@@ -484,50 +493,4 @@ def planpisopagado(request):
                 'grupo': datosconsolidado
         }
         return render(request, 'inventariovehiculos.html', {'datos':datos})
-
-def cuentasxcobrar(request):
-        
-        datoslmm = funciones.resumen_cuentasxcobrar(1, 1)                      
-        datosgve = funciones.resumen_cuentasxcobrar(3, 1)
-        datoscln = funciones.resumen_cuentasxcobrar(5, 1)
-        datosaer = funciones.resumen_cuentasxcobrar(5, 2)
-        datosflo = funciones.resumen_cuentasxcobrar(5, 3)     
-        datoscad = funciones.resumen_cuentasxcobrar(7, 1)
-
-        # Lista de las cuatro variables para iterar
-        variables = [datoslmm, datosgve, datoscln, datoscad]
-        # Llave a comparar
-        llave = 'diasmas'
-        # Inicializa el valor máximo con un valor muy pequeño
-        valor_mas_antiguo = float('-inf')
-        # Itera a través de las variables y encuentra el valor más grande en la llave 'diasmas'
-        for variable in variables:
-                if llave in variable and variable[llave] > valor_mas_antiguo:
-                        valor_mas_antiguo = variable[llave]
-
-        datos = {
-                'opcionmenu': config.obtiene_opcionmenu('cuentasxcobrar'),
-                'mochis': datoslmm,
-                'guasave': datosgve,
-                'culiacan': datoscln,
-                'aeropuerto': datosaer,
-                'flotillas':datosflo,
-                'cadillac': datoscad
-        }
-        return render(request, 'cuentasxcobrar.html', {'datos':datos})
-
-def cuentasxcobrar_detalle(request, empresa, sucursal):
-        agencia = int(empresa)
-        sucursal = int(sucursal)
-        if agencia != 0:
-                strnombreempresa = config.obtiene_empresa(agencia, sucursal)
-                df_resultado = funciones.detalle_cuentasxcobrar(agencia,sucursal)
-        
-                datos = {
-                        'nombreempresa': strnombreempresa,
-                        'opcionmenu': config.obtiene_opcionmenu('cuentasxcobrar'),
-                        'cuentasxcobrar':df_resultado.to_dict(orient='records'), 
-                        'totalveh':df_resultado.shape[0]
-                }
-        return render(request, 'cuentasxcobrardetalle.html', {'datos':datos})
 

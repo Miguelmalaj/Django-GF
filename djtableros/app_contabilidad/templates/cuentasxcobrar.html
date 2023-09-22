@@ -79,7 +79,7 @@
                             </div>
                             <div class="col-sm-12 border-top d-flex justify-content-around">
                                 {% if detalles.empresa and detalles.sucursal %}
-                                <small class="mt-2"><a href="{% url 'cuentasxcobrar_detalle' detalles.empresa detalles.sucursal %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
+                                <small class="mt-2"><a name="botonmostrardetalle" href="{% url 'cuentasxcobrar_detalle' detalles.empresa detalles.sucursal %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
                                 {% endif %}
                             </div>
                         </div>

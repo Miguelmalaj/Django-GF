@@ -11,7 +11,7 @@ class OpcionMenu(models.Model):
         return self.nombre
     
     class Meta:
-        app_label = 'app_postventa'  # Agregar esta línea para indicar la aplicación
+        app_label = 'app_contabilidad'  # Agregar esta línea para indicar la aplicación
         verbose_name = 'Opciones del menu'
         ordering = ['orden']  # Ordenar los registros por el campo 'orden'
     
@@ -24,6 +24,6 @@ class Permisos(models.Model):
         return self.nombre
     
     class Meta:
-        app_label = 'app_postventa'  # Agregar esta línea para indicar la aplicación
+        app_label = 'app_contabilidad'  # Agregar esta línea para indicar la aplicación
         verbose_name = 'Permisos x usuario'
     

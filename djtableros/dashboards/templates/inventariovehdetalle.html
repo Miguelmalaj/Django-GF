@@ -33,12 +33,13 @@
                             <div class="col-12 col-sm-12">
                                 <div class="card card-outline card-lightblue table-responsive">
                                     <div class="card-header">
-                                        <span class="info-box-text"> {{ datos.totalveh}} Vehiculos </span>
+                                        <span class="info-box-text"> {{ datos.totalveh}} Vehiculos / {{ datos.propiosnuevos}} Propios</span>
                                     </div>
                                     <table id="inventarioveh" class="table table-sm">
                                         <thead>
                                             <tr style="font-size: 12px">
                                                 <th>Inv.</th>
+                                                <th style='font-size: 12px' class='text-center'>Propio</th>
                                                 <th>Descrpcion</th>
                                                 <th>Paq.</th>
                                                 <th>Serie</th>
@@ -60,6 +61,11 @@
                                                 {% for row in datos.inventario %}
                                                 <tr style="font-size: 12px">
                                                     <td style='font-size: 12px'>{{ row.inv }}</td>
+                                                    {% if row.propio == 'propio' %}
+                                                        <td style='font-size: 12px' class='text-center'><i class="fas fa-check-circle fa-lg" style="color: #ff3d3d;"></i></td>
+                                                    {% else %}
+                                                        <td></td>
+                                                    {% endif %}
                                                     <td style='font-size: 12px'>{{ row.descm }}</td>
                                                     <td style='font-size: 12px'>{{ row.paq }}</td>
                                                     <td style='font-size: 12px'>{{ row.vin }}</td>
@@ -147,7 +153,7 @@
       
       $("#inventarioveh").DataTable({
         "ordering": true,
-        "order":[[6, "desc"]],
+        "order":[[7, "desc"]],
         "responsive": true,
         "autoWidth": true,
         "searching":true,

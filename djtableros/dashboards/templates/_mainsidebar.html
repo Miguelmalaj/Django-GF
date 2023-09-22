@@ -85,7 +85,25 @@
             </li>
             {% endif %}
 
-
+            <!-- Para la aplicación de Contabilidad / Administracion -->
+            {% if request.session.opciones_menu.contable %}
+            <li class="nav-item has-treeview {% if '/contable/' in request.path %}menu-open{% else %} {% endif %}">
+                <a href="#" class="{% if '/contable/' in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                    <i class="nav-icon fas fa-laptop"></i>
+                    <p>Administracion</p>
+                </a>
+                <ul class="nav nav-treeview">
+                    {% for opcion in request.session.opciones_menu.contable %}
+                        <li class="nav-item" id="{{ opcion.vista }}">
+                            <a name="opcionvista" href="{% url opcion.vista %}"  class="{% if opcion.vista in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                                <i class="nav-icon {{ opcion.icono }}"></i>
+                                <p>{{ opcion.nombre }}</p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
                 
             {% endblock nav_links %}
             {% endblock nav_links_outer %}

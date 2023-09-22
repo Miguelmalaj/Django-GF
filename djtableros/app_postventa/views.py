@@ -9,6 +9,35 @@ def index(request):
     
     return render(request, 'base.html')
 
+# Create your views here.
+def resumenpostventa(request):
+    if request.method == 'POST': 
+            seleccion = request.POST.get('fecha') 
+            fecha = datetime.strptime(seleccion, "%Y-%m-%d").date()
+    else:    
+            fecha = datetime.today()
+    
+    seleccion = fecha.strftime( "%Y-%m-%d")
+    
+    datoslmm = consultas.obtener_resumenpostventa(1, 1, fecha)
+    datosgve = consultas.obtener_resumenpostventa(3, 1, fecha)
+    datoscln = consultas.obtener_resumenpostventa(5, 1, fecha)
+    datosaer = consultas.obtener_resumenpostventa(5, 2, fecha)
+    datoscad = consultas.obtener_resumenpostventa(7, 1, fecha)
+
+    datos = {
+                'opcionmenu': utils.obtiene_opcionmenu('resumenpostventa'),
+                'mochis': datoslmm,
+                'guasave': datosgve,
+                'culiacan': datoscln,
+                'aeropuerto': datosaer,
+                'cadillac': datoscad,
+                'grupo': 0,
+                'fechareporte':seleccion
+        }
+    return render(request, 'resumenpostventa.html', {'datos':datos})
+
+
 def ventaservicio(request):
     if request.method == 'POST': 
         seleccion = request.POST.get('empresas')  # Obtener el valor enviado desde la solicitud, el valor de la izq es la empresa y derecha es la sucursal
@@ -67,11 +96,7 @@ def ordenesproceso(request):
         
         bytEmpresa = 1
         bytSucursal = 1  
-    
-    cboperiodos = utilerias.periodos()
-    cbomeses = utilerias.llenar_combo_meses
-    
-
+        
     df_ordenes, df_ordenes_status, df_ordenes_tipo= consultas.obtener_ordenesproceso(bytEmpresa, bytSucursal)
 
     datos = {
@@ -81,7 +106,6 @@ def ordenesproceso(request):
         'total': df_ordenes.to_dict(orient='records'), 
         'status': df_ordenes_status.to_dict(orient='records'), 
         'concepto': df_ordenes_tipo.to_dict(orient='records')
-        
     }
 
     return render(request, 'ordenes_proceso.html', {'datos':datos})
@@ -120,6 +144,10 @@ def ventarefacciones(request):
         'utiltotal':utiltotal, 
         'porctotal':porctotal
     }
+    
+    # Solo en aeropuerto la sucursal la maneja globalDMS como 3, hay que cambiarla a 2 para que obtenga el nombre correcto de la empresa
+    if bytSucursal == 3:
+         bytSucursal = 2
 
     datos = {
         'empresa':seleccion,
@@ -142,6 +170,9 @@ def detalle_ordenes(request, empresa, tipo_orden, year, mes, tipoconsulta):
     bytEmpresa = int(empresa[:1])
     bytSucursal = int(empresa[-1:])
 
+    if bytSucursal == 3:
+         bytSucursal = 2
+
     # obtener el nombre del menu dependiendo del tipo de consulta que se esta ejecutando.
     opcionmenu = 'ventaservicio'
     if tipoconsulta == 3:  
@@ -162,6 +193,11 @@ def detalle_mostrador(request, empresa, concepto, year, mes, tipoconsulta):
     bytSucursal = int(empresa[-1:])
 
     df_resultado = consultas.obtener_detalleventarefacciones(bytEmpresa, bytSucursal, concepto, year, mes, tipoconsulta)
+
+    # Solo en aeropuerto la sucursal la maneja globalDMS como 3, hay que cambiarla a 2 para que obtenga el nombre correcto de la empresa
+    if bytSucursal == 3:
+         bytSucursal = 2
+    
     datos = {
         'nombreempresa': config.obtiene_empresa(bytEmpresa, bytSucursal),
         'opcionmenu': utils.obtiene_opcionmenu('ventarefacciones'),

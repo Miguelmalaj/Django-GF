@@ -8,7 +8,7 @@
     <div class="col-sm-12">
         <div class="card card-outline card-lightblue">
             <div class="card-header">						
-                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} </h3>
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} </h3>                                    
                 <ul class='navbar-nav'>
                     <div class="row">
                         <div class="col-md-3">                                           
@@ -16,10 +16,13 @@
                         <div class="col-md-3">
                         </div>
                         <div class="col-md-6 align-content-lg-end text-right">
-                            <form method="post" action="{% url 'inventariovehiculos' %}">
-                            {% csrf_token %}                                                               
+                            <form method="post" action="{% url 'resumenpostventa' %}">
+                                {% csrf_token %}
                                 <li class='nav-item d-none d-sm-inline-block'>
-                                    <button id="botonactualizar" type='submit' class='btn btn-primary btn-block'><i class="fas fa-sync-alt"></i> Actualizar</button>
+                                    <input type="date" class="form-control datetimepicker-input" name="fecha" id="fecha" data-target="#timepicker" value="{{ datos.fechareporte }}" />
+                                </li>
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <button id="botonactualizar" type='submit' class='btn btn-primary btn-block'>Actualizar</button>
                                 </li>
                             </form>
                         </div>
@@ -37,71 +40,101 @@
         <div class="row">
             <!-- Ciclo para recorrer los datos, y crear las tarjetas para cada empresa -->
             {% for empresa, detalles in datos.items %}
-            {% if empresa != 'opcionmenu' %}
+            {% if empresa != 'opcionmenu' and empresa != 'fechareporte' %}
                 <div class="col-md-4">
 
                     <div class="card card-widget widget-user">
                         <div class="widget-user-header {{ detalles.bg }}">
                             <h3 class="widget-user-username">{{ detalles.nombre_empresa }}</h3>
-                            <h5 class="widget-user-desc">{{ detalles.totalinv }} Vehiculos en inventario</h5>
+                            <h5 class="widget-user-desc">{{ detalles.utiltotal }} Utilidad Post Venta</h5>
                         </div>
                         <div class="widget-user-image">
                             <img class="img-circle elevation-2" src="{% static detalles.logo %}" alt="User Avatar">
                         </div>
                         <div class="card-footer">
                             <div class="row">
-                                <div class="col-sm-4 border-right">
+                                <div class="col-sm-12 description-block bg-gradient-gray-dark">
+                                    <span class="description-text">Refacciones</span>
+                                </div>
+                                <div class="col-sm-2 border-right">
                                     <div class="description-block">
-                                    <h5 class="description-header">{{ detalles.nu }}</h5>
-                                    <span class="description-text">NUEVOS</span>
+                                        <span class="description-text text-muted">Ventas</span>
+                                        <h5 class="description-header">{{ detalles.venta_ref|floatformat:0|intcomma }}</h5>
                                     </div>
                                 </div>
-                                <div class="col-sm-4 border-right">
+                                <div class="col-sm-2 border-right">
                                     <div class="description-block">
-                                    <h5 class="description-header">{{ detalles.de }}</h5>
-                                    <span class="description-text">DEMOS</span>
+                                        <span class="description-text text-muted">Objetivo</span>
+                                        <h5 class="description-header">{{ detalles.obj_vref|floatformat:0|intcomma }}</h5>
                                     </div>
                                 </div>
-                                <div class="col-sm-4">
+                                <div class="col-sm-2 border-right">
                                     <div class="description-block">
-                                    <h5 class="description-header">{{ detalles.us }}</h5>
-                                    <span class="description-text">SEMINVOS</span>
+                                        <span class="description-text text-muted">%</span>
+                                        <h5 class="description-header">{{ detalles.porc_vref|floatformat:2|intcomma }}</h5>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 border-right border-top d-flex justify-content-around">
-                                    <small class="mt-2"><i class="far fa-calendar-times"></i></small><small class="mt-2 mb-2"> {{ detalles.diasmas }} mas antiguo</small>
+                                <div class="col-sm-2 border-right">
+                                    <div class="description-block">
+                                        <span class="description-text text-muted">Utilidad</span>
+                                        <h5 class="description-header">{{ detalles.util_ref|floatformat:0|intcomma }}</h5>
+                                    </div>
                                 </div>
-                                <div class="col-sm-6 border-top d-flex justify-content-around">
-                                    <small class="mt-2"><i class="far fa-calendar-alt"></i></small><small class="mt-2 mb-2"> {{ detalles.prom }} antig. prom.</small>
+                                <div class="col-sm-2 border-right">
+                                    <div class="description-block">
+                                        <span class="description-text text-muted">Objetivo</span>
+                                        <h5 class="description-header">{{ detalles.obj_uref|floatformat:0|intcomma }}</h5>
+                                    </div>
                                 </div>
+                                <div class="col-sm-2">
+                                    <div class="description-block">
+                                        <span class="description-text">%</span>
+                                        <h5 class="description-header">{{ detalles.porc_uref|floatformat:2|intcomma }}</h5>
+                                    </div>
+                                </div>
+                                
                             </div>
                             <div class="row">
                                 <div class="col-sm-12 description-block bg-gradient-gray-dark">
-                                    <span class="description-text">Vehiculos Propios</span>
+                                    <span class="description-text">Servicio</span>
                                 </div>
-                                <!-- seccion para mostrar los vehiculos propios  -->
-                                <div class="col-sm-6 border-right d-flex justify-content-around">
-                                    <span class="description-text"> {{ detalles.propios }} Vehiculos</span>
-                                </div>
-                                <div class="col-sm-6 d-flex justify-content-around">
-                                    <span class="description-text">$ {{ detalles.propios_importe|floatformat:0|intcomma }} </span>
-                                </div>
-                                <div class="col-sm-4 border-right border-top">
+                                <!-- seccion para mostrar Servicio -->
+                                
+                                <div class="col-sm-2 border-right">
                                     <div class="description-block">
                                     <h5 class="description-header">{{ detalles.propios_nu }}</h5>
-                                    <span class="description-text">NUEVOS</span>
+                                    <span class="description-text">Venta</span>
                                     </div>
                                 </div>
-                                <div class="col-sm-4 border-right border-top">
+                                <div class="col-sm-2 border-right">
                                     <div class="description-block">
                                     <h5 class="description-header">{{ detalles.propios_de }}</h5>
-                                    <span class="description-text">DEMOS</span>
+                                    <span class="description-text">Objetivo</span>
                                     </div>
                                 </div>
-                                <div class="col-sm-4 border-top">
+                                <div class="col-sm-2 border-right">
                                     <div class="description-block">
                                     <h5 class="description-header">{{ detalles.propios_us }}</h5>
-                                    <span class="description-text">SEMINVOS</span>
+                                    <span class="description-text">%</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-2 border-right">
+                                    <div class="description-block">
+                                    <h5 class="description-header">{{ detalles.propios_nu }}</h5>
+                                    <span class="description-text">Utilidad</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 border-right">
+                                    <div class="description-block">
+                                    <h5 class="description-header">{{ detalles.propios_de }}</h5>
+                                    <span class="description-text">Objetivo</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="description-block">
+                                    <h5 class="description-header">{{ detalles.propios_us }}</h5>
+                                    <span class="description-text">%</span>
                                     </div>
                                 </div>
                                 
@@ -115,35 +148,7 @@
                         </div>
                     </div>
 
-                    <div class="card card-outline card-lightblue">	
-                        <div class="card-body">
-                            <span><p class="text-center">{{ detalles.vencidos }} Unidades pagando PP </p></span>
-                            <div class="progress-group"><!-- 30 dias -->						
-                                +30 dias
-                                <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#{{ empresa }}_detalle30_modal"></i></a></span>
-                                <span class="float-right badge bg-warning">{{ detalles.30 }}</span>
-                                <div class="progress progress-sm">
-                                    <div class='progress-bar bg-warning' style='width: {{ detalles.30porc }}%'; aria-valuemax='{{ detalles.vencidos }}'></div> 
-                                </div>
-                            </div>	
-                            <div class="progress-group"><!-- 90 dias -->
-                                +90 dias
-                                <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#{{ empresa }}_detalle90_modal"></i></a></span>
-                                <span class="float-right badge bg-danger">{{ detalles.90 }}</span>
-                                <div class="progress progress-sm">
-                                    <div class='progress-bar bg-danger' style='width: {{ detalles.90porc }}%'; aria-valuemax='{{ detalles.vencidos }}'></div>            
-                                </div>
-                            </div>	
-                            <div class="progress-group"><!-- 180 dias -->
-                                +180 dias
-                                <span class="float-right"><a href="#"><i class="fa fa-fw fa-list-ul" data-toggle="modal" data-target="#{{ empresa }}_detalle180_modal"></i></a></span>
-                                <span class="float-right badge bg-danger">{{ detalles.180 }}</span>
-                                <div class="progress progress-sm">
-                                    <div class='progress-bar bg-danger' style='width: {{ detalles.180porc }}%'; aria-valuemax='{{ detalles.vencidos }}'></div>
-                                </div>
-                            </div>	
-                        </div>
-                    </div>
+                    
                 </div>
             {% endif %}   
             {% endfor %}

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "dashboards",
     "app_postventa",
+    "app_contabilidad",
     # General use templates & template tags (should appear first)
     'adminlte3',
      # Optional: Django admin theme (must be before django.contrib.admin)

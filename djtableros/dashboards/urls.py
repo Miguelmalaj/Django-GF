@@ -1,6 +1,6 @@
 from django.urls import path, include
 from . import views
-from django.conf import settings
+
 
 urlpatterns = [
     path('', views.login_view, name='login'),
@@ -16,7 +16,5 @@ urlpatterns = [
     path('resumeninvveh/', views.resumeninvveh, name='resumeninvveh'),
     path('inventario_detalle/<str:empresa>/<str:sucursal>', views.inventariovehiculos_detalle, name='inventario_detalle'),
     path('inventariovehiculos/', views.inventarioveh, name='inventariovehiculos'),
-    path('planpisopagado/', views.planpisopagado, name='planpisopagado'),
-    path('cuentasxcobrar/', views.cuentasxcobrar, name='cuentasxcobrar'),
-    path('cuentasxcobrar_detalle/<str:empresa>/<str:sucursal>', views.cuentasxcobrar_detalle, name='cuentasxcobrar_detalle'),
+    path('planpisopagado/', views.planpisopagado, name='planpisopagado')
 ]

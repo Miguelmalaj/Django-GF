@@ -11,16 +11,15 @@
     </ul>
     
     <ul class="navbar-nav ml-auto">
-        
-        <li class="breadcrumb-item active">
+      <!-- Messages Dropdown Menu -->
+      <li class="nav-item dropdown">
+        <button class="btn btn-block btn-secondary" style="margin-right: 10px;">
             <div id="current_date">
                 <script>
-                    // Obtener la fecha actual
-                    var fecha = new Date();
-                
+                    var fecha = new Date(); // Obtener la fecha actual
                     // Configurar opciones de formato
                     //var opciones = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' };
-                    var opciones = { day: 'numeric', month: 'long', year: 'numeric'};
+                    var opciones = { day: 'numeric', month: 'short', year: 'numeric'};
                 
                     // Formatear la fecha en español
                     var fechaFormateada = fecha.toLocaleDateString('es-ES', opciones);
@@ -33,22 +32,24 @@
                         var url = "{% url 'logout' %}";
                         window.location.href = url;
                     }
-                    
                     setTimeout(logout, 3600000) //30000 = 30 segundos. || // 3600000 = 60 minutos
-    
-
                 </script>
             </div>
-        </li>
+        </button>
+      </li>
+      <!-- Notifications Dropdown Menu -->
+      <li class="nav-item dropdown">
         <div class="col-md-4 align-content-lg-end text-right">
             <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}                                                               
+            {% csrf_token %}                                                    
                 <li class='nav-item d-none d-sm-inline-block'>
-                    <button type="submit" class="btn btn-primary float-right" style="margin-right: 5px;">Salir</button>
+                    <button type="submit" class="btn btn-block btn-outline-primary" style="margin-right: 10px;">Salir</button>
                 </li>
             </form>
         </div>
+      </li>
     </ul>
+
     
     
     {% endblock %}

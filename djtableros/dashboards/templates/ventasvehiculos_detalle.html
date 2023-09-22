@@ -269,6 +269,7 @@
                                                             <th>Inventario</th>
                                                             <th>Descripcion</th>
                                                             <th>Factura</th>
+                                                            <th>Fecha Fac</th>
                                                             <th>Cliente</th>
                                                             <th>Tipo Venta</th>
                                                             <th>Vendedor</th>
@@ -284,7 +285,7 @@
                                                             <tr style="font-size: 12px">
                                                                 {% for cell in row %}
                                                                 {% if forloop.counter > 1 %}
-                                                                    {% if forloop.counter < 8 %}
+                                                                    {% if forloop.counter < 9 %}
                                                                         <td style='font-size: 12px'>{{ cell }}</td>
                                                                     {% else %}
                                                                         <td style='font-size: 12px; text-align: right'>{{ cell|floatformat:0|intcomma }}</td>
@@ -298,7 +299,7 @@
                                         </div><!-- /.card-body -->
                                         </div><!-- /.card -->
                                     </div><!-- /.col -->
-                                </div><!-- /.row ventas de dia -->
+                                </div><!-- /.row ventas acumuladas -->
 
                                 <div class="row">	
                                     <div class="col-12 col-lg-12">
@@ -349,7 +350,7 @@
                                             </div><!-- post -->
                                         </div><!-- card card-outline -->
                                     </div><!-- Col -->
-                                </div><!-- Row -->
+                                </div><!-- Row Ventas caceladas-->
 
                                 <div class="row">	
                                     <div class="col-12 col-lg-12">
@@ -716,12 +717,13 @@
                                                         <th>Descripcion</th>
                                                         <th>Factura</th>
                                                         <th>Fecha Fac</th>
-                                                        <th>Fecha Entr.</th>
-                                                        <th>Dias Entreg.</th>
-                                                        <th>Vendedor</th>
                                                         <th>Cliente</th>
                                                         <th>Tipo Venta</th>
+                                                        <th>Vendedor</th>
                                                         <th style='text-align: right'>Venta</th>
+                                                        <th style='text-align: right'>Costo</th>
+                                                        <th style='text-align: right'>Util</th>
+                                                        <th style='text-align: right'>%</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -730,7 +732,7 @@
                                                         <tr style="font-size: 12px">
                                                             {% for cell in row %}
                                                             {% if forloop.counter > 1 %}
-                                                                {% if forloop.counter < 11 %}
+                                                                {% if forloop.counter < 9 %}
                                                                     <td style='font-size: 12px'>{{ cell }}</td>
                                                                 {% else %}
                                                                     <td style='font-size: 12px; text-align: right'>{{ cell|floatformat:0|intcomma }}</td>
