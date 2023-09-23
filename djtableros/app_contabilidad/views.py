@@ -4,7 +4,7 @@ from django.http import FileResponse, HttpResponse
 from dashboards.utilerias import config
 from django.shortcuts import render, redirect
 from app_contabilidad import consultas, utils
-from .pdf import html2pdf
+
 import tempfile
 
 # Create your views here.
