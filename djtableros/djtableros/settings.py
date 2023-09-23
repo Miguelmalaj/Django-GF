@@ -122,6 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "es-mx"
 
+WKHTMLTOPDF_CMD = 'C:\Program Files\wkhtmltopdf\bin'
 
 TIME_ZONE = 'America/Mazatlan'
 

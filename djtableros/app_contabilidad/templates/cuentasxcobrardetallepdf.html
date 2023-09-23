@@ -1,12 +1,9 @@
-{% extends 'base.html' %}
+{% load custom_filters %}
 {% load static %}
 {% load humanize %}
 
-{% block page_actions %}
-
-{% endblock %}
-
-{% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
 
 <div class="row mb-2">
     <div class="col-sm-12">
@@ -17,23 +14,15 @@
         </div>
     </div><!-- /.col -->
 </div><!-- /.row -->
-<div>
-    <form method="post" action="{% url 'cuentasxcobrarpdf_detalle' datos.empresa datos.sucursal %}">
-    {% csrf_token %}                                                               
-        <li class='nav-item d-none d-sm-inline-block'>
-            <button type='submit' class='btn btn-primary btn-sm btn-block mb-2'><i class="fas fa-file-pdf mr-2"></i>Imprimir</button>
-        </li>
-    </form>
-</div>
 <div class="card card-outline card-lightblue">
     <div class="card-header">			
         <div class="row">
             <div class="col-12 col-sm-12">
-                <div class="card card-lightblue direct-chat direct-chat-lightblue table-responsive">
+                <div class="card card-lightblue direct-chat direct-chat-lightblue ">{% comment %} table-responsive {% endcomment %}
                     <!-- <div class="card-header">
                         <span class="info-box-text"> Saldo en c </span>
                     </div> -->
-                    <table id="inventarioveh" class="table table-sm table-hover text-nowrap">
+                    <table id="inventarioveh" class="table table-sm table-hover"> {% comment %} text-nowrap {% endcomment %}
                         <thead>
                             <tr style="font-size: 12px">
                                 <th>Cliente</th>
@@ -79,21 +68,3 @@
         </div>
     </div>
 </div>
-{% endblock %}
-{% block js %}
-<script>
-    $(function () {
-      
-      $("#inventarioveh").DataTable({
-        "ordering": true,
-        "order":[[9, "desc"]],
-        "responsive": true,
-        "autoWidth": false,
-        "searching":true,
-        "lengthChange": false,
-        "paginate": false,
-      });
-      
-    });
-  </script>
-{% endblock %}
