@@ -1,11 +1,11 @@
 import pdfkit
 import os
-from django.http import FileResponse, HttpResponse
+from django.http import HttpResponse
 from dashboards.utilerias import config
 from django.shortcuts import render, redirect
 from app_contabilidad import consultas, utils
-
 import tempfile
+
 
 # Create your views here.
 def index(request):
@@ -79,10 +79,16 @@ def cuentasxcobrarpdf_detalle(request, empresa, sucursal):
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as temp_html:
                 temp_html.write(rendered_template.content)
 
+        options = {
+         'page-size': 'A4',
+         'orientation': 'Landscape',
+        }
+
         pdf_filename = tempfile.mktemp(suffix='.pdf')
-        pdfkit.from_file(temp_html.name, pdf_filename)
+        pdfkit.from_file(temp_html.name, pdf_filename, options=options)
 
         os.remove(temp_html.name)
+
 
         # Create an HTTP response with the PDF content
         with open(pdf_filename, 'rb') as pdf_file:
@@ -169,7 +175,6 @@ def generatepdf_cuentasxcobrar(request):
         response['Content-Disposition'] = 'attachment; filename="output.pdf"'
         return response
 
-
 def cuentasxpagar(request):
         
         datoslmm = consultas.resumen_cuentasxpagar(1, 1)                      
@@ -209,7 +214,44 @@ def cuentasxpagar_detalle(request, empresa, sucursal):
                 datos = {
                         'nombreempresa': strnombreempresa,
                         'opcionmenu': utils.obtiene_opcionmenu('cuentasxpagar'),
-                        'cuentasxpagar':df_resultado.to_dict(orient='records')
+                        'cuentasxpagar':df_resultado.to_dict(orient='records'),
+                        'empresa': empresa,
+                        'sucursal': sucursal
                 }
         return render(request, 'cuentasxpagardetalle.html', {'datos':datos})
 
+def cuentasxpagarpdf_detalle(request, empresa, sucursal):
+        agencia = int(empresa)
+        sucursal = int(sucursal)
+        if agencia != 0:
+                strnombreempresa = config.obtiene_empresa(agencia, sucursal)
+                df_resultado = consultas.detalle_cuentasxpagar(agencia,sucursal)
+        
+                datos = {
+                        'nombreempresa': strnombreempresa,
+                        'opcionmenu': utils.obtiene_opcionmenu('cuentasxpagar'),
+                        'cuentasxpagar':df_resultado.to_dict(orient='records'),
+                        'empresa': empresa,
+                        'sucursal': sucursal
+                }
+        rendered_template = render(request, 'cuentasxpagardetallepdf.html', {'datos':datos})
+
+        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as temp_html:
+                temp_html.write(rendered_template.content)
+
+        options = {
+         'page-size': 'A4',
+         'orientation': 'Landscape',
+        }
+
+        pdf_filename = tempfile.mktemp(suffix='.pdf')
+        pdfkit.from_file(temp_html.name, pdf_filename, options=options)
+
+        os.remove(temp_html.name)
+
+        # Create an HTTP response with the PDF content
+        with open(pdf_filename, 'rb') as pdf_file:
+             response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+
+        response['Content-Disposition'] = 'attachment; filename="cuentasxpagar_detalles.pdf"'
+        return response

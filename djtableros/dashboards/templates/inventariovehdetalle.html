@@ -28,7 +28,15 @@
             </ul>
             <div class="card-body">
                 <div class="tab-content" id="custom-tabs-four-tabContent">
-                    <div class="tab-pane fade show active" id="nuevos" role="tabpanel" aria-labelledby="custom-tabs-four-profile-tab">	
+                    <div class="tab-pane fade show active" id="nuevos" role="tabpanel" aria-labelledby="custom-tabs-four-profile-tab">
+
+                    	<div class="d-flex justify-content-start">
+                           <form method="post" action="{% url 'inventariopdf_detalle' datos.empresa datos.sucursal 'nuevos' %}">
+                           {% csrf_token %}
+                               <button type='submit' class='btn btn-primary btn-sm mb-2'><i class="fas fa-file-pdf mr-2"></i>Imprimir</button>
+                           </form>
+                        </div>
+
                         <div class="row">
                             <div class="col-12 col-sm-12">
                                 <div class="card card-outline card-lightblue table-responsive">
@@ -88,8 +96,17 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
-                    <div class="tab-pane fade" id="seminuevos" role="tabpanel" aria-labelledby="custom-tabs-four-profile-tab">	
+                    <div class="tab-pane fade" id="seminuevos" role="tabpanel" aria-labelledby="custom-tabs-four-profile-tab">
+
+                        <div class="d-flex justify-content-start">
+                           <form method="post" action="{% url 'inventariopdf_detalle' datos.empresa datos.sucursal 'seminuevos' %}">
+                           {% csrf_token %}
+                               <button type='submit' class='btn btn-primary btn-sm mb-2'><i class="fas fa-file-pdf mr-2"></i>Imprimir</button>
+                           </form>
+                        </div>
+
                         <div class="row">
                             <div class="col-12 col-sm-12">
                                 <div class="card card-outline card-lightblue table-responsive">
@@ -143,6 +160,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

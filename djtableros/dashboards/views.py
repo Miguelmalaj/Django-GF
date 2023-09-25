@@ -1,5 +1,8 @@
 import pandas as pd
 import calendar
+import pdfkit
+import os
+import tempfile
 from django.shortcuts import render, redirect
 from dashboards.utilerias import funciones, utilerias, consultassql, config
 from app_postventa.utils import obtener_opciones_menu_postventa, obtener_opcion_default
@@ -7,6 +10,7 @@ from app_contabilidad.utils import obtener_opciones_menu_contabilidad
 from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.http import HttpResponse
 
 
 def login_view(request):
@@ -381,9 +385,76 @@ def inventariovehiculos_detalle(request, empresa, sucursal):
                 'totalveh':df_inventario.shape[0],
                 'usados':df_usados.to_dict(orient='records'), 
                 'totalusados':df_usados.shape[0],
-                'propiosnuevos': propios_nuevos
+                'propiosnuevos': propios_nuevos,
+                'empresa': empresa,
+                'sucursal': sucursal
         }
         return render(request, 'inventariovehdetalle.html', {'datos':datos})
+
+def inventariovehiculospdf_detalle(request, empresa, sucursal, tipo):
+
+        agencia = int(empresa)
+        sucursal = int(sucursal)
+        if agencia != 0:
+                strnombreempresa = config.obtiene_empresa(agencia, sucursal)
+                df_inventario, df_usados, propios_nuevos = funciones.inventario_detalle(agencia,sucursal)
+        else:
+                strnombreempresa = "CONSOLIDADO"
+                df_lmm, df_lmmus, propios_lm = funciones.inventario_detalle(1,1)
+                df_gve, df_gveus, propios_gve = funciones.inventario_detalle(3,1)
+                df_cln, df_clnus, propios_clnz = funciones.inventario_detalle(5,1)
+                df_flo, df_flous, propios_flot = funciones.inventario_detalle(5,3)
+                df_cad, df_cadus, propios_cad = funciones.inventario_detalle(7,1)
+                df_lmm["agencia"] = "MOC"
+                df_gve["agencia"] = "GVE"
+                df_cln["agencia"] = "CLN"
+                df_cad["agencia"] = "CAD"
+
+                df_lmmus["agencia"] = "MOC"
+                df_gveus["agencia"] = "GVE"
+                df_clnus["agencia"] = "CLN"
+                df_cadus["agencia"] = "CAD"
+
+                df_inventario = pd.concat([df_lmm, df_gve, df_cln, df_flo, df_cad], axis= 0)
+                df_usados = pd.concat([df_lmmus, df_gveus, df_clnus, df_flous, df_cadus], axis= 0)
+                propios_nuevos = propios_lm + propios_gve + propios_clnz + propios_flot + propios_cad
+        
+        datos = {
+                'nombreempresa': strnombreempresa,
+                'opcionmenu': config.obtiene_opcionmenu('inventariovehiculos'),
+                'inventario':df_inventario.to_dict(orient='records'),                 
+                'totalveh':df_inventario.shape[0],
+                'usados':df_usados.to_dict(orient='records'), 
+                'totalusados':df_usados.shape[0],
+                'propiosnuevos': propios_nuevos,
+        }
+
+
+        rendered_template = render(
+                request, 
+                'inventariovehdetallepdf_nuevos.html' if tipo == 'nuevos' else 'inventariovehdetallepdf_seminuevos.html', 
+                {'datos':datos}
+        )
+
+        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as temp_html:
+            temp_html.write(rendered_template.content)
+
+        options = {
+         'page-size': 'A4',
+         'orientation': 'Landscape',
+        }
+
+        pdf_filename = tempfile.mktemp(suffix='.pdf')
+        pdfkit.from_file(temp_html.name, pdf_filename, options=options)
+
+        os.remove(temp_html.name)
+
+        # Create an HTTP response with the PDF content
+        with open(pdf_filename, 'rb') as pdf_file:
+             response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+
+        response['Content-Disposition'] = 'attachment; filename="inventariovehdetallepdf.pdf"'
+        return response
 
 def inventarioveh(request):
 

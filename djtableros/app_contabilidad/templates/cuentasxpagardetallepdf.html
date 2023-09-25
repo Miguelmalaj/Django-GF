@@ -1,58 +1,31 @@
-{% extends 'base.html' %}
+{% load custom_filters %}
 {% load static %}
 {% load humanize %}
 
-{% block page_actions %}
-
-{% endblock %}
-
-{% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
 
 <div class="row mb-2">
-
-    <div class="col-12">
-
+    <div class="col-sm-12">
         <div class="card card-outline card-lightblue">
-
-            <div class="card-header">
-
-                <div class="d-flex justify-content-between">
-
-                    <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> Detalle {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>             
-                
-                    <form method="post" action="{% url 'cuentasxcobrarpdf_detalle' datos.empresa datos.sucursal %}">
-                    {% csrf_token %}                                                               
-                        <button 
-                            type='submit'
-                            class='btn btn-primary btn-sm mb-2'
-                        >
-                            <i class="fas fa-file-pdf mr-2"></i>
-                            Imprimir
-                        </button>
-                    </form>
-
-                </div>
-
+            <div class="card-header">						
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> Detalle {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>             
             </div>
-
         </div>
-
     </div><!-- /.col -->
-
 </div><!-- /.row -->
-
 <div class="card card-outline card-lightblue">
     <div class="card-header">			
         <div class="row">
             <div class="col-12 col-sm-12">
-                <div class="card card-lightblue direct-chat direct-chat-lightblue table-responsive">
+                <div class="card card-lightblue direct-chat direct-chat-lightblue">
                     <!-- <div class="card-header">
                         <span class="info-box-text"> Saldo en c </span>
                     </div> -->
-                    <table id="inventarioveh" class="table table-sm table-hover text-nowrap">
+                    <table id="inventarioveh" class="table table-sm table-hover">
                         <thead>
                             <tr style="font-size: 12px">
-                                <th>Cliente</th>
+                                <th>Proveedor</th>
                                 <th>Nombre</th>
                                 <th>Cartera</th>
                                 <th style='font-size: 12px; text-align: right'>Importe</th>
@@ -62,13 +35,12 @@
                                 <th style='font-size: 12px; text-align: right'>90</th>
                                 <th style='font-size: 12px; text-align: right'>+90</th>
                                 <th style='font-size: 12px; text-align: right'>Total Vencido</th>
-                                <th width="30%">Comentarios CXC</th>
                                 <th style='font-size: 12px; text-align: right'>Saldo</th>
                                 
                             </tr>
                         </thead>
                         <tbody>
-                                {% for row in datos.cuentasxcobrar %}
+                                {% for row in datos.cuentasxpagar %}
                                 {% if row.nombre == 'TOTAL CARTERA' %}
                                 <tr style="font-size: 12px; font-weight:bold" class="table-warning">
                                 {% else %}
@@ -84,7 +56,6 @@
                                     <td style='font-size: 12px; text-align: right'>{{ row.90|floatformat:0|intcomma}}</td>
                                     <td style='font-size: 12px; text-align: right'>{{ row.mas_90|floatformat:0|intcomma }}</td>
                                     <td style='font-size: 12px; text-align: right'>{{ row.totalvencido|floatformat:0|intcomma }}</td>
-                                    <td width="30%" style='font-size: 12px'>{{ row.comentarios }}</td>
                                     <td style='font-size: 12px; text-align: right'>{{ row.totalcxc|floatformat:0|intcomma }}</td>
                                 </tr>
                                 {% endfor %}
@@ -95,21 +66,3 @@
         </div>
     </div>
 </div>
-{% endblock %}
-{% block js %}
-<script>
-    $(function () {
-      
-      $("#inventarioveh").DataTable({
-        "ordering": true,
-        "order":[[9, "desc"]],
-        "responsive": true,
-        "autoWidth": false,
-        "searching":true,
-        "lengthChange": false,
-        "paginate": false,
-      });
-      
-    });
-  </script>
-{% endblock %}

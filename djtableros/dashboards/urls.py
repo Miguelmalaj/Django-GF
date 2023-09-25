@@ -15,6 +15,7 @@ urlpatterns = [
     path('ventasvehiculos_detalle/<str:bytAgencia>/<str:bytSucursal>/<str:fechareporte>', views.ventasvehiculos_detalle, name='ventasvehiculos_detalle'),
     path('resumeninvveh/', views.resumeninvveh, name='resumeninvveh'),
     path('inventario_detalle/<str:empresa>/<str:sucursal>', views.inventariovehiculos_detalle, name='inventario_detalle'),
+    path('inventario_detalle/pdf/<str:empresa>/<str:sucursal>/<str:tipo>', views.inventariovehiculospdf_detalle, name='inventariopdf_detalle'),
     path('inventariovehiculos/', views.inventarioveh, name='inventariovehiculos'),
     path('planpisopagado/', views.planpisopagado, name='planpisopagado')
 ]

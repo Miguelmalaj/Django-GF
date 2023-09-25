@@ -8,22 +8,46 @@
 
 {% block content %}
 <div class="row mb-2">
-    <div class="col-sm-12">
+
+    <div class="col-12">
+
         <div class="card card-outline card-lightblue">
-            <div class="card-header">						
-                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> Detalle {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>             
+
+            <div class="card-header">
+
+                <div class="d-flex justify-content-between">
+
+                    <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> Detalle {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>     
+
+                    <form method="post" action="{% url 'cuentasxpagarpdf_detalle' datos.empresa datos.sucursal %}">
+                    {% csrf_token %}
+
+                        <button 
+                            class='btn btn-primary btn-sm mb-2'
+                            type='submit' 
+                        >
+                            <i class="fas fa-file-pdf mr-2"></i>
+                            Imprimir
+                        </button>
+
+                    </form>
+
+                </div>
+
             </div>
+
         </div>
+
     </div><!-- /.col -->
+
 </div><!-- /.row -->
+
+
 <div class="card card-outline card-lightblue">
     <div class="card-header">			
         <div class="row">
             <div class="col-12 col-sm-12">
                 <div class="card card-lightblue direct-chat direct-chat-lightblue table-responsive">
-                    <!-- <div class="card-header">
-                        <span class="info-box-text"> Saldo en c </span>
-                    </div> -->
                     <table id="inventarioveh" class="table table-sm table-hover text-nowrap">
                         <thead>
                             <tr style="font-size: 12px">

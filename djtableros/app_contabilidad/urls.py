@@ -9,4 +9,5 @@ urlpatterns = [
     path('cuentasxcobrar_detalle/pdf/<str:empresa>/<str:sucursal>', views.cuentasxcobrarpdf_detalle, name='cuentasxcobrarpdf_detalle'),
     path('cuentasxpagar', views.cuentasxpagar, name='cuentasxpagar'),
     path('cuentasxpagar_detalle/<str:empresa>/<str:sucursal>', views.cuentasxpagar_detalle, name='cuentasxpagar_detalle'),
+    path('cuentasxpagar_detalle/pdf/<str:empresa>/<str:sucursal>', views.cuentasxpagarpdf_detalle, name='cuentasxpagarpdf_detalle'),
 ]
