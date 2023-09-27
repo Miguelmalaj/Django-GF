@@ -497,7 +497,7 @@ def obtener_ventarefacciones(bytAgencia, bytSucursal, mes, periodo):
     strSQL = strSQL + " WHERE EMPR_EMPRESAID = " + str(bytEmpresa)
     strSQL = strSQL + " AND PEDI_ALMA_CLAVE = " + str(bytSucursal)
     strSQL = strSQL + " AND Depto IN (' REFACCIONES', ' SERVICIO') "
-    # strSQL = strSQL + " AND CanalVta = 'VENTA MOSTRADOR' "
+    #strSQL = strSQL + " AND CanalVta = 'VENTA MOSTRADOR' "
     strSQL = strSQL + " AND (Extract(Month from PEDI_FECHAFACTURA)) = " + str(mes)
     strSQL = strSQL + " AND (Extract(Year from PEDI_FECHAFACTURA)) = " + str(periodo)
     strSQL = strSQL + " Order by PEDI_FECHAFACTURA Desc "

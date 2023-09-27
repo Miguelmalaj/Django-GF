@@ -22,12 +22,8 @@
                 
                     <form method="post" action="{% url 'cuentasxcobrarpdf_detalle' datos.empresa datos.sucursal %}">
                     {% csrf_token %}                                                               
-                        <button 
-                            type='submit'
-                            class='btn btn-primary btn-sm mb-2'
-                        >
-                            <i class="fas fa-file-pdf mr-2"></i>
-                            Imprimir
+                        <button type='submit' class='btn btn-primary btn-sm mb-2'>
+                            <i class="fas fa-file-pdf mr-2"></i> Generar PDF
                         </button>
                     </form>
 

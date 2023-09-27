@@ -449,11 +449,15 @@ def inventariovehiculospdf_detalle(request, empresa, sucursal, tipo):
 
         os.remove(temp_html.name)
 
+        tiporeporte = "_inventario_nuevos.pdf" if tipo == 'nuevos' else "_inventario_seminuevos.pdf";
+
+        strnombrearchivo = "attachment; filename=" + str(strnombreempresa.nombre_empresa) + tiporeporte
+
         # Create an HTTP response with the PDF content
         with open(pdf_filename, 'rb') as pdf_file:
              response = HttpResponse(pdf_file.read(), content_type='application/pdf')
 
-        response['Content-Disposition'] = 'attachment; filename="inventariovehdetallepdf.pdf"'
+        response['Content-Disposition'] = strnombrearchivo
         return response
 
 def inventarioveh(request):

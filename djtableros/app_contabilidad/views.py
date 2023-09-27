@@ -79,9 +79,14 @@ def cuentasxcobrarpdf_detalle(request, empresa, sucursal):
         with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as temp_html:
                 temp_html.write(rendered_template.content)
 
+        # Opciones para pdfkit
         options = {
-         'page-size': 'A4',
-         'orientation': 'Landscape',
+        'page-size': 'Letter',  # Tamaño de página (puede personalizarse)
+        'orientation': 'Landscape',  # Orientación horizontal (landscape)
+        'margin-top': '5mm',
+        'margin-right': '5mm',
+        'margin-bottom': '5mm',
+        'margin-left': '5mm',
         }
 
         pdf_filename = tempfile.mktemp(suffix='.pdf')
@@ -89,12 +94,12 @@ def cuentasxcobrarpdf_detalle(request, empresa, sucursal):
 
         os.remove(temp_html.name)
 
-
+        strnombrearchivo = "attachment; filename=" + str(strnombreempresa.nombre_empresa) + "_cuentasxcobrar.pdf"
         # Create an HTTP response with the PDF content
         with open(pdf_filename, 'rb') as pdf_file:
                 response = HttpResponse(pdf_file.read(), content_type='application/pdf')
 
-        response['Content-Disposition'] = 'attachment; filename="cuentasxcobrar_detalles.pdf"'
+        response['Content-Disposition'] = strnombrearchivo
         return response
 
 def cuentasxcobrarpdf(request):
@@ -230,8 +235,7 @@ def cuentasxpagarpdf(request):
                response = HttpResponse(pdf_file.read(), content_type='application/pdf')
 
         response['Content-Disposition'] = 'attachment; filename="Reporte_Cuentasxpagar.pdf"'
-        return response
-               
+        return response  
 
 def cuentasxpagar_detalle(request, empresa, sucursal):
         agencia = int(empresa)
@@ -278,9 +282,11 @@ def cuentasxpagarpdf_detalle(request, empresa, sucursal):
 
         os.remove(temp_html.name)
 
+        strnombrearchivo = "attachment; filename=" + str(strnombreempresa.nombre_empresa) + "_cuentasxpagar.pdf"
+
         # Create an HTTP response with the PDF content
         with open(pdf_filename, 'rb') as pdf_file:
              response = HttpResponse(pdf_file.read(), content_type='application/pdf')
 
-        response['Content-Disposition'] = 'attachment; filename="cuentasxpagar_detalles.pdf"'
+        response['Content-Disposition'] = strnombrearchivo
         return response
