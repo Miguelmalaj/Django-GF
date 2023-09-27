@@ -8,28 +8,60 @@
 {% block page_actions %}
 
 <div class="row mb-2">
-    <div class="col-sm-12">
+
+    <div class="col-12">
+
         <div class="card card-outline card-lightblue">
-            <div class="card-header">						
-                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} </h3>
-                <ul class='navbar-nav'>
-                    <div class="row">
-                    <div class="col-md-3"></div>
-                        <div class="col-md-9 align-content-lg-end text-right">
+
+            <div class="card-header">
+                
+                    <div class="d-flex justify-content-between align-items-center">
                             
+                        <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} </h3>
+                        
+                        <div class="d-flex justify-content-between">
+
                             <form method="post" action="{% url 'cuentasxcobrar' %}">
                             {% csrf_token %}                                                               
-                                <li class='nav-item d-none d-sm-inline-block'>
-                                    <button id="botonactualizar" type='submit' class='btn btn-primary btn-block'><i class="far fa-hand-point-right"></i> Actualizar</button>
-                                </li>
+                                
+                                <button 
+                                    id="botonactualizar"
+                                    type='submit' 
+                                    class='btn btn-primary mr-2'
+                                >
+                                    <i class="far fa-hand-point-right"></i> 
+                                    Actualizar
+                                </button>
+                                
                             </form>
+
+                            <form method="post" action="{% url 'cuentasxcobrarpdf' %}">
+                            {% csrf_token %}                                                               
+                                
+                                <button 
+                                    type='submit' 
+                                    class='btn btn-primary'
+                                >
+                                    <i class="fas fa-file-pdf"></i> 
+                                    Generar PDF
+                                </button>
+                                
+                            </form>
+
                         </div>
+                        
+
                     </div>
-                </ul>						
+                
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+
 {% endblock %}
 
 {% block content %}
@@ -122,10 +154,11 @@
                                 </div>
                             </div>	
                             <div class="progress-group">						
-                                +90 vencido ({{ detalles.90p|floatformat:2 }}%) 
+                                +90 vencido ####({{ detalles.90p|floatformat:2 }}%) 
                                 <span class="float-right">$ {{ detalles.90|floatformat:0|intcomma }}</span>
                                 <div class="progress progress-sm">
-                                    <div class='progress-bar bg-danger' style="width: {{ detalles.90p }}%"; aria-valuemax='{{ detalles.totalvencido }}'></div> 
+                                    {% comment %} <div class='progress-bar bg-danger' style="width: {{ detalles.90p }}%"; aria-valuemax='{{ detalles.totalvencido }}'></div>  {% endcomment %}
+                                    <div class='progress-bar bg-danger' style="width: 4%"; aria-valuemax='3000'></div> 
                                 </div>
                             </div>	
                             
