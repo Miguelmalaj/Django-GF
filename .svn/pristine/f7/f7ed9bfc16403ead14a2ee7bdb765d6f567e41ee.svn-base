@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+
+{% endblock %}
+
+{% block content %}
+<div class="row mb-2">
+    <div class="col-sm-12">
+        <div class="card card-outline card-lightblue">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> Detalle {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>             
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+<div class="card card-outline card-lightblue">
+    <div class="card-header">			
+        <div class="row">
+            <div class="col-12 col-sm-12">
+                <div class="card card-lightblue direct-chat direct-chat-lightblue table-responsive">
+                    <!-- <div class="card-header">
+                        <span class="info-box-text"> Saldo en c </span>
+                    </div> -->
+                    <table id="inventarioveh" class="table table-sm table-hover text-nowrap">
+                        <thead>
+                            <tr style="font-size: 12px">
+                                <th>Cliente</th>
+                                <th>Nombre</th>
+                                <th>Cartera</th>
+                                <th style='font-size: 12px; text-align: right'>Importe</th>
+                                <th style='font-size: 12px; text-align: right'>Vigente</th>
+                                <th style='font-size: 12px; text-align: right'>30</th>
+                                <th style='font-size: 12px; text-align: right'>60</th>
+                                <th style='font-size: 12px; text-align: right'>90</th>
+                                <th style='font-size: 12px; text-align: right'>+90</th>
+                                <th style='font-size: 12px; text-align: right'>Total Vencido</th>
+                                <th width="30%">Comentarios CXC</th>
+                                <th style='font-size: 12px; text-align: right'>Saldo</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {% for row in datos.cuentasxcobrar %}
+                                {% if row.nombre == 'TOTAL CARTERA' %}
+                                <tr style="font-size: 12px; font-weight:bold" class="table-warning">
+                                {% else %}
+                                <tr style="font-size: 12px">
+                                {% endif %}
+                                    <td style='font-size: 12px'>{{ row.cliente|floatformat:0 }}</td>
+                                    <td style='font-size: 12px'>{{ row.nombre }}</td>
+                                    <td style='font-size: 12px'>{{ row.grupocartera }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.importe|floatformat:0|intcomma }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.vigente|floatformat:0|intcomma }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.30|floatformat:0|intcomma }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.60|floatformat:0|intcomma }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.90|floatformat:0|intcomma}}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.mas_90|floatformat:0|intcomma }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.totalvencido|floatformat:0|intcomma }}</td>
+                                    <td width="30%" style='font-size: 12px'>{{ row.comentarios }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.totalcxc|floatformat:0|intcomma }}</td>
+                                </tr>
+                                {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+    $(function () {
+      
+      $("#inventarioveh").DataTable({
+        "ordering": true,
+        "order":[[9, "desc"]],
+        "responsive": true,
+        "autoWidth": false,
+        "searching":true,
+        "lengthChange": false,
+        "paginate": false,
+      });
+      
+    });
+  </script>
+{% endblock %}

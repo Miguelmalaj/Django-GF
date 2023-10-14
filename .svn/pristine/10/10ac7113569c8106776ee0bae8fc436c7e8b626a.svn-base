@@ -1,0 +1,28 @@
+from django.shortcuts import render
+from dashboards.utilerias import config
+# from dashboards import consultas
+# from app_astilleros.consultas import detalle_cuentasxcobrar
+from app_astilleros import consultas
+
+# Create your views here.
+def index(request):
+    return render(request, 'base.html')
+
+def informegerencial(request):
+    return render(request, 'informegerencial.html')
+
+def cxcastilleros(request):
+    agencia = 1;
+    sucursal = 1;
+    strnombreempresa = config.obtiene_empresa(agencia, sucursal)
+
+    df_resultado = consultas.detalle_cuentasxcobrar(agencia, sucursal)
+
+    datos = {
+        'nombreempresa': strnombreempresa,
+        'cxcastilleros': df_resultado.to_dict(orient='records'),
+        'empresa': agencia,
+        'sucursal': sucursal
+    }
+
+    return render(request, 'cxcastilleros.html', {'datos': datos})

@@ -1,0 +1,36 @@
+const openModalSpinner = document.getElementById("buttonModalOpen");
+
+const botonactualizar = document.getElementById("botonactualizar");
+
+const botonesMostrarDetalle = document.getElementsByName("botonmostrardetalle");
+
+const iconoDetalleOrdenes = document.getElementsByName("iconodetalleordenes");
+
+const spinners = document.getElementsByName("opcionvista");
+
+for ( spin of spinners ) {
+    spin.addEventListener('click', function(){
+        //spinner.classList.add('spinner-visible');
+        openModalSpinner.click();
+    });
+}
+
+for ( boton of botonesMostrarDetalle ) {
+    boton.addEventListener('click', function(){
+        openModalSpinner.click();
+    })
+}
+
+for ( icono of iconoDetalleOrdenes ) {
+    icono.addEventListener('click', function(){
+        openModalSpinner.click();
+    })
+}
+
+if ( botonactualizar !== null ) {
+
+    botonactualizar.addEventListener('click', function(){
+        openModalSpinner.click();
+    });
+
+}

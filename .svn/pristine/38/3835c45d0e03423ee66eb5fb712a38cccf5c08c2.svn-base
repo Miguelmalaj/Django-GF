@@ -1,0 +1,165 @@
+{% comment %} copy all from cuentasxcobrarpdf.html {% endcomment %}
+
+
+{% load custom_filters %}
+{% load static %}
+{% load humanize %}
+
+<html>
+
+    <head>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
+
+        <style>
+            .pagebreak{
+                page-break-before: always;
+            }
+        </style>
+
+    </head>
+
+
+    <body>
+
+
+        <div class="card card-outline card-lightblue">
+
+            <div class="card-header">	
+                    
+                    {% for empresa, detalles in datos.items %}
+
+                        {% if empresa != 'opcionmenu' %}
+
+                            {% if forloop.counter == 2 or forloop.counter == 5 %}
+                                <div class="row">
+                            {% endif %}
+
+                                <div class="col mt-4">
+
+                                    {% comment %} Tarjeta superior {% endcomment %}
+                                    <div class="card card-widget widget-user">
+
+                                        <div class="widget-user-header {{ detalles.bg }}">
+                                            <h3 class="widget-user-username">{{ detalles.nombre_empresa }}</h3>
+                                            <h5 class="widget-user-desc">{{ detalles.totalcartera|floatformat:0|intcomma }}</h5>
+                                        </div>
+
+                                        <div class="card-footer pt-0">
+
+                                            <div class="row">
+
+                                                <div class="col-12 border-top border-bottom text-center">
+                                                    <div class="description-block">
+                                                        <h5 class="description-header text-danger">{{ detalles.totalvencido|floatformat:0|intcomma }} Vencido</h5>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col border-right border-top d-flex justify-content-center">
+                                                    <small class="mt-2"><i class="far fa-calendar-times"></i></small>
+                                                    <small class="mt-2 mb-2" style="font-size:11px"> {{ detalles.diasmas }} mas antiguo</small>
+                                                </div>
+
+                                                <div class="col border-top d-flex justify-content-center">
+                                                    <small class="mt-2"><i class="far fa-calendar-alt"></i></small>
+                                                    <small class="mt-2 mb-2" style="font-size:12px"> {{ detalles.prom }} antig. prom.</small>
+                                                </div>
+
+                                            </div>
+                                            
+                                            <div class="row">
+
+                                                <div class="col border-top d-flex justify-content-center">
+                                                    {% if detalles.empresa and detalles.sucursal %}
+                                                    <small class="mt-2">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></small>
+                                                    {% endif %}
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        
+                                    </div>
+
+                                    {% comment %} Desgloce de cxc {% endcomment %}
+                                    <div class="card card-outline card-lightblue">
+
+                                        <div class="card-body">
+
+                                            <span><p class="text-center">Desgloce de cxp </p></span>
+
+                                            <div class="progress-group">						
+                                                <small>Por vencer ({{ detalles.vigentep|floatformat:2 }}%)</small>
+                                                <small class="float-right">{{ detalles.vigente|floatformat:0|intcomma }}</small>
+                                                <div class="progress progress-sm">
+                                                    <div class='progress-bar bg-lightblue' style="width: {{ detalles.vigentep }}%"; aria-valuemax='{{ detalles.totalcartera }}'></div> 
+                                                </div>
+                                            </div>
+
+                                            <div class="progress-group">						
+                                                <small>1 a 30 vencido ({{ detalles.1a30p|floatformat:2 }}%)</small>
+                                                <small class="float-right">$ {{ detalles.1a30|floatformat:0|intcomma }}</small>
+                                                <div class="progress progress-sm">
+                                                    <div class='progress-bar bg-lightblue' style="width: {{ detalles.1a30p }}%"; aria-valuemax='{{ detalles.totalvencido }}'></div> 
+                                                </div>
+                                            </div>
+
+                                            <div class="progress-group">						
+                                                <small>30 a 60 vencido ({{ detalles.30a60p|floatformat:2 }}%)</small>
+                                                <small class="float-right">$ {{ detalles.30a60|floatformat:0|intcomma }}</small>
+                                                <div class="progress progress-sm">
+                                                    <div class='progress-bar bg-warning' style="width: {{ detalles.30a60p }}%"; aria-valuemax='{{ detalles.totalvencido }}'></div> 
+                                                </div>
+                                            </div>
+
+                                            <div class="progress-group">						
+                                                <small>60 a 90 vencido ({{ detalles.60a90p|floatformat:2 }}%)</small>
+                                                <small class="float-right">$ {{ detalles.60a90|floatformat:0|intcomma }}</small>
+                                                <div class="progress progress-sm">
+                                                    <div class='progress-bar bg-danger' style="width: {{ detalles.60a90p }}%"; aria-valuemax='{{ detalles.totalvencido }}'></div> 
+                                                </div>
+                                            </div>
+
+                                            <div class="progress-group">						
+                                                <small>+90 vencido ({{ detalles.90p|floatformat:2 }}%)</small>
+                                                <small class="float-right">$ {{ detalles.90|floatformat:0|intcomma }}</small>
+                                                <div class="progress progress-sm">
+                                                    <div class='progress-bar bg-danger' style="width: {{ detalles.90p }}%;" aria-valuemax='{{ detalles.totalvencido }}'></div> 
+                                                </div>
+                                                
+                                            </div>	
+                                            
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                
+                            {% if forloop.counter == 4 or forloop.counter == 7 %}
+                                </div>
+
+                                {% comment %} {% if forloop.counter != 7 %}
+                                    <div class="pagebreak"></div>
+                                {% endif %} {% endcomment %}
+
+                            {% endif %}
+
+                        {% endif %} 
+
+                    {% endfor %}
+                
+            </div>
+
+        </div>
+    
+    </body>
+
+</html>

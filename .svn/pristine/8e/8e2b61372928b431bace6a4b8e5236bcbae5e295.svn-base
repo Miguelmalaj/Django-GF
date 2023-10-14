@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+<div class="row mb-2">
+    <div class="col-sm-12">
+        <div class="card card-outline card-lightblue">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>
+                <ul class='navbar-nav'>
+                    <div class="row">
+                        <div class="col-md-3">                                           
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-6 align-content-lg-end text-right">
+                            <form method="post" action="{% url 'ventasanuales' %}">
+                            {% csrf_token %}
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <select  class='form-control select2' id="empresas" name="empresas">
+                                        {% if datos.empresa == '11' %}<option selected value="11">Felix Automotores</option>{% else %}<option value="11">Felix Automotores</option>{% endif%}
+                                        {% if datos.empresa == '31' %}<option selected value="31">Felix Automotriz</option>{% else %}<option value="31">Felix Automotriz</option>{% endif%}
+                                        {% if datos.empresa == '51' %}<option selected value="51">Culiacan Zapata</option>{% else %}<option value="51">Culiacan Zapata</option>{% endif%}
+                                        {% if datos.empresa == '52' %}<option selected value="52">Culiacan Aeropuerto</option>{% else %}<option value="52">Culiacan Aeropuerto</option>{% endif%}
+                                        {% if datos.empresa == '53' %}<option selected value="53">Culiacan Flotillas</option>{% else %}<option value="53">Culiacan Flotillas</option>{% endif%}
+                                        {% if datos.empresa == '71' %}<option selected value="71">Noroeste Motors</option>{% else %}<option value="71">Noroeste Motors</option>{% endif%}
+                                    </select>
+                                </li>
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <select class='form-control select2' id="periodo" name="periodo">
+                                        {% for year in datos.cboperiodos %}
+                                            {% if datos.periodoselec == year %}<option selected  value="{{ year }}">{{ year }}</option> {% else %}<option  value="{{ year }}">{{ year }}</option>{% endif%}
+                                        {% endfor %}
+                                    </select>
+                                </li>
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <button id="botonactualizar" type='submit' class='btn btn-primary btn-block'>Actualizar</button>
+                                </li>
+                            </form>
+                        </div>
+                    </div>
+                </ul>						
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-lightblue">
+    <div class="card-header">			
+        <div class="row">
+            <div class="col-12 col-sm-6">
+                
+                    <div class="card card-lightblue direct-chat direct-chat-lightblue">
+                        <div class="card-header">
+                            <i class="fas fa-truck-pickup"></i><span class="light-box-text"> Ventas por gama de vehiculos</span>
+                        </div>
+                        <table id="ventasveh" class="table table-sm">
+                            <thead>
+                                <tr style="font-size: 12px">
+                                    <th></th>
+                                    <th style='text-align: right'>Ene</th>
+                                    <th style='text-align: right'>Feb</th>
+                                    <th style='text-align: right'>Mar</th>
+                                    <th style='text-align: right'>Abr</th>
+                                    <th style='text-align: right'>May</th>
+                                    <th style='text-align: right'>Jun</th>
+                                    <th style='text-align: right'>Jul</th>
+                                    <th style='text-align: right'>Ago</th>
+                                    <th style='text-align: right'>Sep</th>
+                                    <th style='text-align: right'>Oct</th>
+                                    <th style='text-align: right'>Nov</th>
+                                    <th style='text-align: right'>Dic</th>
+                                    <th style='text-align: right'>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in datos.tablaveh %}
+                                {% if row.0 == 'TOTAL VENTAS' or row.0 == 'SUBTOT BAJA' or row.0 == 'SUBTOT ALTA' %}
+                                    <tr style="font-size: 12px" class="table-warning">
+                                {% else %}
+                                    <tr>
+                                {% endif %}
+                                    {% for cell in row %}
+                                            {% if forloop.counter < 2 %}
+                                            <td style='font-size: 12px'>{{ cell }}</td>
+                                            {% else %}
+                                            <td style='font-size: 12px; text-align: right'>{{ cell|floatformat:0 }}</td>
+                                            {% endif %}
+                                    
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                
+            </div>
+            <div class="col-12 col-sm-6">
+                
+                    <div class="card card-lightblue direct-chat direct-chat-lightblue">
+                        <div class="card-header">
+                            <i class="fas fa-users"></i><span class="info-box-text text-center">     Ventas por vendedor</span>
+                        </div>
+                        <table id="ventasvend" class="table table-sm">
+                            <thead>
+                                <tr style="font-size: 12px">
+                                    <th>Nombre</th>
+                                    <th style='text-align: right'>Ene</th>
+                                    <th style='text-align: right'>Feb</th>
+                                    <th style='text-align: right'>Mar</th>
+                                    <th style='text-align: right'>Abr</th>
+                                    <th style='text-align: right'>May</th>
+                                    <th style='text-align: right'>Jun</th>
+                                    <th style='text-align: right'>Jul</th>
+                                    <th style='text-align: right'>Ago</th>
+                                    <th style='text-align: right'>Sep</th>
+                                    <th style='text-align: right'>Oct</th>
+                                    <th style='text-align: right'>Nov</th>
+                                    <th style='text-align: right'>Dic</th>
+                                    <th style='text-align: right'>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in datos.tablavend %}
+                                    {% if row.0 == 'TOTAL' or row.0 == 'SUBTOT BAJA' or row.0 == 'SUBTOT ALTA' %}
+                                        <tr style="font-size: 12px" class="table-warning">
+                                    {% else %}
+                                        <tr style="font-size: 12px"></tr>
+                                    {% endif %}
+                                    {% for cell in row %}
+                                        {% if forloop.first %}
+                                        <td style='font-size: 12px'>{{ cell }}</td>
+                                        {% else%}
+                                        <td style='font-size: 12px; text-align: right'>{{ cell|floatformat:0 }}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

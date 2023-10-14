@@ -1,0 +1,163 @@
+{% load adminlte_helpers %}
+{%load static %}
+
+<!-- Left side column. contains the sidebar -->
+<aside class="main-sidebar sidebar-light-lightblue elevation-4">
+     <!-- Brand Logo -->
+    {% block logo %}
+        <a href="/" class="brand-link">
+            <div class="text-center">
+                <img class="profile-user-img img-fluid img-circle" src="{%static 'admin-lte/dist/img/LogoGF.png' %}" alt="User profile picture">
+            </div>
+        </a>
+    {% endblock %}
+    <!-- sidebar: style can be found in sidebar.less -->
+    <div class="sidebar visible-sidebar-mini">
+        <!-- Sidebar user panel -->
+        {% block user_panel %}
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="user-block">
+                <img class="img-circle img-bordered-sm" src="{%static request.session.usericon %}" alt="User Image">
+                <span class="username">{{ request.session.username }} </span>
+                <span class="description">{{ request.session.puesto }}</span>
+            </div>
+        </div>
+
+        {% endblock %}
+
+        {% block form %}{% endblock %}
+
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        {% block nav_links_ul %}
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            {% block nav_links_outer %}
+            <li class="nav-header">
+                {% block nav_heading %}
+                
+                {% endblock %}
+            </li>
+            {% block nav_links %}
+
+            <!-- Para la aplicación de ventas -->
+            {% if request.session.opciones_menu.ventas %}
+            <li class="nav-item has-treeview {% if '/ventas/' in request.path %}menu-open{% else %} {% endif %}">
+                <a href="#" class="{% if '/ventas/' in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                    <i class="nav-icon fas fa-chart-bar"></i>
+                    <p>Ventas Vehiculos</p>
+                </a>
+                <ul class="nav nav-treeview">
+                    {% for opcion in request.session.opciones_menu.ventas %}
+                        <li class="nav-item" id="{{ opcion.vista }}">
+                            <a name="opcionvista" href="{% url opcion.vista %}"  class="{% if opcion.vista in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                                <i class="nav-icon {{ opcion.icono }}"></i>
+                                <p>{{ opcion.nombre }}</p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
+
+            <!-- Para la aplicación de postventa -->
+            {% if request.session.opciones_menu.postventa %}
+            <li class="nav-item has-treeview {% if '/postventa/' in request.path %}menu-open{% else %} {% endif %}">
+                <a href="#" class="{% if '/postventa/' in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                    <i class="nav-icon fas fa-wrench"></i>
+                    <p>Postventa</p>
+                </a>
+                <ul class="nav nav-treeview">
+                    {% for opcion in request.session.opciones_menu.postventa %}
+                        <li class="nav-item" id="{{ opcion.vista }}">
+                            <a name="opcionvista" href="{% url opcion.vista %}"  class="{% if opcion.vista in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                                <i class="nav-icon {{ opcion.icono }}"></i>
+                                <p>{{ opcion.nombre }}</p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
+
+            <!-- Para la aplicación de Contabilidad / Administracion -->
+            {% if request.session.opciones_menu.contable %}
+            <li class="nav-item has-treeview {% if '/contable/' in request.path %}menu-open{% else %} {% endif %}">
+                <a href="#" class="{% if '/contable/' in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                    <i class="nav-icon fas fa-laptop"></i>
+                    <p>Administracion</p>
+                </a>
+                <ul class="nav nav-treeview">
+                    {% for opcion in request.session.opciones_menu.contable %}
+                        <li class="nav-item" id="{{ opcion.vista }}">
+                            <a name="opcionvista" href="{% url opcion.vista %}"  class="{% if opcion.vista in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                                <i class="nav-icon {{ opcion.icono }}"></i>
+                                <p>{{ opcion.nombre }}</p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
+            
+            <!-- Para la aplicación de Astilleros -->
+            {% if request.session.opciones_menu.astilleros %}
+            <li class="nav-item has-treeview {% if '/astilleros/' in request.path %}menu-open{% else %} {% endif %}">
+                <a href="#" class="{% if '/astilleros/' in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                    <i class="nav-icon fas fa-ship"></i>
+                    <p>Astilleros</p>
+                </a>
+                <ul class="nav nav-treeview">
+                    {% for opcion in request.session.opciones_menu.astilleros %}
+                        <li class="nav-item" id="{{ opcion.vista }}">
+                            <a name="opcionvista" href="{% url opcion.vista %}"  class="{% if opcion.vista in request.path %}nav-link active{% else %}nav-link{% endif %}">
+                                <i class="nav-icon {{ opcion.icono }}"></i>
+                                <p>{{ opcion.nombre }}</p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
+                
+            {% endblock nav_links %}
+            {% endblock nav_links_outer %}
+            </ul>
+            </nav>
+        {% endblock nav_links_ul %}
+    </div>
+   
+    <!-- /.sidebar -->
+</aside>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const spinner = document.getElementById("spinner");
+    const links = document.querySelectorAll(".sidebar-menu a"); // Cambia el selector según tus necesidades
+
+    links.forEach(link => {
+        link.addEventListener("click", function(event) {
+            event.preventDefault(); // Evita que el enlace siga su comportamiento normal
+
+            spinner.style.display = "block"; // Muestra el spinner al hacer clic en el enlace
+
+            // Obtén la URL del enlace
+            const url = link.getAttribute("href");
+
+            // Realiza la petición a la vista de Django
+            fetch(url)
+                .then(response => response.text())
+                .then(content => {
+                    // Simula la inserción del contenido en un elemento HTML
+                    // Aquí puedes usar una librería como jQuery para cargar el contenido en un elemento específico
+                    document.getElementById("content-wraper").innerHTML = content;
+                    spinner.style.display = "none"; // Oculta el spinner después de cargar el contenido
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    spinner.style.display = "none"; // Oculta el spinner en caso de error
+                });
+        });
+    });
+});
+</script>

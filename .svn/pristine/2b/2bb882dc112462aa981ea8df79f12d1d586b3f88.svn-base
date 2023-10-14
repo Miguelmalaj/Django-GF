@@ -1,0 +1,292 @@
+import pdfkit
+import os
+from django.http import HttpResponse
+from dashboards.utilerias import config
+from django.shortcuts import render, redirect
+from app_contabilidad import consultas, utils
+import tempfile
+
+
+# Create your views here.
+def index(request):
+    
+    return render(request, 'base.html')
+
+def cuentasxcobrar(request):
+        
+        datoslmm = consultas.resumen_cuentasxcobrar(1, 1)                      
+        datosgve = consultas.resumen_cuentasxcobrar(3, 1)
+        datoscln = consultas.resumen_cuentasxcobrar(5, 1)
+        datosaer = consultas.resumen_cuentasxcobrar(5, 2)
+        datosflo = consultas.resumen_cuentasxcobrar(5, 3)     
+        datoscad = consultas.resumen_cuentasxcobrar(7, 1)
+
+        # Lista de las cuatro variables para iterar
+        variables = [datoslmm, datosgve, datoscln, datoscad]
+        # Llave a comparar
+        llave = 'diasmas'
+        # Inicializa el valor máximo con un valor muy pequeño
+        valor_mas_antiguo = float('-inf')
+        # Itera a través de las variables y encuentra el valor más grande en la llave 'diasmas'
+        for variable in variables:
+                if llave in variable and variable[llave] > valor_mas_antiguo:
+                        valor_mas_antiguo = variable[llave]
+
+        datos = {
+                'opcionmenu': utils.obtiene_opcionmenu('cuentasxcobrar'),
+                'mochis': datoslmm,
+                'guasave': datosgve,
+                'culiacan': datoscln,
+                'aeropuerto': datosaer,
+                'flotillas':datosflo,
+                'cadillac': datoscad
+        }
+        return render(request, 'cuentasxcobrar.html', {'datos':datos})
+
+def cuentasxcobrar_detalle(request, empresa, sucursal):
+        agencia = int(empresa)
+        sucursal = int(sucursal)
+        if agencia != 0:
+                strnombreempresa = config.obtiene_empresa(agencia, sucursal)
+                df_resultado = consultas.detalle_cuentasxcobrar(agencia,sucursal)
+        
+                datos = {
+                        'nombreempresa': strnombreempresa,
+                        'opcionmenu': utils.obtiene_opcionmenu('cuentasxcobrar'),
+                        'cuentasxcobrar':df_resultado.to_dict(orient='records'),
+                        'empresa': empresa,
+                        'sucursal': sucursal
+                }
+        return render(request, 'cuentasxcobrardetalle.html', {'datos':datos})
+
+def cuentasxcobrarpdf_detalle(request, empresa, sucursal):
+        agencia = int(empresa)
+        sucursal = int(sucursal)
+        if agencia != 0:
+                strnombreempresa = config.obtiene_empresa(agencia, sucursal)
+                df_resultado = consultas.detalle_cuentasxcobrar(agencia,sucursal)
+        
+                datos = {
+                        'nombreempresa': strnombreempresa,
+                        'opcionmenu': utils.obtiene_opcionmenu('cuentasxcobrar'),
+                        'cuentasxcobrar':df_resultado.to_dict(orient='records'),
+                        'empresa': empresa,
+                        'sucursal': sucursal
+                }
+
+        rendered_template = render(request, 'cuentasxcobrardetallepdf.html', {'datos':datos})
+
+        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as temp_html:
+                temp_html.write(rendered_template.content)
+
+        # Opciones para pdfkit
+        options = {
+        'page-size': 'Letter',  # Tamaño de página (puede personalizarse)
+        'orientation': 'Landscape',  # Orientación horizontal (landscape)
+        'margin-top': '5mm',
+        'margin-right': '5mm',
+        'margin-bottom': '5mm',
+        'margin-left': '5mm',
+        }
+
+        pdf_filename = tempfile.mktemp(suffix='.pdf')
+        pdfkit.from_file(temp_html.name, pdf_filename, options=options)
+
+        os.remove(temp_html.name)
+
+        strnombrearchivo = "attachment; filename=" + str(strnombreempresa.nombre_empresa) + "_cuentasxcobrar.pdf"
+        # Create an HTTP response with the PDF content
+        with open(pdf_filename, 'rb') as pdf_file:
+                response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+
+        response['Content-Disposition'] = strnombrearchivo
+        return response
+
+def cuentasxcobrarpdf(request):
+
+        datoslmm = consultas.resumen_cuentasxcobrar(1, 1)                      
+        datosgve = consultas.resumen_cuentasxcobrar(3, 1)
+        datoscln = consultas.resumen_cuentasxcobrar(5, 1)
+        datosaer = consultas.resumen_cuentasxcobrar(5, 2)
+        datosflo = consultas.resumen_cuentasxcobrar(5, 3)     
+        datoscad = consultas.resumen_cuentasxcobrar(7, 1)
+        
+        variables = [datoslmm, datosgve, datoscln, datoscad]
+        
+        llave = 'diasmas'
+        
+        valor_mas_antiguo = float('-inf')
+        
+        for variable in variables:
+                if llave in variable and variable[llave] > valor_mas_antiguo:
+                        valor_mas_antiguo = variable[llave]
+
+        datos = {
+                'opcionmenu': utils.obtiene_opcionmenu('cuentasxcobrar'),
+                'mochis': datoslmm,
+                'guasave': datosgve,
+                'culiacan': datoscln,
+                'aeropuerto': datosaer,
+                'flotillas':datosflo,
+                'cadillac': datoscad
+        }
+
+
+        rendered_template = render(request, 'cuentasxcobrarpdf.html', {'datos':datos}) 
+        
+        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as temp_html:
+            temp_html.write(rendered_template.content)
+
+        options = {
+                'page-size': 'letter',
+                'margin-top': '12mm',
+                'margin-right': '0mm',
+                'margin-bottom': '0mm',
+                'margin-left': '0mm',
+        }
+        
+        pdf_filename = tempfile.mktemp(suffix='.pdf')
+        pdfkit.from_file(temp_html.name, pdf_filename, options = options ) #, options = options
+        
+        os.remove(temp_html.name)
+
+        # Create an HTTP response with the PDF content
+        with open(pdf_filename, 'rb') as pdf_file:
+          response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        
+        response['Content-Disposition'] = 'attachment; filename="Reporte_Cuentasxcobrar.pdf"'
+        return response
+
+def cuentasxpagar(request):
+        
+        datoslmm = consultas.resumen_cuentasxpagar(1, 1)                      
+        datosgve = consultas.resumen_cuentasxpagar(3, 1)
+        datoscln = consultas.resumen_cuentasxpagar(5, 1)
+        datosaer = consultas.resumen_cuentasxpagar(5, 2)
+        datoscad = consultas.resumen_cuentasxpagar(7, 1)
+
+        # Lista de las cuatro variables para iterar
+        variables = [datoslmm, datosgve, datoscln, datoscad]
+        # Llave a comparar
+        llave = 'diasmas'
+        # Inicializa el valor máximo con un valor muy pequeño
+        valor_mas_antiguo = float('-inf')
+        # Itera a través de las variables y encuentra el valor más grande en la llave 'diasmas'
+        for variable in variables:
+                if llave in variable and variable[llave] > valor_mas_antiguo:
+                        valor_mas_antiguo = variable[llave]
+
+        datos = {
+                'opcionmenu': utils.obtiene_opcionmenu('cuentasxpagar'),
+                'mochis': datoslmm,
+                'guasave': datosgve,
+                'culiacan': datoscln,
+                'aeropuerto': datosaer,
+                'cadillac': datoscad
+        }
+        return render(request, 'cuentasxpagar.html', {'datos':datos})
+
+def cuentasxpagarpdf(request):
+        datoslmm = consultas.resumen_cuentasxpagar(1, 1)                      
+        datosgve = consultas.resumen_cuentasxpagar(3, 1)
+        datoscln = consultas.resumen_cuentasxpagar(5, 1)
+        datosaer = consultas.resumen_cuentasxpagar(5, 2)
+        datoscad = consultas.resumen_cuentasxpagar(7, 1)
+
+        # Lista de las cuatro variables para iterar
+        variables = [datoslmm, datosgve, datoscln, datoscad]
+        # Llave a comparar
+        llave = 'diasmas'
+        # Inicializa el valor máximo con un valor muy pequeño
+        valor_mas_antiguo = float('-inf')
+        # Itera a través de las variables y encuentra el valor más grande en la llave 'diasmas'
+        for variable in variables:
+                if llave in variable and variable[llave] > valor_mas_antiguo:
+                        valor_mas_antiguo = variable[llave]
+
+        datos = {
+                'opcionmenu': utils.obtiene_opcionmenu('cuentasxpagar'),
+                'mochis': datoslmm,
+                'guasave': datosgve,
+                'culiacan': datoscln,
+                'aeropuerto': datosaer,
+                'cadillac': datoscad
+        }
+
+        rendered_template = render(request, 'cuentasxpagarpdf.html', {'datos':datos})
+
+        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as temp_html:
+               temp_html.write(rendered_template.content)
+
+        options = {
+               'page-size': 'letter',
+               'margin-top': '12mm',
+               'margin-right': '0mm',
+               'margin-bottom': '0mm',
+               'margin-left': '0mm',
+        }
+
+        pdf_filename = tempfile.mktemp(suffix='.pdf')
+        pdfkit.from_file(temp_html.name, pdf_filename, options= options)
+
+        os.remove(temp_html.name)
+
+        with open(pdf_filename, 'rb') as pdf_file:
+               response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+
+        response['Content-Disposition'] = 'attachment; filename="Reporte_Cuentasxpagar.pdf"'
+        return response  
+
+def cuentasxpagar_detalle(request, empresa, sucursal):
+        agencia = int(empresa)
+        sucursal = int(sucursal)
+        if agencia != 0:
+                strnombreempresa = config.obtiene_empresa(agencia, sucursal)
+                df_resultado = consultas.detalle_cuentasxpagar(agencia,sucursal)
+        
+                datos = {
+                        'nombreempresa': strnombreempresa,
+                        'opcionmenu': utils.obtiene_opcionmenu('cuentasxpagar'),
+                        'cuentasxpagar':df_resultado.to_dict(orient='records'),
+                        'empresa': empresa,
+                        'sucursal': sucursal
+                }
+        return render(request, 'cuentasxpagardetalle.html', {'datos':datos})
+
+def cuentasxpagarpdf_detalle(request, empresa, sucursal):
+        agencia = int(empresa)
+        sucursal = int(sucursal)
+        if agencia != 0:
+                strnombreempresa = config.obtiene_empresa(agencia, sucursal)
+                df_resultado = consultas.detalle_cuentasxpagar(agencia,sucursal)
+        
+                datos = {
+                        'nombreempresa': strnombreempresa,
+                        'opcionmenu': utils.obtiene_opcionmenu('cuentasxpagar'),
+                        'cuentasxpagar':df_resultado.to_dict(orient='records'),
+                        'empresa': empresa,
+                        'sucursal': sucursal
+                }
+        rendered_template = render(request, 'cuentasxpagardetallepdf.html', {'datos':datos})
+
+        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as temp_html:
+                temp_html.write(rendered_template.content)
+
+        options = {
+         'page-size': 'A4',
+         'orientation': 'Landscape',
+        }
+
+        pdf_filename = tempfile.mktemp(suffix='.pdf')
+        pdfkit.from_file(temp_html.name, pdf_filename, options=options)
+
+        os.remove(temp_html.name)
+
+        strnombrearchivo = "attachment; filename=" + str(strnombreempresa.nombre_empresa) + "_cuentasxpagar.pdf"
+
+        # Create an HTTP response with the PDF content
+        with open(pdf_filename, 'rb') as pdf_file:
+             response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+
+        response['Content-Disposition'] = strnombrearchivo
+        return response

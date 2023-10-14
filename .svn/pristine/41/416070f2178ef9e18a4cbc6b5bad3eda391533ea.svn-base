@@ -1,0 +1,459 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+<div class="row mb-2">
+    <div class="col-sm-12">
+        <div class="card card-outline card-lightblue">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} </h3>                                    
+                <ul class='navbar-nav'>
+                    <div class="row">
+                        <div class="col-md-3">                                           
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-6 align-content-lg-end text-right">
+                            <form method="post" action="{% url 'ventasvehiculos' %}">
+                                {% csrf_token %}
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <input type="date" class="form-control datetimepicker-input" name="fecha" id="fecha" data-target="#timepicker" value="{{ datos.fechareporte }}" />
+                                </li>
+                                <li class='nav-item d-none d-sm-inline-block'>
+                                    <button id="botonactualizar" type='submit' class='btn btn-primary btn-block'>Actualizar</button>
+                                </li>
+                            </form>
+                        </div>
+                    </div>
+                </ul>						
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-lightblue">
+    <div class="card-header">			
+        <div class="row">
+            <div class="col-md-3">
+                <div class="small-box bg-lightblue">
+                    <div class="inner">
+                        <h5 class="text-center">Felix Automotores</h5>
+                    </div>
+                    <a name="botonmostrardetalle" href="{% url 'ventasvehiculos_detalle' '1' '1' datos.fechareporte %}" class="small-box-footer">Mostrar Detalle <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+                <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">Menudeo Nuevos</p></span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.mochis %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <span><p class="text-center">Semi-Nuevos</p></span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.mochisus %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="small-box bg-lightblue">
+                    <div class="inner">
+                        <h5 class="text-center">Felix Automotriz</h5>
+                    </div>
+                    <a name="botonmostrardetalle" href="{% url 'ventasvehiculos_detalle' '3' '1' datos.fechareporte %}" class="small-box-footer">Mostrar Detalle <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+                <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">Menudeo Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.guasave %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <span><p class="text-center">Semi-Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.guasaveus %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="small-box bg-lightblue">
+                    <div class="inner">
+                        <h5 class="text-center">Culiacan Zapata</h5>
+                    </div>
+                    <a name="botonmostrardetalle" href="{% url 'ventasvehiculos_detalle' '5' '1' datos.fechareporte %}" class="small-box-footer">Mostrar Detalle <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+                <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">Menudeo Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.zapata %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <span><p class="text-center">Semi-Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.zapataus %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="small-box bg-lightblue">
+                    <div class="inner">
+                        <h5 class="text-center">Culiacan Aeropuerto</h5>
+                    </div>
+                    <a name="botonmostrardetalle" href="{% url 'ventasvehiculos_detalle' '5' '2' datos.fechareporte %}" class="small-box-footer">Mostrar Detalle <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+                    <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">Menudeo Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.aero %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <span><p class="text-center">Semi-Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.aerous %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="small-box bg-lightblue">
+                    <div class="inner">
+                        <h5 class="text-center">Culiacan Flotillas</h5>
+                    </div>
+                    <a name="botonmostrardetalle" href="{% url 'ventasvehiculos_detalle' '5' '3' datos.fechareporte %}" class="small-box-footer">Mostrar Detalle <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+                    <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">Menudeo Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.flotillas %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <span><p class="text-center">Semi-Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.flotillasus %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h5 class="text-center">Noroeste Motors</h5>
+                    </div>
+                    <a name="botonmostrardetalle" href="{% url 'ventasvehiculos_detalle' '7' '1' datos.fechareporte %}" class="small-box-footer">Mostrar Detalle <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+                    <div class="card card-outline card-lightblue">	
+                    <div class="card-body">
+                        <span><p class="text-center">Menudeo Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.cadillac %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <span><p class="text-center">Semi-Nuevos</p><span>
+                        <div class="card card-widget widget-user">
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <table id="ventasveh" class="table table-sm">
+                                        <tbody>
+                                            {% for row in datos.cadillacus %}
+                                                {% if row.0 == 'CANCELADAS' %}
+                                                    <tr style="font-size: 16px; color: red;" >
+                                                {% else %}
+                                                    <tr>
+                                                {% endif %}
+                                                {% for cell in row %}
+                                                        {% if forloop.counter < 3 %}
+                                                        <td style='font-size: 16px'>{{ cell }}</td>
+                                                        {% else %}
+                                                        <td style='font-size: 16px; text-align: right'>$ {{ cell|floatformat:0|intcomma }}</td>
+                                                        {% endif %}
+                                                
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

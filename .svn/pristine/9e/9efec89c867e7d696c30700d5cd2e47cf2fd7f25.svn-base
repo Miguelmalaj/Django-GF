@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+<div class="row">
+    <div class="col-sm-12 col-12 table-responsive">
+        <div class="card card-outline card-primary">
+            <div class="card-header">						
+                <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>		
+                <ul class='navbar-nav'>
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-9 align-content-lg-end text-right">
+                            <ul class='navbar-nav ml-auto'>
+                                <form method="post" action="{% url 'ventarefacciones' %}">
+                                {% csrf_token %}
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select  class='form-control select2' id="empresas" name="empresas">
+                                            {% if datos.empresa == '11' %}<option selected value="11">Felix Automotores</option>{% else %}<option value="11">Felix Automotores</option>{% endif%}
+                                            {% if datos.empresa == '31' %}<option selected value="31">Felix Automotriz</option>{% else %}<option value="31">Felix Automotriz</option>{% endif%}
+                                            {% if datos.empresa == '51' %}<option selected value="51">Culiacan Zapata</option>{% else %}<option value="51">Culiacan Zapata</option>{% endif%}
+                                            {% if datos.empresa == '53' %}<option selected value="53">Culiacan Aeropuerto</option>{% else %}<option value="53">Culiacan Aeropuerto</option>{% endif%}
+                                            {% if datos.empresa == '71' %}<option selected value="71">Noroeste Motors</option>{% else %}<option value="71">Noroeste Motors</option>{% endif%}
+                                        </select>
+                                    </li>
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select  class='form-control select2' id="mes" name="mes">
+                                            {% for mes, nombre_mes in datos.cbomeses.items %}
+                                                {% if datos.mes == mes %}<option selected  value="{{ mes }}">{{ nombre_mes }}</option> {% else %}<option  value="{{ mes }}">{{ nombre_mes }}</option>{% endif%}
+                                            {% endfor %}
+                                        </select>
+                                    </li>
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <select class='form-control select2' id="periodo" name="periodo">
+                                            {% for year in datos.cboperiodos %}
+                                                {% if datos.periodoselec == year %}<option selected  value="{{ year }}">{{ year }}</option> {% else %}<option  value="{{ year }}">{{ year }}</option>{% endif%}
+                                            {% endfor %}
+                                        </select>
+                                    </li>
+                                    <li class='nav-item d-none d-sm-inline-block'>
+                                        <button id="botonactualizar" type='submit' class='btn btn-primary btn-block'>Actualizar</button>
+                                    </li>
+                                </form>
+                            </ul>
+                        </div>
+                    </div>
+                </ul>				
+            </div>
+        </div>
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+{% endblock %}
+
+{% block content %}
+<div class="card-body">
+    <div class="row">
+        <div class="col-12 col-sm-3 col-lg-12 order-2 order-md-2">
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-2 col-6">
+                        <div class="description-block border-right">
+                            {% if datos.resumen.porcref >= 45 %}
+                                <span class='description-percentage text-success'>{{ datos.resumen.porcref|floatformat:2 }} %</span>
+                            {% else %}
+                                <span class='description-percentage text-danger'>{{ datos.resumen.porcref|floatformat:2 }} %</span>
+                            {% endif %}
+                        <h5 class="description-header">${{ datos.resumen.utilref|floatformat:0|intcomma }}</h5>
+                        <span class="description-text">Util. Mostrador</span>
+                        </div>
+                        <!-- /.description-block -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-2 col-6">
+                        <div class="description-block border-right">
+                            {% if datos.resumen.porcser >= 45 %}
+                                <span class='description-percentage text-success'>{{ datos.resumen.porcser|floatformat:2 }} %</span>
+                            {% else %}
+                                <span class='description-percentage text-danger'>{{ datos.resumen.porcser|floatformat:2 }} %</span>
+                            {% endif %}
+                        <h5 class="description-header">${{ datos.resumen.utilser|floatformat:0|intcomma }}</h5>
+                        <span class="description-text">Util. Servicio</span>
+                        </div>
+                        <!-- /.description-block -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-2 col-6">
+                        <div class="description-block border-right">
+                            {% if datos.resumen.porcinterna >= 45 %}
+                                <span class='description-percentage text-success'>{{ datos.resumen.porcinterna|floatformat:2 }} %</span>
+                            {% else %}
+                                <span class='description-percentage text-danger'>{{ datos.resumen.porcinterna|floatformat:2 }} %</span>
+                            {% endif %}
+                        <h5 class="description-header">${{ datos.resumen.utilinterna|floatformat:0|intcomma }}</h5>
+                        <span class="description-text">Internas</span>
+                        </div>
+                        <!-- /.description-block -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-3 col-6">
+                        <div class="description-block border-right">
+                            {% if datos.resumen.porctotal >= 45 %}
+                                <span class='description-percentage text-success'>{{ datos.resumen.porctotal|floatformat:2 }} %</span>
+                            {% else %}
+                                <span class='description-percentage text-danger'>{{ datos.resumen.porctotal|floatformat:2 }} %</span>
+                            {% endif %}
+                        <h5 class="description-header">${{ datos.resumen.utiltotal|floatformat:0|intcomma }}</h5>
+                        <span class="description-text">Util. General</span>
+                        </div>
+                        <!-- /.description-block -->
+                    </div><div class="col-sm-3 col-6">
+                        <div class="description-block">
+                            {% if datos.resumen.porctotal >= 45 %}
+                                <span class='description-percentage text-success'>{{ datos.resumen.porctotal|floatformat:2 }} %</span>
+                            {% else %}
+                                <span class='description-percentage text-danger'>{{ datos.resumen.porctotal|floatformat:2 }} %</span>
+                            {% endif %}
+                        <h5 class="description-header">${{ datos.resumen.ventatotal|floatformat:0|intcomma }}</h5>
+                        <span class="description-text">Venta Total</span>
+                        </div>
+                        <!-- /.description-block -->
+                    </div>
+                </div>
+            </div>						
+            <div class="row">
+                <div class="col-sm-3 col-lg-12">
+                    <!-- Reporte por tipo de precio -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-outline card-primary"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                            <tr style="font-size: 12px">
+                                                <th style="width: 30%; text-align:center">MOSTRADOR</th>
+                                            </tr>
+                                    </table>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr style="font-size: 12px">
+                                                <th>Tipo Cliente</th>
+                                                <th style="text-align: center">Venta</th>
+                                                <th style="text-align: center">Utilidad</th>
+                                                <th style="text-align: center">%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in datos.refa %}
+                                            {% if row.tipovta == 'TOTAL' %}
+                                            <tr style="font-size: 12px; font-weight:bold">
+                                            {% else %}
+                                            <tr style="font-size: 12px">
+                                            {% endif %}
+                                                <td style='font-size: 12px'>{{ row.tipovta }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porc|floatformat:2|intcomma }}</td>
+                                            </tr>
+                                            {% endfor %}  
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                            <tr style="font-size: 12px">
+                                                <th style="width: 30%; text-align:center">VENDEDORES MOSTRADOR</th>
+                                            </tr>
+                                    </table>
+                                
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr style="font-size: 12px">
+                                                <th>Vendedor</th>
+                                                <th></th>
+                                                <th>Objetivo</th>
+                                                <th style="text-align: center">Venta</th>
+                                                <th style="text-align: center">Utilidad</th>
+                                                <th style="text-align: center">%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>										
+                                            {% for row in datos.mostrador %}
+                                            {% if row.empleado == 'TOTAL' %}
+                                            <tr style="font-size: 12px; font-weight:bold">
+                                            {% else %}
+                                            <tr style="font-size: 12px">
+                                            {% endif %}
+                                                <td style='font-size: 12px'>{{ row.empleado }}</td>
+                                                <td></td>
+                                                <td style='font-size: 12px; text-align: right'>500,000</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porc|floatformat:2|intcomma }}</td>
+                                            </tr>
+                                            {% endfor %}  
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-lg-4">	
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                            <tr style="font-size: 12px">
+                                                <th style="width: 30%; text-align:center">SERVICIO</th>
+                                            </tr>
+                                    </table>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr style="font-size: 12px">
+                                                <th>Tipo Cliente</th>
+                                                <th></th>
+                                                <th style="text-align: center">Venta</th>
+                                                <th style="text-align: center">Utilidad</th>
+                                                <th style="text-align: center">%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>										
+                                            {% for row in datos.servicio %}
+                                            {% if row.tipovta == 'TOTAL' %}
+                                            <tr style="font-size: 12px; font-weight:bold">
+                                            {% else %}
+                                            <tr style="font-size: 12px">
+                                            {% endif %}
+                                                <td style='font-size: 12px'>{{ row.tipovta }}</td>
+                                                <!-- Solo colocar el link de enlace a la pagina de detalle cuando no sea el total -->
+                                                {% if row.concepto == 'TOTAL' %} 
+                                                    <td></td>
+                                                {% else %}
+                                                    <td><a name="iconodetalleordenes" href="{% url 'detalleordenes' datos.empresa row.tipovta datos.periodoselec datos.mes 1 %}"><i class='fas fa-list-ul'></i></a></td>
+                                                {% endif %}
+                                                <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porc|floatformat:2|intcomma }}</td>
+                                            </tr>
+                                            {% endfor %}  
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-lg-4">	
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                            <tr style="font-size: 12px">
+                                                <th style="width: 30%; text-align:center">INTERNAS</th>
+                                            </tr>
+                                    </table>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr style="font-size: 12px">
+                                                <th>Tipo Cliente</th>
+                                                <th style="text-align: center">Venta</th>
+                                                <th style="text-align: center">Utilidad</th>
+                                                <th style="text-align: center">%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>	
+                                            {% for row in datos.internas %}
+                                            {% if row.tipovta == 'TOTAL' %}
+                                            <tr style="font-size: 12px; font-weight:bold">
+                                            {% else %}
+                                            <tr style="font-size: 12px">
+                                            {% endif %}
+                                                <td style='font-size: 12px'>{{ row.tipovta }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.venta|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.utilidad|floatformat:0|intcomma }}</td>
+                                                <td style='font-size: 12px; text-align: right'>{{ row.porc|floatformat:2|intcomma }}</td>
+                                            </tr>
+                                            {% endfor %}  
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /.col -->
+            </div>	<!-- /.row -->
+            <div class="row">
+                <div class="col-sm-4 col-lg-4">
+                    
+                </div>
+            </div>
+        </div><!-- /.col -->									
+    </div><!-- /.row -->
+</div><!-- /.card-body -->	
+{% endblock %}
