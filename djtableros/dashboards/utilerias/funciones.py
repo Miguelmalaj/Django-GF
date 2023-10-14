@@ -511,10 +511,13 @@ def obtiene_ventasvehiculos_detalle(bytAgencia, bytSucursal, fechareporte):
         values=['contador', 'venta'],
         aggfunc={'contador': ['sum'], 'venta': ['sum']}
     )
-    pivot_table.columns=['cant', 'venta']
-    lista_datos = pivot_table.reset_index().to_dict() # Pasar la tabla pivote a un diccionario de datos para eliminar el formato de tabla pivote y quedarnos con los datos planos.
-    dfn_modebasico = pd.DataFrame.from_dict(lista_datos)   # Volver a crear el DataFrame del diccionario de datos.
-    dfn_modebasico = dfn_modebasico.sort_values(by='cant', ascending=False, ignore_index=True)
+    if not pivot_table.empty:
+        pivot_table.columns=['cant', 'venta']
+        lista_datos = pivot_table.reset_index().to_dict() # Pasar la tabla pivote a un diccionario de datos para eliminar el formato de tabla pivote y quedarnos con los datos planos.
+        dfn_modebasico = pd.DataFrame.from_dict(lista_datos)   # Volver a crear el DataFrame del diccionario de datos.
+        dfn_modebasico = dfn_modebasico.sort_values(by='cant', ascending=False, ignore_index=True)
+    else:
+        dfn_modebasico = pivot_table
 
     tmp_df = df_consulta[df_consulta['clase'] == 'NU']
     tmp_df = tmp_df[['venta', 'vendedor', 'contador']].copy()
@@ -523,10 +526,13 @@ def obtiene_ventasvehiculos_detalle(bytAgencia, bytSucursal, fechareporte):
         values=['contador', 'venta'],
         aggfunc={'contador': ['sum'], 'venta': ['sum']}
     )  
-    pivot_table.columns=['cant', 'venta']
-    lista_datos = pivot_table.reset_index().to_dict() # Pasar la tabla pivote a un diccionario de datos para eliminar el formato de tabla pivote y quedarnos con los datos planos.
-    dfn_vendedor = pd.DataFrame.from_dict(lista_datos)   # Volver a crear el DataFrame del diccionario de datos.
-    dfn_vendedor = dfn_vendedor.sort_values(by='cant', ascending=False, na_position='last', ignore_index=True)
+    if not pivot_table.empty:
+        pivot_table.columns=['cant', 'venta']
+        lista_datos = pivot_table.reset_index().to_dict() # Pasar la tabla pivote a un diccionario de datos para eliminar el formato de tabla pivote y quedarnos con los datos planos.
+        dfn_vendedor = pd.DataFrame.from_dict(lista_datos)   # Volver a crear el DataFrame del diccionario de datos.
+        dfn_vendedor = dfn_vendedor.sort_values(by='cant', ascending=False, na_position='last', ignore_index=True)
+    else:
+        dfn_vendedor = pivot_table
 
     tmp_df = df_consulta[df_consulta['clase'] == 'NU']
     tmp_df = tmp_df[['venta', 'tipoventa', 'contador']].copy()
@@ -535,10 +541,13 @@ def obtiene_ventasvehiculos_detalle(bytAgencia, bytSucursal, fechareporte):
         values=['contador', 'venta'],
         aggfunc={'contador': ['sum'], 'venta': ['sum']}
     )
-    pivot_table.columns=['cant', 'venta']
-    lista_datos = pivot_table.reset_index().to_dict() # Pasar la tabla pivote a un diccionario de datos para eliminar el formato de tabla pivote y quedarnos con los datos planos.
-    dfn_tipoventa = pd.DataFrame.from_dict(lista_datos)   # Volver a crear el DataFrame del diccionario de datos.
-    dfn_tipoventa = dfn_tipoventa.sort_values(by='cant', ascending=False, na_position='last', ignore_index=True)
+    if not pivot_table.empty:
+        pivot_table.columns=['cant', 'venta']
+        lista_datos = pivot_table.reset_index().to_dict() # Pasar la tabla pivote a un diccionario de datos para eliminar el formato de tabla pivote y quedarnos con los datos planos.
+        dfn_tipoventa = pd.DataFrame.from_dict(lista_datos)   # Volver a crear el DataFrame del diccionario de datos.
+        dfn_tipoventa = dfn_tipoventa.sort_values(by='cant', ascending=False, na_position='last', ignore_index=True)
+    else:
+        dfn_tipoventa = pivot_table
 
     # ******************************************************************
     # Obtener la informacion de los seminuevos

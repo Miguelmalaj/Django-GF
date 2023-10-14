@@ -66,56 +66,59 @@
                             <th style="width: 10%;  text-align:center">Objetivos</th>
                             <th style="width: 100%; text-align:center">{{ datos.mesperiodo }}</th>
                             <th style="width: 10%; text-align:center">Real</th>
-                            
+                            <th style="width: 10%; text-align:center">Conversion</th>
                         </tr>
                     <tbody>
                         <tr class="width: 100px">
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.afluencia.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/afluencia1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.afluencia.real }} </td>
-                            
+                            <td style="text-align: left; vertical-align: bottom;"> </td>
                         </tr>
                         <tr class="width: 100px">
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.solicitudes.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/solicitudes1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.solicitudes.real }} </td>
+                            <td style="text-align: right; vertical-align: bottom;"> {{ datos.por_sol|floatformat:0|intcomma }} %</td>
                             
                         </tr>
                         <tr class="p-0 m-0 pt-0 mt-0 pb-0 ml-0">
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.demos.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/demos1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.demos.real }} </td>
-                            
+                            <td style="text-align: rigth; vertical-align: bottom;"> </td>
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.aprobadas.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/aprobadas1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.aprobadas.real }} </td>
+                            <td style="text-align: right; vertical-align: bottom;"> {{ datos.por_aprob|floatformat:0|intcomma }} %</td>
                             
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.facturas.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/facturadas1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.facturas.real }} </td>
-                            
+                            <td style="text-align: real; vertical-align: bottom;"> </td>
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.contratos.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/contratos1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.contratos.real }} </td>
+                            <td style="text-align: right; vertical-align: bottom;"> {{ datos.por_cont|floatformat:0|intcomma }} %</td>
                             
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.entregasgmf.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/entregasgmf1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.entregasgmf.real }} </td>
-                            
+                            <td style="text-align: left; vertical-align: bottom;"> </td>
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: bottom;"> {{ datos.entregascont.objetivo }} </td>
                             <td style="text-align: center;"><img src="{%static 'admin-lte/dist/img/entregascont1.jpg' %}" width="400" height="50" class="img-responsive" /></td>
                             <td style="text-align: left; vertical-align: bottom;"> {{ datos.entregascont.real }} </td>
-                            
+                            <td style="text-align: left; vertical-align: bottom;"> </td>
                         </tr>
                     </tbody>
                 </table>

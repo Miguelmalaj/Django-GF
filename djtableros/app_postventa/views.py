@@ -32,7 +32,6 @@ def resumenpostventa(request):
                 'culiacan': datoscln,
                 'aeropuerto': datosaer,
                 'cadillac': datoscad,
-                'grupo': 0,
                 'fechareporte':seleccion
         }
     return render(request, 'resumenpostventa.html', {'datos':datos})

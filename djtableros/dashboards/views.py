@@ -6,7 +6,8 @@ import tempfile
 from django.shortcuts import render, redirect
 from dashboards.utilerias import funciones, utilerias, consultassql, config
 from app_postventa.utils import obtener_opciones_menu_postventa, obtener_opcion_default
-from app_contabilidad.utils import obtener_opciones_menu_contabilidad
+from app_contabilidad.utils import obtener_opciones_menu_contabilidad, obtener_opcion_default_conta
+from app_astilleros.utils import obtener_opciones_menu_astilleros, obtener_opcion_default_astilleros
 from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -34,10 +35,12 @@ def login_view(request):
                 opciones_menuvta = utilerias.obtener_opciones_menu(username)
                 opciones_menu_postventa = obtener_opciones_menu_postventa(username)
                 opciones_menu_contabilidad = obtener_opciones_menu_contabilidad(username)
+                opciones_menu_astilleros = obtener_opciones_menu_astilleros(username)
                 opciones_menu = {
                         'ventas': opciones_menuvta,
                         'postventa': opciones_menu_postventa,
-                        'contable': opciones_menu_contabilidad
+                        'contable': opciones_menu_contabilidad,
+                        'astilleros': opciones_menu_astilleros
                 }
                 # Almacenar las opciones de menú en la sesión
                 request.session['opciones_menu'] = opciones_menu
@@ -45,18 +48,35 @@ def login_view(request):
                 # buscar en dashsboard la opcion por default
                 opcion_default = utilerias.obtener_opcion_default(username)
                 if opcion_default:
+                        print(opcion_default.vista)# TEST
                         return redirect(opcion_default.vista)
                 else:
                         # buscar en la app_postventa la opcion por default
                         opcion_default = obtener_opcion_default(username)
                         if opcion_default:
+                                print(opcion_default.vista)# TEST
                                 return redirect(opcion_default.vista)
                         else:
-                                return redirect('base')
+                                # buscar en la app_contabilidad la opcion por default
+                                opcion_default = obtener_opcion_default_conta(username)
+                                if opcion_default:
+                                        print(opcion_default.vista)# TEST
+                                        return redirect(opcion_default.vista)
+                                else:
+                                        #return redirect('base')
+                                        #buscar en la app_astilleros la opción por default
+                                        opcion_default = obtener_opcion_default_astilleros(username)
+                                        if opcion_default:
+                                                print(opcion_default.vista)# TEST
+                                                return redirect(opcion_default.vista)
+                                        else:
+                                                return redirect('base')
         else:
                 messages.error(request, 'Usuario o Clave incorrecta')
     
     return render(request, 'login.html')
+
+
 
 def logout_view(request):
         logout(request)
@@ -131,6 +151,17 @@ def funnel_chart(request):
                 'hoy': datosdms['entregascont'] + datosdms['entregasgm'],
         }
 
+        por_sol = 0
+        por_aprob = 0
+        por_cont = 0
+
+        if afluencia['real'] != 0:
+                por_sol = (solicitudes['real']/afluencia['real']) * 100
+        if solicitudes['real'] !=0:
+                por_aprob = (aprobadas['real'] / solicitudes['real']) * 100
+        if aprobadas['real'] != 0:
+                por_cont = (contratos['real'] / aprobadas['real']) * 100
+
         datos = {
                 'empresa':seleccion,
                 'nombreempresa': config.obtiene_empresa(bytEmpresa, bytSucursal),
@@ -153,8 +184,11 @@ def funnel_chart(request):
                 'contratos':contratos,
                 'entregastotales': datosentregastotales,
                 'mesperiodo': mesperiodo,
-                'mesperiodoant' : mesperiodant
-        }
+                'mesperiodoant' : mesperiodant,
+                'por_sol': por_sol,
+                'por_aprob' : por_aprob,
+                'por_cont' : por_cont
+                                }
         return render(request, 'funnel_chart.html', {'datos':datos})
 
 def funel_vendedor(request):
@@ -210,7 +244,7 @@ def ventasanuales(request):
         tablavendedores = dataframevendedores.reset_index().values.tolist
         tablavehiculosbaja = dataframevehiculosbaja.reset_index().values.tolist
         cboperiodos = utilerias.periodos()
-        print(seleccion)
+        
         datos = {
                 'empresa':seleccion,
                 'nombreempresa': config.obtiene_empresa(bytEmpresa, bytSucursal),

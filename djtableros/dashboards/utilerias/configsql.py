@@ -33,5 +33,10 @@ def obtiene_empresasql(bytEmpresa, bytSucursal):
     
     return strempresa
 
+#conexión a BD Marina
+def creaconeccionsqlM():
+    conn = None
+    conn = pymssql.connect(server='10.0.82.10', user='web', password='webadmin', database='Marina')
+    return conn
 
 creaconeccionsql()

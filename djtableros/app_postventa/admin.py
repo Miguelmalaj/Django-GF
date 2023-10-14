@@ -1,6 +1,6 @@
 from django.contrib import admin
-from app_postventa.models import  OpcionMenu, Permisos
-# Register your models here.
+from app_postventa.models import  OpcionMenu, Permisos, Objetivos
+#Register your models here.
 
 
 @admin.register(OpcionMenu)
@@ -17,3 +17,9 @@ class Permisos(admin.ModelAdmin):
         return ", ".join([opcion.nombre for opcion in obj.opciones_menu.all()])
     lista_opciones_menu.short_description = 'Opciones de Menú vta'  # Nombre de la columna en la vista de lista
 
+
+@admin.register(Objetivos)
+class ObjetivoAdmin(admin.ModelAdmin):
+    list_display = ('empresa_sucursal', 'periodo', 'venta_refacciones', 'utilidad_refacciones', 'venta_servicio', 'utilidad_servicio')
+    list_filter = ('empresa_sucursal', 'periodo')
+    search_fields = ('empresa_sucursal', 'periodo')

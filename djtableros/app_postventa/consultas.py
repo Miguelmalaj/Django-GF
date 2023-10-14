@@ -2,7 +2,7 @@
 from dashboards.utilerias import config
 from datetime import datetime, date, timedelta
 import pandas as pd
-from  .utils import calcula_porcentaje_valor
+from  .utils import calcula_porcentaje_valor, obtiene_objetivos
 
 cadillac = 7    # Constante para la empresa cadillac
 
@@ -609,15 +609,40 @@ def obtener_resumenpostventa(bytAgencia, bytSucursal, fechareporte):
         bytEmpresa = 2
 
     periodo = fechareporte
+    strperiodo = str(periodo.year) + str('0' + str(periodo.month))[-2:]
     strempresa = config.obtiene_empresa(bytAgencia, bytSucursal)
 
-    conn = None
-    conn = config.creaconeccion(bytAgencia)
-    c = conn.cursor()
+    # Inicializar datos a regresar
+    datos = {
+        'nombre_empresa': strempresa.nombre_empresa,
+        'empresa': int(bytAgencia), 
+        'sucursal': int(bytSucursal),
+        'utilitotal': 0,
+        'venta_ref': 0,
+        'obj_vref': 0,
+        'porc_vref': 0,
+        'util_ref': 0,
+        'obj_uref':0,
+        'porc_uref': 0,
+        'venta_ser': 0,
+        'obj_vser': 0,
+        'por_vser': 0,
+        'util_ser': 0,
+        'obj_user': 0,
+        'porc_user': 0,
+        'logo': strempresa.logo,
+        'bg': strempresa.bg_color
+        }
     
+    objetivos = obtiene_objetivos(bytAgencia, bytSucursal, strperiodo)
+
     bytSuctemp = 1
     if bytSucursal == 2:
         bytSuctemp = 3
+
+    conn = None
+    conn = config.creaconeccion(bytAgencia)
+    c = conn.cursor()   
 
     strSQL = " SELECT TO_DATE(PEDI_FECHAFACTURA, 'DD/MM/YY') AS FECHA, PEDI_NUMEROFACTURA, PEDI_RAZONFACTURA, PROD_CLAVE, PROD_DESCRIPCION1, CANTIDAD, PRECIO, COSTO, UTILIDAD, "
     strSQL = strSQL + " TIPO_DESCRIPCION, TIPOCTES_DESCRIPCION, DEPTO, CANALVTA "
@@ -633,67 +658,78 @@ def obtener_resumenpostventa(bytAgencia, bytSucursal, fechareporte):
     c.execute(strSQL) 
 
     df = pd.DataFrame.from_records(c)
-    df.columns =["fecha", "factura", "cliente", "codigo", "articulo", "cant", "venta", "costo", "utilidad", "grupo", "tipovta", "depto", "canalvta" ]
+    if not df.empty:
+        df.columns =["fecha", "factura", "cliente", "codigo", "articulo", "cant", "venta", "costo", "utilidad", "grupo", "tipovta", "depto", "canalvta" ]
 
-    # Filtrar los datos por departamentos y tipos de venta
-    df_refacciones = df[df['depto'] == ' REFACCIONES']
+        # Filtrar los datos por departamentos y tipos de venta
+        df_refacciones = df[df['depto'] == ' REFACCIONES']
 
-    # 1. Suma total de la venta y utilidad en REFACCIONES
-    vtaref = df_refacciones['venta'].sum()
-    utilref = df_refacciones['utilidad'].sum()
-    porcref = calcula_porcentaje_valor(utilref, vtaref)
+        # 1. Suma total de la venta y utilidad en REFACCIONES
+        vtaref = df_refacciones['venta'].sum()
+        utilref = df_refacciones['utilidad'].sum()
+        
 
-    strSQL = "SELECT (VS.NOMBRE) AS ASESOR,   (VS.TIOR_DESCRIPCION) as Concepto,  ( 1 )  as Cant,  "
-    strSQL = strSQL + " nvl((VS.FASE_REFACCIONES - VS.FASE_DESCUENTOREFACCIONES),0) AS VtaRef, nvl((VS.FASE_COSTOREFACCIONES),0) AS CtoRef, "
-    strSQL = strSQL + " nvl((VS.FASE_MANOOBRAMECANICO - VS.FASE_DESCUENTOMECANICO),0) as VtaMO, nvl((VS.FASE_COSTOMECANICO),0) as CtoMO,  "
-    strSQL = strSQL + " nvl((VS.FASE_TOTS - VS.FASE_DESCUENTOTOTS + VS.FASE_MATERIALDIVERSO),0) as VtaTOT, nvl((VS.FASE_COSTOTOTS),0) as CtoTOT "
-    strSQL = strSQL + " FROM SE_VFACTURASERVICIOS VS "
-    strSQL = strSQL + " WHERE VS.EMPR_EMPRESAID = " + str(bytEmpresa)
-    strSQL = strSQL + " AND VS.AGEN_IDAGENCIA = " + str(bytSucursal)
-    strSQL = strSQL + " AND (Extract(Month from VS.FASE_FECHA)) = " + str(periodo.month)
-    strSQL = strSQL + " AND (Extract(Year from VS.FASE_FECHA)) =  " + str(periodo.year)
-    strSQL = strSQL + " UNION ALL "
-    strSQL = strSQL + " SELECT (VS.NOMBRE) AS ASESOR,   (VS.TIOR_DESCRIPCION) as Concepto,  ( -1 )  as Cant,  "
-    strSQL = strSQL + " nvl((VS.FASE_REFACCIONES - VS.FASE_DESCUENTOREFACCIONES) * -1, 0) AS VtaRef, nvl((VS.FASE_COSTOREFACCIONES) * -1, 0) AS CtoRef, "
-    strSQL = strSQL + " nvl((VS.FASE_MANOOBRAMECANICO - VS.FASE_DESCUENTOMECANICO) * -1, 0) as VtaMO, nvl((VS.FASE_COSTOMECANICO) * -1, 0) as CtoMO,  "
-    strSQL = strSQL + " nvl((VS.FASE_TOTS - VS.FASE_DESCUENTOTOTS + VS.FASE_MATERIALDIVERSO) * -1, 0) as VtaTOT, nvl((VS.FASE_COSTOTOTS) * -1, 0) as CtoTOT "
-    strSQL = strSQL + " FROM SE_VFACTURASERVICIOS VS "
-    strSQL = strSQL + " WHERE VS.EMPR_EMPRESAID = " + str(bytEmpresa)
-    strSQL = strSQL + " AND VS.AGEN_IDAGENCIA = " + str(bytSucursal)
-    strSQL = strSQL + " AND (Extract(Month from VS.FASE_FECHACANCELACION)) = " + str(periodo.month)
-    strSQL = strSQL + " AND (Extract(Year from VS.FASE_FECHACANCELACION)) =  " + str(periodo.year)
+        strSQL = "SELECT (VS.NOMBRE) AS ASESOR,   (VS.TIOR_DESCRIPCION) as Concepto,  ( 1 )  as Cant,  "
+        strSQL = strSQL + " nvl((VS.FASE_REFACCIONES - VS.FASE_DESCUENTOREFACCIONES),0) AS VtaRef, nvl((VS.FASE_COSTOREFACCIONES),0) AS CtoRef, "
+        strSQL = strSQL + " nvl((VS.FASE_MANOOBRAMECANICO - VS.FASE_DESCUENTOMECANICO),0) as VtaMO, nvl((VS.FASE_COSTOMECANICO),0) as CtoMO,  "
+        strSQL = strSQL + " nvl((VS.FASE_TOTS - VS.FASE_DESCUENTOTOTS + VS.FASE_MATERIALDIVERSO),0) as VtaTOT, nvl((VS.FASE_COSTOTOTS),0) as CtoTOT "
+        strSQL = strSQL + " FROM SE_VFACTURASERVICIOS VS "
+        strSQL = strSQL + " WHERE VS.EMPR_EMPRESAID = " + str(bytEmpresa)
+        strSQL = strSQL + " AND VS.AGEN_IDAGENCIA = " + str(bytSucursal)
+        strSQL = strSQL + " AND (Extract(Month from VS.FASE_FECHA)) = " + str(periodo.month)
+        strSQL = strSQL + " AND (Extract(Year from VS.FASE_FECHA)) =  " + str(periodo.year)
+        strSQL = strSQL + " UNION ALL "
+        strSQL = strSQL + " SELECT (VS.NOMBRE) AS ASESOR,   (VS.TIOR_DESCRIPCION) as Concepto,  ( -1 )  as Cant,  "
+        strSQL = strSQL + " nvl((VS.FASE_REFACCIONES - VS.FASE_DESCUENTOREFACCIONES) * -1, 0) AS VtaRef, nvl((VS.FASE_COSTOREFACCIONES) * -1, 0) AS CtoRef, "
+        strSQL = strSQL + " nvl((VS.FASE_MANOOBRAMECANICO - VS.FASE_DESCUENTOMECANICO) * -1, 0) as VtaMO, nvl((VS.FASE_COSTOMECANICO) * -1, 0) as CtoMO,  "
+        strSQL = strSQL + " nvl((VS.FASE_TOTS - VS.FASE_DESCUENTOTOTS + VS.FASE_MATERIALDIVERSO) * -1, 0) as VtaTOT, nvl((VS.FASE_COSTOTOTS) * -1, 0) as CtoTOT "
+        strSQL = strSQL + " FROM SE_VFACTURASERVICIOS VS "
+        strSQL = strSQL + " WHERE VS.EMPR_EMPRESAID = " + str(bytEmpresa)
+        strSQL = strSQL + " AND VS.AGEN_IDAGENCIA = " + str(bytSucursal)
+        strSQL = strSQL + " AND (Extract(Month from VS.FASE_FECHACANCELACION)) = " + str(periodo.month)
+        strSQL = strSQL + " AND (Extract(Year from VS.FASE_FECHACANCELACION)) =  " + str(periodo.year)
 
-    c.execute(strSQL) 
-    conn.close
+        c.execute(strSQL) 
+        conn.close
 
-    df = pd.DataFrame.from_records(c)
-    df.columns =["asesor", "concepto", "cant", "vtaref", "ctoref", "vtamo", "ctomo", "vtatot", "ctotot"]
+        df = pd.DataFrame.from_records(c)
+        df.columns =["asesor", "concepto", "cant", "vtaref", "ctoref", "vtamo", "ctomo", "vtatot", "ctotot"]
 
-    # Filtrar y calcular utilidades
-    filtro_interna = df["concepto"].str.contains("INTERNA", case=False)
-    df_utilidad_vtamo_ctomo = df[~filtro_interna].copy()
-    df_utilidad_vtamo_ctomo["util"] = df_utilidad_vtamo_ctomo["vtamo"].sum() - df_utilidad_vtamo_ctomo["ctomo"].sum()
-    df_utilidad_vtamo_ctomo["porc"] =  (df_utilidad_vtamo_ctomo["util"] / df_utilidad_vtamo_ctomo["vtamo"].sum()) * 100
+        # Filtrar y calcular utilidades
+        filtro_interna = df["concepto"].str.contains("INTERNA", case=False)
+        df_utilidad_vtamo_ctomo = df[~filtro_interna].copy()
+        utilservicio = df_utilidad_vtamo_ctomo["vtamo"].sum() - df_utilidad_vtamo_ctomo["ctomo"].sum()
+        
+        objvtaref = 0
+        objutilref = 0
+        objvtaser = 0
+        objutilserv = 0
+        if objetivos is not None:
+            objvtaref = objetivos.venta_refacciones
+            objutilref = objetivos.utilidad_refacciones
+            objvtaser = objetivos.venta_servicio
+            objutilserv = objetivos.utilidad_servicio
 
-    datos = {
-        'nombre_empresa': strempresa.nombre_empresa,
-        'empresa': int(bytAgencia), 
-        'sucursal': int(bytSucursal),
-        'utilitotal': 0,
-        'venta_ref': vtaref,
-        'obj_vref': 0,
-        'porc_vref': porcref,
-        'util_ref': utilref,
-        'obj_uref':0,
-        'porc_uref': porcref,
-        'venta_ser': df_utilidad_vtamo_ctomo["vtamo"].sum(),
-        'obj_vser': 0,
-        'por_vser': 0,
-        'util_ser': df_utilidad_vtamo_ctomo["util"],
-        'obj_user': 0,
-        'porc_user': 0,
-        'logo': strempresa.logo,
-        'bg': strempresa.bg_color
-        }
+
+        datos = {
+            'nombre_empresa': strempresa.nombre_empresa,
+            'empresa': int(bytAgencia), 
+            'sucursal': int(bytSucursal),
+            'utilitotal': 0,
+            'venta_ref': vtaref,
+            'obj_vref': objvtaref,
+            'porc_vref': calcula_porcentaje_valor(vtaref, objvtaref),
+            'util_ref': utilref,
+            'obj_uref': objutilref,
+            'porc_uref': calcula_porcentaje_valor(utilref, objutilref),
+            'venta_ser': df_utilidad_vtamo_ctomo["vtamo"].sum(),
+            'obj_vser': objvtaser,
+            'por_vser': calcula_porcentaje_valor(df_utilidad_vtamo_ctomo["vtamo"].sum(), objvtaser),
+            'util_ser': utilservicio,
+            'obj_user': objutilserv,
+            'porc_user': calcula_porcentaje_valor(utilservicio, objutilserv),
+            'logo': strempresa.logo,
+            'bg': strempresa.bg_color
+            }
 
     return datos

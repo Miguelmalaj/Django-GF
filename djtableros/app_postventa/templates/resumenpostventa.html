@@ -71,7 +71,7 @@
                                 <div class="col-sm-2 border-right">
                                     <div class="description-block">
                                         <span class="description-text text-muted">%</span>
-                                        <h5 class="description-header">{{ detalles.porc_vref|floatformat:2|intcomma }}</h5>
+                                        <h5 class="description-header">{{ detalles.porc_vref|floatformat:0|intcomma }} %</h5>
                                     </div>
                                 </div>
                                 <div class="col-sm-2 border-right">
@@ -88,8 +88,8 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <div class="description-block">
-                                        <span class="description-text">%</span>
-                                        <h5 class="description-header">{{ detalles.porc_uref|floatformat:2|intcomma }}</h5>
+                                        <span class="description-text text-muted">%</span>
+                                        <h5 class="description-header">{{ detalles.porc_uref|floatformat:0|intcomma }} %</h5>
                                     </div>
                                 </div>
                                 
@@ -102,49 +102,45 @@
                                 
                                 <div class="col-sm-2 border-right">
                                     <div class="description-block">
-                                    <h5 class="description-header">{{ detalles.propios_nu }}</h5>
-                                    <span class="description-text">Venta</span>
+                                    <span class="description-text text-muted">Ventas</span>
+                                    <h5 class="description-header">{{ detalles.venta_ser|floatformat:0|intcomma }}</h5>
                                     </div>
                                 </div>
                                 <div class="col-sm-2 border-right">
                                     <div class="description-block">
-                                    <h5 class="description-header">{{ detalles.propios_de }}</h5>
-                                    <span class="description-text">Objetivo</span>
+                                    <span class="description-text text-muted">Objetivo</span>
+                                    <h5 class="description-header">{{ detalles.obj_vser|floatformat:0|intcomma }}</h5>
+                                    
                                     </div>
                                 </div>
                                 <div class="col-sm-2 border-right">
                                     <div class="description-block">
-                                    <h5 class="description-header">{{ detalles.propios_us }}</h5>
-                                    <span class="description-text">%</span>
+                                    <span class="description-text text-muted">%</span>
+                                    <h5 class="description-header">{{ detalles.por_vser|floatformat:0|intcomma }} %</h5>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-2 border-right">
                                     <div class="description-block">
-                                    <h5 class="description-header">{{ detalles.propios_nu }}</h5>
-                                    <span class="description-text">Utilidad</span>
+                                    <span class="description-text text-muted">Utilidad</span>
+                                    <h5 class="description-header">{{ detalles.util_ser|floatformat:0|intcomma }}</h5>
                                     </div>
                                 </div>
                                 <div class="col-sm-2 border-right">
                                     <div class="description-block">
-                                    <h5 class="description-header">{{ detalles.propios_de }}</h5>
-                                    <span class="description-text">Objetivo</span>
+                                    <span class="description-text text-muted">Objetivo</span>
+                                    <h5 class="description-header">{{ detalles.obj_user|floatformat:0|intcomma }}</h5>
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
                                     <div class="description-block">
-                                    <h5 class="description-header">{{ detalles.propios_us }}</h5>
-                                    <span class="description-text">%</span>
+                                    <span class="description-text text-muted">%</span>
+                                    <h5 class="description-header">{{ detalles.porc_user|floatformat:0|intcomma }} %</h5>
                                     </div>
                                 </div>
                                 
                             </div>
-                            <!-- seccion para mostrar el link para el detalle -->
-                            <div class="col-sm-12 border-top d-flex justify-content-around">
-                                {% if detalles.empresa and detalles.sucursal %}
-                                <small class="mt-2"><a name="botonmostrardetalle" href="{% url 'inventario_detalle' detalles.empresa detalles.sucursal %}">Mostrar Detalle <i class="fas fa-arrow-alt-circle-right"></i></a></small>
-                                {% endif %}
-                            </div>
+                            
                         </div>
                     </div>
 
@@ -155,75 +151,7 @@
         </div>		
         
     </div>
-    {% for empresa, detalles in datos.items %}
-            {% for rango, detalle in detalles.items %}
-                {% if "detalle" in rango %}
-                    <!-- Ciclo para recorrer los detalles y crear los modales para cada vencimiento de cada empresa -->
-                    <div class="modal fade" id="{{ empresa }}_{{ rango }}_modal" tabindex="-1" role="dialog" aria-labelledby="{{ empresa }}_{{ rango }}_label" aria-hidden="true">
-                        <div class="modal-dialog modal-xl" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="{{ empresa }}_{{ rango }}_label">{{ detalles.nombre_empresa }} - {{ rango|replace:"detalle, " }} días</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <table id="{{ empresa }}_{{ rango }}" class="table table-sm ">
-                                        <thead>
-                                            <tr style="font-size: 12px">
-                                                <th>Inv.</th>
-                                                <th>Descrpcion</th>
-                                                <th>Paq.</th>
-                                                <th>Serie</th>
-                                                <th>F.Asig.</th>
-                                                <th>F.Interes</th>
-                                                <th>Dias</th>
-                                                <th>Modelo</th>
-                                                <th>Ubicacion</th>
-                                                <th>Observaciones</th>
-                                                <th style='font-size: 12px; text-align: right'>Saldo GMF</th>
-                                                <th style='font-size: 12px; text-align: right'>Costo</th>
-                                                {% if datos.nombrempresa == 'CONSOLIDADO' %}
-                                                    <th>Agencia</th>
-                                                {% endif %}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for row in detalle %}
-                                                <tr>
-                                                    <tr style="font-size: 12px">
-                                                        <td style='font-size: 12px'>{{ row.inv }}</td>
-                                                        <td style='font-size: 12px'>{{ row.descm }}</td>
-                                                        <td style='font-size: 12px'>{{ row.paq }}</td>
-                                                        <td style='font-size: 12px'>{{ row.vin }}</td>
-                                                        <td style='font-size: 12px'>{{ row.fasignacion }}</td>
-                                                        <td style='font-size: 12px'>{{ row.finteres }}</td>
-                                                        <td style='font-size: 12px'>{{ row.diaspp }}</td>
-                                                        <td style='font-size: 12px'>{{ row.modelo }}</td>
-                                                        <td style='font-size: 12px'>{{ row.ubicacion }}</td>
-                                                        <td style='font-size: 12px'>{{ row.observaciones }}</td>
-                                                        <td style='font-size: 12px; text-align: right'>{{ row.saldopp|floatformat:0|intcomma }}</td>
-                                                        <td style='font-size: 12px; text-align: right'>{{ row.costo|floatformat:0|intcomma }}</td>
-                                                        {% if datos.nombrempresa == 'CONSOLIDADO' %}
-                                                        <td style='font-size: 12px'>{{ row.agencia }}</td>
-                                                        {% endif %}
-                                                    </tr>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-
-    {% endfor %}
+    
 </div>
 {% endblock %}
 

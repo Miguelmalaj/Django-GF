@@ -90,7 +90,8 @@ def obtiene_afluencia(bytEmpresa, bytSucursal, mes, periodo, fechahoy):
         'contratos': intContratos
     }
 
-    strperiodo = str(periodo) + str('0' + str(mes))[:2]
+    strperiodo = str(periodo) + str('0' + str(mes))[-2:]
+
     objetivos = {
             'periodo': strperiodo,
             'afluencia': 0,
