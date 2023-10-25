@@ -1,0 +1,10 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('cxcautoleasing', views.cxcautoleasing, name='cxcautoleasing'),
+    path('cxcautoleasing_pdf', views.cxcautoleasing_pdf, name='cxcautoleasing_pdf'),
+    path('inmobiliaria', views.inmobiliaria, name='inmobiliaria'),
+    path('inmobiliaria_detalle', views.inmobiliaria_detalle, name='inmobiliaria_detalle'),
+]

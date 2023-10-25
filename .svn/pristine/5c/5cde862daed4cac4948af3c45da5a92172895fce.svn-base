@@ -16,13 +16,6 @@ def creaconeccionsql():
     
     return conn
 
-def creaconeccionsql_corp():
-    conn = None
-    
-    conn = pymssql.connect(server='10.10.10.253', user='web', password='webadmin', database='Corporativo')
-    
-    return conn
-
 def obtiene_empresasql(bytEmpresa, bytSucursal):
     if bytEmpresa== 1:
         strempresa= "FELIX AUTOMOTORES"

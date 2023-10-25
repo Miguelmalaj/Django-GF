@@ -1,0 +1,58 @@
+from dashboards.utilerias import configsql
+from datetime import datetime
+import pandas as pd
+
+def detalle_cuentasxcobrar(bytAgencia, bytSucursal, dateSelected):
+    """
+    Obtiene el resumen de las cuentas x cobrar de corporativo
+    """
+
+    conn = None
+    # Crea conexión a BD.
+    conn = configsql.creaconeccionsql_corp()
+
+    # Crea un cursor.
+    c = conn.cursor()
+
+    proc_almacenado = "spx_Cuentas_Cobrar_tableros"
+    # tstdate = '2023-10-17'
+    # fecha = dateSelected.strftime("%Y-%m-%d")
+
+    c.callproc(proc_almacenado, (bytAgencia, bytSucursal, dateSelected))
+
+    resultados = c.fetchall()
+
+    c.close()
+    conn.close()
+
+    cxcautoleasing = pd.DataFrame.from_records(resultados)
+
+    cxcautoleasing.columns = ['cliente', 'nombre', 'importe', 'totalcxc', 'vigente', '30','60', '90', 'mas_90', 'totalvencido']
+
+    # Agrupar el DataFrame df_totals por numero
+    df_grouped_totals = cxcautoleasing.groupby(['cliente']).agg({
+        'nombre': 'first',  # Tomar el primer valor del nombre
+        'importe': 'sum',
+        'totalcxc': 'sum',
+        'vigente': 'sum',
+        '30': 'sum',
+        '60': 'sum',
+        '90': 'sum',
+        'mas_90': 'sum',
+        'totalvencido': 'sum'
+    }).reset_index()
+
+    # Calcular los totales para la fila "TOTAL"
+    total_row = df_grouped_totals.drop(['cliente'], axis=1).sum().fillna(0)
+    total_row['nombre'] = 'TOTAL CARTERA'  # Agregar el nombre "TOTAL"
+
+    # Crear un DataFrame con la fila "TOTAL"
+    df_total_row = pd.DataFrame([total_row], columns=df_grouped_totals.columns)
+
+    # Concatenar df_grouped_totals y df_total_row
+    df_final = pd.concat([df_grouped_totals, df_total_row], ignore_index=True).fillna(' ')
+
+    # Ordenar primero por la columna 'Edad' de forma descendente y luego por 'Puntuación' de forma ascendente
+    df_final = df_final.sort_values(by=['totalvencido', 'totalcxc'], ascending=[False, False])
+
+    return df_final

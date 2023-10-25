@@ -105,7 +105,7 @@
             <li class="nav-item has-treeview {% if '/astilleros/' in request.path %}menu-open{% else %} {% endif %}">
                 <a href="#" class="{% if '/astilleros/' in request.path %}nav-link active{% else %}nav-link{% endif %}">
                     <i class="nav-icon fas fa-ship"></i>
-                    <p>Astilleros Marina</p>
+                    <p>Astilleros</p>
                 </a>
                 <ul class="nav nav-treeview">
                     {% for opcion in request.session.opciones_menu.astilleros %}

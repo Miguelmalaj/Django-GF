@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block page_actions %}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row mb-2">
+
+    <div class="col-12">
+
+        <div class="card card-outline card-lightblue">
+
+            <div class="card-header">
+
+                <div class="d-flex justify-content-between">
+
+                    <h3 class="card-title"><i class="fas {{ datos.opcionmenu.icono }}"></i> Detalle {{ datos.opcionmenu }} | {{ datos.nombreempresa }} </h3>             
+                
+                    <div class="d-flex justify-content-between">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div><!-- /.col -->
+
+</div><!-- /.row -->
+
+
+<div class="card card-outline card-lightblue">
+    <div class="card-header">			
+        <div class="row">
+            <div class="col-12 col-sm-12">
+                <div class="card card-lightblue direct-chat direct-chat-lightblue table-responsive">
+                    
+                    <table id="inventarioveh" class="table table-sm table-hover text-nowrap">
+                        <thead>
+                            <tr style="font-size: 12px">
+                                <th>Tipo</th>
+                                <th>Activo</th>
+                                <th>Propietario</th>
+                                <th>Cliente</th>
+                                <th>Vigencia</th>
+                                <th style='font-size: 12px; text-align: right'>Monto</th>
+                                <th style='font-size: 12px; text-align: right'>Periodicidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in datos.df_ocupacion_detalle %}
+                                <tr style="font-size: 12px">
+                                    <td style='font-size: 12px'>{{ row.Tipo }}</td>
+                                    <td style='font-size: 12px'>{{ row.Activo }}</td>
+                                    <td style='font-size: 12px'>{{ row.Propietario }}</td>
+                                    <td style='font-size: 12px'>{{ row.Cliente }}</td>
+                                    <td style='font-size: 12px'>{{ row.Vigencia }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.Monto|floatformat:0|intcomma }}</td>
+                                    <td style='font-size: 12px; text-align: right'>{{ row.Periodicidad }}</td>
+                                </tr>
+                            {% endfor %} 
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    $(function () {
+      
+      $("#inventarioveh").DataTable({
+        "ordering": true,
+        "order":[[6, "desc"]],
+        "responsive": true,
+        "autoWidth": false,
+        "searching":true,
+        "lengthChange": false,
+        "paginate": false,
+      });
+      
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,135 @@
+from dashboards.utilerias import configsql
+from datetime import datetime
+import pandas as pd
+
+def detalle_cuentasxcobrar(bytAgencia, bytSucursal, dateSelected):
+    """
+    Obtiene el resumen de las cuentas x cobrar de corporativo
+    """
+
+    conn = None
+    # Crea conexión a BD.
+    conn = configsql.creaconeccionsql_corp()
+
+    # Crea un cursor.
+    c = conn.cursor()
+
+    proc_almacenado = "spx_Cuentas_Cobrar_tableros"
+
+    c.callproc(proc_almacenado, (bytAgencia, bytSucursal, dateSelected))
+
+    resultados = c.fetchall()
+
+    c.close()
+    conn.close()
+
+    cxcautoleasing = pd.DataFrame.from_records(resultados)
+
+    cxcautoleasing.columns = ['cliente', 'nombre', 'importe', 'totalcxc', 'vigente', '30','60', '90', 'mas_90', 'totalvencido']
+
+    # Agrupar el DataFrame df_totals por numero
+    df_grouped_totals = cxcautoleasing.groupby(['cliente']).agg({
+        'nombre': 'first',  # Tomar el primer valor del nombre
+        'importe': 'sum',
+        'totalcxc': 'sum',
+        'vigente': 'sum',
+        '30': 'sum',
+        '60': 'sum',
+        '90': 'sum',
+        'mas_90': 'sum',
+        'totalvencido': 'sum'
+    }).reset_index()
+
+    # Calcular los totales para la fila "TOTAL"
+    total_row = df_grouped_totals.drop(['cliente'], axis=1).sum().fillna(0)
+    total_row['nombre'] = 'TOTAL CARTERA'  # Agregar el nombre "TOTAL"
+
+    # Crear un DataFrame con la fila "TOTAL"
+    df_total_row = pd.DataFrame([total_row], columns=df_grouped_totals.columns)
+
+    # Concatenar df_grouped_totals y df_total_row
+    df_final = pd.concat([df_grouped_totals, df_total_row], ignore_index=True).fillna(' ')
+
+    # Ordenar primero por la columna 'Edad' de forma descendente y luego por 'Puntuación' de forma ascendente
+    df_final = df_final.sort_values(by=['totalvencido', 'totalcxc'], ascending=[False, False])
+
+    return df_final
+
+
+def detalle_inmobiliaria():
+    """
+    Obtiene el resumen de las cuentas x cobrar de corporativo
+    """
+
+    conn = None
+    # Crea conexión a BD.
+    conn = configsql.creaconeccionsql_corp()
+
+    # Crea un cursor.
+    c = conn.cursor()
+
+    proc_almacenado = "spA_Activos_Ocupacion"
+
+    # Ocupación Plazas. Parámetros : 1, 11
+    c.callproc(proc_almacenado, (1, 11))
+
+    ocupacion_plazas = c.fetchall()
+
+    # Ocupación Otros Inmuebles. Parámetros : 2, 0
+    c.callproc(proc_almacenado, (2, 0))
+
+    ocupacion_otros_inmuebles = c.fetchall()
+
+    c.close()
+    conn.close()
+
+    # DataFrame Ocupación Plazas
+    df_ocupacion_plazas = pd.DataFrame.from_records(ocupacion_plazas)
+
+    df_ocupacion_plazas.columns = ['Descripcion', 'Total', 'Ocupados']
+
+    fila_total = pd.Series({
+        'Descripcion': 'TOTAL',
+        'Total': df_ocupacion_plazas['Total'].sum(),
+        'Ocupados': df_ocupacion_plazas['Ocupados'].sum(),
+    })
+
+    df_ocupacion_plazas.to_dict()
+
+    # Agregar fila con los totales
+    df_ocupacion_plazas.loc[len(df_ocupacion_plazas)] = fila_total
+
+    # Agregar columna con Disponibles
+    df_ocupacion_plazas['Disponibles'] = df_ocupacion_plazas.apply(lambda row: (row['Total'] - row['Ocupados'] ), axis=1)
+
+    # Agregar columna con el porcentaje
+    df_ocupacion_plazas['Porcentaje'] = df_ocupacion_plazas.apply(lambda row: (row['Ocupados'] / row['Total']) * 100 if row['Total'] != 0 else 0, axis=1)
+
+    df_ocupacion_plazas['Porcentaje'] = pd.to_numeric(df_ocupacion_plazas['Porcentaje'], errors='coerce').round()
+
+
+    # DataFrame Ocupación Plazas
+    df_ocupacion_otros_inmuebles = pd.DataFrame.from_records(ocupacion_otros_inmuebles)
+
+    df_ocupacion_otros_inmuebles.columns = ['Descripcion', 'Total', 'Ocupados']
+
+    fila_total = pd.Series({
+        'Descripcion': 'TOTAL',
+        'Total': df_ocupacion_otros_inmuebles['Total'].sum(),
+        'Ocupados': df_ocupacion_otros_inmuebles['Ocupados'].sum(),
+    })
+
+    df_ocupacion_otros_inmuebles.to_dict()
+
+    # Agregar fila con los totales
+    df_ocupacion_otros_inmuebles.loc[len(df_ocupacion_otros_inmuebles)] = fila_total
+
+    # Agregar columna con Disponibles
+    df_ocupacion_otros_inmuebles['Disponibles'] = df_ocupacion_otros_inmuebles.apply(lambda row: (row['Total'] - row['Ocupados'] ), axis=1)
+
+    # Agregar columna con el porcentaje.
+    df_ocupacion_otros_inmuebles['Porcentaje'] = df_ocupacion_otros_inmuebles.apply(lambda row: (row['Ocupados'] / row['Total']) * 100 if row['Total'] != 0 else 0, axis=1)
+
+    df_ocupacion_otros_inmuebles['Porcentaje'] = pd.to_numeric(df_ocupacion_otros_inmuebles['Porcentaje'], errors='coerce').round()
+
+    return df_ocupacion_plazas, df_ocupacion_otros_inmuebles
